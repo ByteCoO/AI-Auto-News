@@ -1,6 +1,9 @@
-import { redirect } from "next/navigation";
+import Navbar from './components/Navbar';
 
 export default function Home() {
-  redirect("/news");
-  return null;
+  return (
+    <>
+      <Navbar />
+    </>
+  );
 }
