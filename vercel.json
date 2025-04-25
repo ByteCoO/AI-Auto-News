@@ -1,9 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/news",
-      "permanent": true
-    }
-  ]
+  "redirects": []
 }
