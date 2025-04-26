@@ -1,5 +1,6 @@
 import { supabase } from '../../lib/supabase'; // 確保路徑正確
 import Link from 'next/link'; // 導入 Link 組件
+import NewsDetailClient from './NewsDetailClient'; // 导入新的客户端组件
 
 interface NewsItem {
   id: number;
@@ -45,7 +46,7 @@ async function fetchNewsDetail(id: string): Promise<NewsItem | null> {
   }
 }
 
-// 這是服務器組件，不需要 'use client'
+// 這是服務器組件，保持不变
 export default async function NewsDetailPage({ params }: { params: { id: string } }) {
   const id = params?.id;
 
@@ -93,27 +94,6 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     );
   }
 
-  // 成功獲取數據，渲染頁面
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="container mx-auto max-w-3xl bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          {newsItem.News?.title || '无标题'}
-        </h1>
-        <div className="text-sm text-gray-500 mb-6">
-          发布时间: {new Date(newsItem.created_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-        </div>
-        {/* 確保內容正確渲染，如果內容是 HTML，需要特殊處理 */} 
-        <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
-          {/* 如果 content 包含 HTML，使用 dangerouslySetInnerHTML (注意安全風險) */} 
-          {/* <div dangerouslySetInnerHTML={{ __html: newsItem.News?.content || '暂无内容' }} /> */}
-          {/* 如果 content 是純文本 */}
-          <p>{newsItem.News?.content || '暂无内容'}</p>
-        </div>
-        <div className="mt-8 pt-6 border-t border-gray-200">
-           <Link href="/news" className="text-blue-600 hover:underline">&larr; 返回新聞列表</Link>
-        </div>
-      </div>
-    </div>
-  );
+  // 成功獲取數據，渲染客户端组件并传递数据
+  return <NewsDetailClient newsItem={newsItem} />;
 }
