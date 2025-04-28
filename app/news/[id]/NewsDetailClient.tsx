@@ -10,6 +10,7 @@ interface NewsItem {
   News: {
     title?: string;
     content?: string;
+    zh_body?: string;
   } | null;
 }
 
@@ -22,7 +23,12 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
   const [isLoadingTTS, setIsLoadingTTS] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [ttsError, setTtsError] = useState<string | null>(null);
+  const [audioUrlZh, setAudioUrlZh] = useState<string | null>(null);
+  const [isLoadingTTSZh, setIsLoadingTTSZh] = useState<boolean>(false);
+  const [isPlayingZh, setIsPlayingZh] = useState<boolean>(false);
+  const [ttsErrorZh, setTtsErrorZh] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRefZh = useRef<HTMLAudioElement>(null);
 
   const handlePlayTTS = async () => {
     if (!newsItem.News?.content) {
@@ -78,6 +84,49 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
     }
   };
 
+  const handlePlayTTSZh = async () => {
+    if (!newsItem.News?.zh_body) {
+      setTtsErrorZh('没有可播报的内容。');
+      return;
+    }
+
+    setIsLoadingTTSZh(true);
+    setTtsErrorZh(null);
+    setAudioUrlZh(null);
+    setIsPlayingZh(false);
+    const filename = `news_${newsItem.id}_zh_${Date.now()}`;
+    const textToSpeak = newsItem.News.zh_body;
+
+    try {
+      const response = await fetch('/api/tts-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: textToSpeak,
+          name: filename,
+          voice: "zh-CN-XiaoxiaoNeural",
+          rate: "-4%",
+          volume: "+0%",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: '无法解析代理错误信息' }));
+        throw new Error(`代理 API 错误: ${response.status} ${response.statusText} - ${errorData.message || ''}`);
+      }
+
+      const generatedAudioUrl = `https://fond-nina-ballpo-dba04486.koyeb.app/files/${filename}.mp3`;
+      setAudioUrlZh(generatedAudioUrl);
+    } catch (error) {
+      console.error("TTS 请求失败 (通过代理):", error);
+      setTtsErrorZh(error instanceof Error ? error.message : '生成语音时发生未知错误。');
+    } finally {
+      setIsLoadingTTSZh(false);
+    }
+  };
+
   // 当 audioUrl 更新后，尝试播放音频
   useEffect(() => {
     if (audioUrl && audioRef.current) {
@@ -89,6 +138,18 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
       });
     }
   }, [audioUrl]);
+
+  // 当 audioUrlZh 更新后，尝试播放音频
+  useEffect(() => {
+    if (audioUrlZh && audioRefZh.current) {
+      audioRefZh.current.load();
+      audioRefZh.current.play().catch(e => {
+         console.error("音频播放失败:", e);
+         setTtsErrorZh("无法自动播放音频，请手动点击播放。");
+         setIsPlayingZh(false); // 确保状态正确
+      });
+    }
+  }, [audioUrlZh]);
 
   // 更新播放状态
   useEffect(() => {
@@ -103,13 +164,30 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
     audioElement.addEventListener('pause', handlePause);
     audioElement.addEventListener('ended', handleEnded);
 
-    // 清理事件监听器
     return () => {
       audioElement.removeEventListener('play', handlePlay);
       audioElement.removeEventListener('pause', handlePause);
       audioElement.removeEventListener('ended', handleEnded);
     };
-  }, []); // 空依赖数组，仅在挂载和卸载时运行
+  }, []);
+
+  useEffect(() => {
+    const audioElementZh = audioRefZh.current;
+    if (!audioElementZh) return;
+
+    const handlePlay = () => setIsPlayingZh(true);
+    const handlePause = () => setIsPlayingZh(false);
+    const handleEnded = () => setIsPlayingZh(false);
+
+    audioElementZh.addEventListener('play', handlePlay);
+    audioElementZh.addEventListener('pause', handlePause);
+    audioElementZh.addEventListener('ended', handleEnded);
+    return () => {
+      audioElementZh.removeEventListener('play', handlePlay);
+      audioElementZh.removeEventListener('pause', handlePause);
+      audioElementZh.removeEventListener('ended', handleEnded);
+    };
+  }, []);
 
   const togglePlayPause = () => {
     if (!audioRef.current) return;
@@ -117,6 +195,15 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
       audioRef.current.pause();
     } else {
        audioRef.current.play().catch(e => console.error("手动播放失败:", e));
+    }
+  };
+
+  const togglePlayPauseZh = () => {
+    if (!audioRefZh.current) return;
+    if (isPlayingZh) {
+      audioRefZh.current.pause();
+    } else {
+       audioRefZh.current.play().catch(e => console.error("手动播放失败:", e));
     }
   };
 
@@ -136,32 +223,40 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
           <button
             onClick={handlePlayTTS}
             disabled={isLoadingTTS || !newsItem.News?.content}
-            className={`px-4 py-2 rounded text-white font-semibold mr-4 ${
-              isLoadingTTS
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-            } disabled:opacity-50`}
+            className={`px-4 py-2 rounded text-white font-semibold mr-4 ${isLoadingTTS ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} disabled:opacity-50`}
           >
-            {isLoadingTTS ? '正在生成语音...' : '生成并播放语音'}
+            {isLoadingTTS ? '正在生成语音...' : '生成并播放原文语音'}
           </button>
-
-          {/* 播放/暂停按钮 (仅当有音频 URL 时显示) */}
           {audioUrl && (
-             <button
-               onClick={togglePlayPause}
-               className={`px-4 py-2 rounded text-white font-semibold ${
-                 isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'
-               }`}
-             >
-               {isPlaying ? '暂停' : '播放'}
-             </button>
+            <button
+              onClick={togglePlayPause}
+              className={`px-4 py-2 rounded text-white font-semibold mr-4 ${isPlaying ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'}`}
+            >
+              {isPlaying ? '暂停' : '播放'}
+            </button>
           )}
-
           {ttsError && <p className="text-red-500 text-sm mt-2">{ttsError}</p>}
+          <button
+            onClick={handlePlayTTSZh}
+            disabled={isLoadingTTSZh || !newsItem.News?.zh_body}
+            className={`px-4 py-2 rounded text-white font-semibold mr-4 ${isLoadingTTSZh ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} disabled:opacity-50`}
+          >
+            {isLoadingTTSZh ? '正在生成语音...' : '生成并播放译文语音'}
+          </button>
+          {audioUrlZh && (
+            <button
+              onClick={togglePlayPauseZh}
+              className={`px-4 py-2 rounded text-white font-semibold ${isPlayingZh ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'}`}
+            >
+              {isPlayingZh ? '暂停' : '播放'}
+            </button>
+          )}
+          {ttsErrorZh && <p className="text-red-500 text-sm mt-2">{ttsErrorZh}</p>}
         </div>
 
         {/* 音频播放器 (可以隐藏) */}
         <audio ref={audioRef} src={audioUrl || undefined} className="w-full mt-4" controls></audio>
+        <audio ref={audioRefZh} src={audioUrlZh || undefined} className="w-full mt-4" controls></audio>
         {/* 如果不想显示播放器控件，可以移除 controls 属性，或者用 CSS 隐藏 */}
         {/* <audio ref={audioRef} src={audioUrl || undefined} style={{ display: 'none' }}></audio> */}
 
@@ -169,6 +264,12 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
         {/* 新闻内容 */}
         <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed mt-4">
           <p>{newsItem.News?.content || '暂无内容'}</p>
+          {newsItem.News?.zh_body && (
+            <div className="mt-4 p-4 bg-gray-100 rounded">
+              <div className="font-semibold text-gray-700 mb-2">译文：</div>
+              <p>{newsItem.News.zh_body}</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
