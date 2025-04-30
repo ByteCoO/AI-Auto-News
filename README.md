@@ -1,3 +1,13 @@
+MCP AI Agent: 
+Last News:
+
+《金融时报》
+《路透社》
+https://www.ft.com/
+https://www.reuters.com/
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
