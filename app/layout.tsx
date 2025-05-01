@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { ThemeProvider } from './providers/ThemeProvider';
+import Footer from './components/Footer';
 
 export const metadata: Metadata = {
   title: 'GameVerse',
@@ -21,6 +22,7 @@ export default function RootLayout({
       </head>
       <body className="font-inter transition-colors duration-200 bg-white dark:bg-[#121212]" suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>
+        <Footer />
       </body>
     </html>
   );
