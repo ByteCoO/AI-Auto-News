@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { supabase } from '../lib/supabase'; // 确保路径正确
 import NewsList from './NewsList'; // 導入新的客戶端組件
 import Link from 'next/link'; // 导入 Link 组件
@@ -5,6 +6,11 @@ import Link from 'next/link'; // 导入 Link 组件
 // 添加这一行来强制动态渲染，确保数据总是最新的
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // <--- 添加这一行来禁用缓存
+
+export const metadata: Metadata = {
+  title: '新闻中心 - 最新动态与资讯',
+  description: '浏览我们的新闻中心，获取最新的公司动态、行业资讯和深度分析。',
+};
 // console.log('[NewsPage Server] Module loaded (this logs once per server start/reload)'); // Can be noisy
 
 interface NewsItem {

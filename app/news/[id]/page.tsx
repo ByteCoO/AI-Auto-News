@@ -1,6 +1,7 @@
 import { supabase } from '../../lib/supabase'; // 確保路徑正確
 import Link from 'next/link'; // 導入 Link 組件
 import NewsDetailClient from './NewsDetailClient'; // 导入新的客户端组件
+import { Metadata, ResolvingMetadata } from 'next';
 
 interface NewsItem {
   id: number;
@@ -23,15 +24,12 @@ async function fetchNewsDetail(id: string): Promise<NewsItem | null> {
     if (fetchError) {
       console.error("Supabase fetch detail error:", fetchError);
       if (fetchError.code === 'PGRST116') { // PostgREST code for 'Searched item was not found'
-         // 返回 null 表示未找到，讓組件處理
          return null;
       } else {
-         // 對於其他錯誤，可以拋出以便 Next.js 捕獲或顯示錯誤頁面
          throw new Error(`Supabase Error: ${fetchError.message}`);
       }
     }
 
-    // 如果 data 為空（理論上 single() 錯誤會先捕獲，但以防萬一）
     if (!data) {
       return null;
     }
@@ -40,18 +38,67 @@ async function fetchNewsDetail(id: string): Promise<NewsItem | null> {
 
   } catch (err) {
      console.error("Error fetching news detail:", err);
-     // 在服務器端，通常會讓錯誤冒泡，由 Next.js 處理
-     // 或者你可以返回一個特定的錯誤狀態或 null
-     throw err; // 重新拋出錯誤
+     throw err;
   }
 }
 
-// 這是服務器組件，保持不变
-export default async function NewsDetailPage({ params }: { params: { id: string } }) {
+type Props = {
+  params: { id: string };
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.id;
+  if (!id) {
+    return {
+      title: '无效的新闻ID',
+      description: '请求的新闻ID无效或不存在。',
+    };
+  }
+
+  try {
+    const newsItem = await fetchNewsDetail(id);
+
+    if (!newsItem || !newsItem.News) {
+      return {
+        title: '新闻未找到',
+        description: `ID为 ${id} 的新闻未找到。`,
+      };
+    }
+
+    const title = newsItem.News.title || '无标题新闻';
+    // 截取部分内容作为描述，避免过长
+    const description = newsItem.News.content
+      ? newsItem.News.content.substring(0, 160) + (newsItem.News.content.length > 160 ? '...' : '')
+      : '阅读完整新闻内容。';
+
+    return {
+      title: `${title} - 新闻详情`,
+      description: description,
+      openGraph: {
+        title: `${title} - 新闻详情`,
+        description: description,
+        type: 'article',
+        publishedTime: newsItem.created_at,
+        // images: [{ url: 'URL_TO_IMAGE' }], // 可选：添加新闻图片URL
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata for news detail:', error);
+    return {
+      title: '新闻详情加载错误',
+      description: '加载新闻详情元数据时发生错误。',
+    };
+  }
+}
+
+// 這是服務器組件
+export default async function NewsDetailPage({ params }: Props) {
   const id = params?.id;
 
   if (!id) {
-    // 可以在這裡返回一個提示無效 ID 的組件
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4 flex justify-center items-center">
         <div className="text-center text-red-500">無效的新聞 ID。</div>
@@ -69,7 +116,6 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     error = err instanceof Error ? err.message : '獲取新聞詳情失敗';
   }
 
-  // 處理錯誤狀態
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 px-4 flex justify-center items-center">
@@ -82,7 +128,6 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     );
   }
 
-  // 處理未找到新聞的狀態
   if (!newsItem) {
      return (
       <div className="min-h-screen bg-gray-50 py-8 px-4 flex justify-center items-center">
@@ -94,6 +139,36 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
     );
   }
 
-  // 成功獲取數據，渲染客户端组件并传递数据
-  return <NewsDetailClient newsItem={newsItem} />;
+  // JSON-LD Structured Data
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: newsItem.News?.title || '无标题新闻',
+    datePublished: newsItem.created_at,
+    dateModified: newsItem.created_at, // Assuming same as published if no modified date
+    description: newsItem.News?.content ? newsItem.News.content.substring(0, 250) + (newsItem.News.content.length > 250 ? '...' : '') : '阅读完整新闻内容。',
+    // image: ['URL_TO_IMAGE_1', 'URL_TO_IMAGE_2'], // 可选：添加新闻图片URL
+    author: {
+      '@type': 'Organization', // Or 'Person' if applicable
+      name: '您的组织名称' // 替换为您的组织或作者名称
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: '您的组织名称',
+      // logo: { // 可选
+      //   '@type': 'ImageObject',
+      //   url: 'URL_TO_YOUR_LOGO'
+      // }
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <NewsDetailClient newsItem={newsItem} />
+    </>
+  );
 }

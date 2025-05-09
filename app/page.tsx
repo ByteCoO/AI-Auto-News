@@ -1,9 +1,22 @@
 import PopularSection from './components/PopularSection';
 import Header from './components/Header';
 import LatestNews from './components/LatestNews';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: '首页 - 我们的网站',
+  description: '欢迎来到我们的网站。发现最新新闻、热门内容和更多信息。',
+  // 可以添加更多元数据，例如 keywords, openGraph 等
+  // keywords: ['关键词1', '关键词2'],
+  // openGraph: {
+  //   title: '首页 - 我们的网站',
+  //   description: '欢迎来到我们的网站。发现最新新闻、热门内容和更多信息。',
+  //   // images: [{ url: '/path/to/home-image.jpg' }],
+  // },
+};
 
 export default async function Home() {
   return (
