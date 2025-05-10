@@ -146,7 +146,7 @@ export default async function NewsDetailPage({ params }: Props) {
     headline: newsItem.News?.title || '无标题新闻',
     datePublished: newsItem.created_at,
     dateModified: newsItem.created_at, // Assuming same as published if no modified date
-    description: newsItem.News?.content ? newsItem.News.content.substring(0, 250) + (newsItem.News.content.length > 250 ? '...' : '') : '阅读完整新闻内容。',
+    description: typeof newsItem.News?.content === 'string' ? newsItem.News.content.substring(0, 250) + (newsItem.News.content.length > 250 ? '...' : '') : '阅读完整新闻内容。',
     // image: ['URL_TO_IMAGE_1', 'URL_TO_IMAGE_2'], // 可选：添加新闻图片URL
     author: {
       '@type': 'Organization', // Or 'Person' if applicable
