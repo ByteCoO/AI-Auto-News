@@ -70,9 +70,20 @@ export async function generateMetadata(
 
     const title = newsItem.News.title || '无标题新闻';
     // 截取部分内容作为描述，避免过长
-    const description = newsItem.News.content
-      ? newsItem.News.content.substring(0, 160) + (newsItem.News.content.length > 160 ? '...' : '')
-      : '阅读完整新闻内容。';
+    let description = '阅读完整新闻内容。'; // Default description
+    if (newsItem.News && newsItem.News.content) { // Check if content exists
+      if (typeof newsItem.News.content === 'string' && newsItem.News.content.trim() !== '') {
+        const contentStr = newsItem.News.content;
+        description = contentStr.substring(0, 160) + (contentStr.length > 160 ? '...' : '');
+      } else {
+        // Content exists but is not a non-empty string
+        console.warn(`[generateMetadata] News content for ID ${id} (newsItem.News.content) is present but not a non-empty string. Type: ${typeof newsItem.News.content}, Value:`, newsItem.News.content);
+        description = '暂无有效描述或内容格式不正确。';
+      }
+    } else {
+      // newsItem.News is null/undefined OR newsItem.News.content is null/undefined
+      description = '暂无内容描述。';
+    }
 
     return {
       title: `${title} - 新闻详情`,
@@ -140,13 +151,26 @@ export default async function NewsDetailPage({ params }: Props) {
   }
 
   // JSON-LD Structured Data
+  let structuredDataDescription = '阅读完整新闻内容。';
+  if (newsItem.News && newsItem.News.content) {
+    if (typeof newsItem.News.content === 'string' && newsItem.News.content.trim() !== '') {
+      const contentStr = newsItem.News.content;
+      structuredDataDescription = contentStr.substring(0, 250) + (contentStr.length > 250 ? '...' : '');
+    } else {
+      console.warn(`[StructuredData] News content for ID ${id} (newsItem.News.content) is present but not a non-empty string. Type: ${typeof newsItem.News.content}, Value:`, newsItem.News.content);
+      structuredDataDescription = '暂无有效描述或内容格式不正确。';
+    }
+  } else {
+    structuredDataDescription = '暂无内容描述。';
+  }
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: newsItem.News?.title || '无标题新闻',
     datePublished: newsItem.created_at,
     dateModified: newsItem.created_at, // Assuming same as published if no modified date
-    description: typeof newsItem.News?.content === 'string' ? newsItem.News.content.substring(0, 250) + (newsItem.News.content.length > 250 ? '...' : '') : '阅读完整新闻内容。',
+    description: structuredDataDescription, // Use the new variable here
     // image: ['URL_TO_IMAGE_1', 'URL_TO_IMAGE_2'], // 可选：添加新闻图片URL
     author: {
       '@type': 'Organization', // Or 'Person' if applicable

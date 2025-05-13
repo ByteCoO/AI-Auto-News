@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
-import { supabase } from '../lib/supabase'; // 确保路径正确
-import NewsList from './NewsList'; // 導入新的客戶端組件
-import Link from 'next/link'; // 导入 Link 组件
+import { supabase } from '../lib/supabase';
+import NewsList from './NewsList';
+import Link from 'next/link';
+import { NewsProvider } from '../contexts/NewsContext';
 
 // 添加这一行来强制动态渲染，确保数据总是最新的
 export const dynamic = 'force-dynamic';
@@ -97,14 +98,12 @@ export default async function NewsPage() {
 
   // console.log('[NewsPage Server] Rendering NewsList component.');
   return (
-    // The outer div needs to be relative if you want z-index to work reliably across all browsers for fixed children,
-    // but for simple fixed positioning, it's usually not strictly necessary.
-    // className="relative min-h-screen bg-gray-50 py-8 px-4"
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="container mx-auto max-w-3xl">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">新闻中心</h1>
-        {/* 传递给客户端组件 */}
-        <NewsList initialNews={initialNews} />
+        <NewsProvider initialNews={initialNews}>
+          <NewsList initialNews={initialNews} />
+        </NewsProvider>
       </div>
 
       {/* Fixed Home Icon Link */}

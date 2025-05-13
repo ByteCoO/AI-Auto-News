@@ -1,25 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { supabase } from '../lib/supabase'; // 确保路径正确
-
-// --- > 确认或添加这个接口定义 < ---
-interface NewsItem {
-  id: number;
-  created_at: string;
-  News: {
-    title?: string;
-    content?: string;
-    age?: number;
-    Name?: string;
-    name?: string;
-  } | null;
-}
-// --- > 接口定义结束 < ---
+import { supabase } from '../lib/supabase';
+import { useNewsContext } from '../contexts/NewsContext';
+import { NewsItem } from '../types/news';
 
 interface NewsListProps {
-  initialNews: NewsItem[]; // <--- 首次使用
+  initialNews: NewsItem[];
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -63,14 +51,20 @@ async function fetchNewsPage(page: number): Promise<{ news: NewsItem[]; error: s
 }
 
 export default function NewsList({ initialNews }: NewsListProps) {
-   // <-- 添加日志 (客户端): 组件渲染/重渲染时触发
   console.log('[NewsList Client] Component rendering / Re-rendering.');
 
-  const [news, setNews] = useState<NewsItem[]>(initialNews);
+  const {
+    news,
+    setNews,
+    loading,
+    setLoading,
+    hasMore,
+    setHasMore,
+    error,
+    setError
+  } = useNewsContext();
+  
   const [page, setPage] = useState(2);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(initialNews.length === ITEMS_PER_PAGE);
-  const [error, setError] = useState<string | null>(null);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   // <-- 添加日志 (客户端): 检查传入的 initialNews
