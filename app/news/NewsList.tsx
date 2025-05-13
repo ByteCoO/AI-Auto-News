@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { useNewsContext } from '../contexts/NewsContext';
@@ -100,10 +100,10 @@ export default function NewsList({ initialNews }: NewsListProps) {
     if (fetchError) {
       setError(fetchError);
     } else if (newNews.length > 0) {
-      setNews((prevNews) => {
-          console.log(`[NewsList Client] loadMoreNews: Appending ${newNews.length} new items to state.`); // <-- 添加日志
-          return [...prevNews, ...newNews];
-        });
+      setNews((prevNews: NewsItem[]) => {
+        console.log(`[NewsList Client] loadMoreNews: Appending ${newNews.length} new items to state.`); // <-- 添加日志
+        return [...prevNews, ...newNews] as NewsItem[];
+      });
       setPage((prevPage) => prevPage + 1);
       setHasMore(newNews.length === ITEMS_PER_PAGE);
     } else {
