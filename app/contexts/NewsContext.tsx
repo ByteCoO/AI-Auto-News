@@ -5,7 +5,7 @@ import { NewsItem } from '../types/news';
 
 type NewsContextType = {
   news: NewsItem[];
-  setNews: (news: NewsItem[]) => void;
+  setNews: React.Dispatch<React.SetStateAction<NewsItem[]>>;
   loading: boolean;
   setLoading: (loading: boolean) => void;
   hasMore: boolean;

@@ -1,0 +1,20 @@
+处理URL列表任务
+
+1. 初始化URL列表:
+   - https://www.ft.com/china
+   - https://www.ft.com/
+   - https://www.ft.com/technology
+   - https://www.reuters.com/
+   - https://www.reuters.com/business/
+   - https://www.reuters.com/world/china/
+   - https://www.reuters.com/technology/
+
+2. 处理流程:
+   - 每个URL最多尝试2次
+   - 第一次尝试使用browser_navigate
+   - 如果失败则尝试browser_snapshot
+   - 记录每次尝试的结果
+
+3. 输出要求:
+   - 生成处理状态报告
+   - 包含每个URL的最终状态
