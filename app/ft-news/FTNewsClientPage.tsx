@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function FTNewsClientPage() {
   return (
     <FTNewsProvider>
-      <div className="min-h-screen bg-gray-900 text-white py-8 px-4">
+      <div className="min-h-screen dark:bg-gray-900 w-full bg-white dark:text-white text-gray-900 py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-8 text-center text-orange-400">FT News</h1>
           <FTNewsListComponent />

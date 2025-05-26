@@ -1,24 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
-import { supabase } from '../lib/supabase'; // Assuming this path is correct
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface NewsItem {
-  id: number;
-  created_at: string;
-  News: {
-    title?: string;
-    content?: string; // Keep content if it's part of the News object schema for detail pages
-  } | null;
+  id: string;
+  published_timestamp: string;
+  headline?: string;
+  page_title?: string;
+  publishedtimestamputc?: string;
 }
 
-// Interface for the structure of grouped news
 interface GroupedNews {
   [date: string]: NewsItem[];
 }
 
-// Helper function to format date to YYYY-MM-DD
 const formatDate = (dateString: string): string => {
   if (!dateString) return 'YYYY-MM-DD';
   try {
@@ -36,132 +32,187 @@ const formatDate = (dateString: string): string => {
   }
 };
 
+const ITEMS_PER_PAGE = 8;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
 export default function LatestNews() {
-  const [visibleItems, setVisibleItems] = useState(8); // Controls total individual items visible
   const [loading, setLoading] = useState(true);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [hasManuallyLoadedOnce, setHasManuallyLoadedOnce] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  // 新增：控制首次点击后再启用滚动加载
+  const [manualLoadDone, setManualLoadDone] = useState(false);
 
-  useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('NSD') // Make sure 'NSD' is the correct table name
-        .select('id, created_at, News')
-        .order('created_at', { ascending: false }); // Fetch all, sorted by date descending
-  
-      if (error) {
-        console.error('Error fetching news:', error);
-      } else {
-        setNewsItems(data || []);
+  const fetchNewsFromApi = useCallback(async (page: number, retries = 0) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/news?page=${page}&limit=${ITEMS_PER_PAGE}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Error: ${response.status}`);
       }
-      setLoading(false);
-    };
-  
-    fetchNews();
-  }, []);
+      const { data, count } = await response.json();
+      
+      // 确保数据按时间戳降序排序
+      const sortedData = (data || []).sort((a: NewsItem, b: NewsItem) => 
+        new Date(b.published_timestamp).getTime() - new Date(a.published_timestamp).getTime()
+      );
 
-  const loadMoreItems = useCallback(() => {
-    setLoading(true); 
-    setTimeout(() => {
-      // Increase the number of visible *individual items*
-      setVisibleItems(prev => Math.min(prev + 8, newsItems.length));
+      setNewsItems(prevItems => page === 1 ? sortedData : [...prevItems, ...sortedData]);
+      if (count !== undefined) {
+        setTotalItems(count);
+      }
+      setCurrentPage(page);
+      setRetryCount(0); // 重置重试计数
+    } catch (err) {
+      console.error('Error fetching news:', err);
+      if (retries < MAX_RETRIES) {
+        setTimeout(() => {
+          fetchNewsFromApi(page, retries + 1);
+        }, RETRY_DELAY * (retries + 1));
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setRetryCount(retries);
+    } finally {
       setLoading(false);
-    }, 500);
-  }, [newsItems.length]);
+      if (!initialLoadComplete) {
+        setInitialLoadComplete(true);
+      }
+    }
+  }, [initialLoadComplete]);
 
-  // Scroll listener effect
   useEffect(() => {
+    fetchNewsFromApi(1);
+  }, [fetchNewsFromApi]);
+
+  // 修改loadMoreItems，首次点击时设置manualLoadDone
+  const loadMoreItems = useCallback(() => {
+    if (!loading && newsItems.length < totalItems) {
+      fetchNewsFromApi(currentPage + 1);
+      if (!manualLoadDone) setManualLoadDone(true);
+    }
+  }, [loading, newsItems.length, totalItems, currentPage, fetchNewsFromApi, manualLoadDone]);
+
+  // 启用无限滚动（仅在manualLoadDone为true时生效）
+  useEffect(() => {
+    if (!manualLoadDone) return;
     const handleScroll = () => {
-      if (hasManuallyLoadedOnce && 
-          window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150) {
-        if (!loading && visibleItems < newsItems.length) {
+      if (initialLoadComplete &&
+          window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
+        if (!loading && newsItems.length < totalItems) {
           loadMoreItems();
         }
       }
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, visibleItems, newsItems.length, loadMoreItems, hasManuallyLoadedOnce]);
+  }, [loading, newsItems.length, totalItems, loadMoreItems, initialLoadComplete, manualLoadDone]);
 
-  // Function to handle the button click for "Load More"
-  const handleManualLoadMoreClick = () => {
-    loadMoreItems();
-    if (!hasManuallyLoadedOnce) {
-      setHasManuallyLoadedOnce(true);
-    }
-  };
-
-  // 1. Slice the newsItems to get only the ones that should be currently visible
-  const itemsToDisplay = useMemo(() => {
-    return newsItems.slice(0, visibleItems);
-  }, [newsItems, visibleItems]);
-
-  // 2. Group these visible items by date
   const groupedVisibleNews = useMemo(() => {
-    return itemsToDisplay.reduce((acc, item) => {
-      const dateKey = formatDate(item.created_at);
+    const grouped = newsItems.reduce((acc, item) => {
+      // 使用 created_at 进行日期分组
+      const dateKey = formatDate(item.publishedtimestamputc || item.published_timestamp); 
       if (!acc[dateKey]) {
         acc[dateKey] = [];
       }
       acc[dateKey].push(item);
       return acc;
     }, {} as GroupedNews);
-  }, [itemsToDisplay]);
 
-  // 3. Get sorted date keys for rendering groups in order
+    // 对每个日期组内的新闻按 created_at (或备选的 published_timestamp) 排序
+    Object.keys(grouped).forEach(dateKey => {
+      grouped[dateKey].sort((a, b) => 
+        new Date(b.created_at || b.published_timestamp).getTime() - 
+        new Date(a.created_at || a.published_timestamp).getTime()
+      );
+    });
+
+    return grouped;
+  }, [newsItems]);
+
   const sortedVisibleDates = useMemo(() => {
+    // 按日期键（基于 created_at）降序排序
     return Object.keys(groupedVisibleNews).sort((a, b) => {
-      // Sort by date descending (newest date groups first)
-      return new Date(b).getTime() - new Date(a).getTime();
+      // 为了正确比较，我们需要从 groupedVisibleNews 中获取实际的日期对象进行比较
+      // 假设 groupedVisibleNews[a] 和 groupedVisibleNews[b] 至少有一个元素
+      const dateA = new Date(groupedVisibleNews[a][0].publishedtimestamputc || groupedVisibleNews[a][0].published_timestamp);
+      const dateB = new Date(groupedVisibleNews[b][0].publishedtimestamputc || groupedVisibleNews[b][0].published_timestamp);
+      return dateB.getTime() - dateA.getTime();
     });
   }, [groupedVisibleNews]);
 
+  const canLoadMore = newsItems.length < totalItems;
+
+  if (loading && newsItems.length === 0) {
+    return (
+      <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
+        <div className="container mx-auto px-4 w-full max-w-3xl text-center py-20">
+          <div
+            className="inline-block h-10 w-10 sm:h-12 sm:w-12 animate-spin rounded-full border-4 border-solid dark:border-white border-gray-900 dark:border-r-transparent border-r-transparent"
+            role="status"
+          >
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
+        <div className="container mx-auto px-4 w-full max-w-3xl text-center py-10">
+          <p className="text-red-500">
+            Error loading news: {error}
+            {retryCount > 0 && ` (Retry attempt ${retryCount}/${MAX_RETRIES})`}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loading && newsItems.length === 0 && initialLoadComplete) {
+    return (
+      <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
+        <div className="container mx-auto px-4 w-full max-w-3xl text-center py-10">
+           <p className="dark:text-gray-400 text-gray-600 text-lg">No news items to display currently.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="py-8 bg-zinc-800 text-gray-200 min-h-screen">
+    <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
       <div className="container mx-auto px-4 w-full max-w-3xl">
-        
-        {/* Spinner for initial loading when no items are fetched yet */}
-        {loading && newsItems.length === 0 && (
-          <div className="text-center py-20"> {/* More padding for initial load spinner */}
-            <div 
-              className="inline-block h-10 w-10 sm:h-12 sm:w-12 animate-spin rounded-full border-4 border-solid border-white border-r-transparent" 
-              role="status"
-            >
-              <span className="sr-only">Loading...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Message if no items are available after loading */}
-        {!loading && newsItems.length === 0 && (
-          <p className="text-gray-400 text-lg text-center py-10">No news items to display currently.</p>
-        )}
-
-        {/* Render news items grouped by date */}
         {sortedVisibleDates.length > 0 && sortedVisibleDates.map(dateKey => (
-          <div key={dateKey} className="mb-10"> {/* Container for each date's section */}
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-white">
-              Show Latest Daily Selection ({dateKey})
+          <div key={dateKey} className="mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 dark:text-white text-gray-900">
+              {/* 使用 created_at (或备选的 published_timestamp) 显示日期 */}
+              Show Latest Daily Selection ({formatDate(groupedVisibleNews[dateKey][0].publishedtimestamputc || groupedVisibleNews[dateKey][0].published_timestamp)})
             </h2>
+            
             <ul className="space-y-2 list-none p-0 m-0">
               {groupedVisibleNews[dateKey].map((item) => (
                 <li key={item.id} className="text-base sm:text-lg leading-relaxed">
-                  <Link 
-                    href={`/news/${item.id}`} 
-                    className="text-gray-200 hover:text-orange-400 transition-colors duration-150 group block py-1.5 px-2 rounded hover:bg-zinc-700"
+                  <Link
+                    href={`/ft-news/${item.id}`}
+                    className="dark:text-gray-200 text-gray-800 dark:hover:text-orange-400 hover:text-orange-600 transition-colors duration-150 group block py-1.5 px-2 rounded dark:hover:bg-zinc-700 hover:bg-gray-200"
                   >
                     <span className="select-none mr-2 sm:mr-3" aria-hidden="true">•</span>
                     <span className="group-hover:underline">
-                      {item.News?.title || '无标题'}
-                      {item.created_at && (
-                        // Appending the item's specific date, as per example
-                        <span className="ml-1">{/* Small margin for separation */}
-                          - ({formatDate(item.created_at)})
+                      {item.headline || item.page_title || '无标题'}
+                      {/* 日期已在标题显示，可选择性移除这里的日期显示 */}
+                      {/* {item.published_timestamp && (
+                        <span className="ml-1">
+                          - ({formatDate(item.published_timestamp)})
                         </span>
-                      )}
+                      )} */}
                     </span>
                   </Link>
                 </li>
@@ -169,12 +220,11 @@ export default function LatestNews() {
             </ul>
           </div>
         ))}
-        
-        {/* Loading spinner for "loadMore" action (when some items are already shown) */}
-        {loading && newsItems.length > 0 && visibleItems < newsItems.length && (
+
+        {loading && newsItems.length > 0 && ( // 显示加载中，即使用户已看到部分数据
           <div className="text-center py-8">
-            <div 
-              className="inline-block h-8 w-8 sm:h-10 sm:w-10 animate-spin rounded-full border-4 border-solid border-white border-r-transparent" 
+            <div
+              className="inline-block h-8 w-8 sm:h-10 sm:w-10 animate-spin rounded-full border-4 border-solid dark:border-white border-gray-900 dark:border-r-transparent border-r-transparent"
               role="status"
             >
               <span className="sr-only">Loading...</span>
@@ -182,12 +232,12 @@ export default function LatestNews() {
           </div>
         )}
 
-        {/* Load More Button */}
-        {!loading && visibleItems < newsItems.length && (
+        {/* 只在未手动加载过时显示按钮 */}
+        {!loading && canLoadMore && !manualLoadDone && (
           <div className="text-center mt-8 mb-4">
-            <button 
-              onClick={handleManualLoadMoreClick}
-              className="px-6 py-2.5 sm:px-8 sm:py-3 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 text-sm sm:text-base font-medium"
+            <button
+              onClick={loadMoreItems}
+              className="px-6 py-2.5 sm:px-8 sm:py-3 dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-900 rounded-md dark:hover:bg-gray-600 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 text-sm sm:text-base font-medium"
             >
               加载更多
             </button>

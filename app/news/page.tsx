@@ -99,13 +99,13 @@ export default async function NewsPage() {
       },
     }
   )
-
+/* 
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login') // Redirect to a login page if user is not logged in
   }
-
+ */
   // console.log(`[NewsPage Server] Component rendering start. Timestamp: ${new Date().toISOString()}`);
 
   // console.log('[NewsPage Server] Calling fetchInitialNews...');

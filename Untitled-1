@@ -1,0 +1,299 @@
+{
+  "task_name": "ProcessURLListWithRetryAndSnapshot",
+  "description": "Iterates through a list of URLs. For each URL, attempts to navigate. If navigation fails, attempts a snapshot. This entire process (navigate then snapshot if needed) is tried up to two times per URL. All outcomes are recorded.",
+  "version": "1.1",
+  "tasks": [
+    {
+      "task_id": "1_initialize_url_list",
+      "task_type": "mcp.taskmanager.create_variable",
+      "description": "Create the list of URLs to process.",
+      "inputs": {
+        "variable_name": "url_list_to_process",
+        "variable_value": [
+            "https://www.ft.com/china",
+            "https://www.ft.com/",
+            "https://www.ft.com/technology",
+            "https://www.ft.com/markets",
+            "https://www.ft.com/companies",
+            "https://www.reuters.com/",
+            "https://www.reuters.com/business/",
+            "https://www.reuters.com/world/china/",
+            "https://www.reuters.com/technology/"
+        ]
+      }
+    },
+    {
+      "task_id": "2_initialize_report_list",
+      "task_type": "mcp.taskmanager.create_variable",
+      "description": "Initialize a list to store processing reports for each URL.",
+      "inputs": {
+        "variable_name": "processing_status_reports",
+        "variable_value": []
+      }
+    },
+    {
+      "task_id": "3_process_urls_loop",
+      "task_type": "mcp.taskmanager.loop",
+      "description": "Loop through each URL in the list.",
+      "inputs": {
+        "loop_over_variable": "url_list_to_process",
+        "loop_item_variable_name": "current_url",
+        "loop_index_variable_name": "url_index"
+      },
+      "tasks": [
+        {
+          "task_id": "3.1_initialize_url_report",
+          "task_type": "mcp.taskmanager.create_variable",
+          "description": "Initialize report structure for the current URL.",
+          "inputs": {
+            "variable_name": "current_url_report",
+            "variable_value": {
+              "URL": "{{current_url}}",
+              "尝试次数": 0,
+              "最终状态": "",
+              "成功方式": "",
+              "错误信息": ""
+            }
+          }
+        },
+        {
+          "task_id": "3.2_increment_attempt_counter_1",
+          "task_type": "mcp.taskmanager.update_variable",
+          "description": "Set attempt counter to 1 for current URL.",
+          "inputs": {
+            "variable_name": "current_url_report",
+            "update_actions": [
+              {"action": "set_value", "key": "尝试次数", "value": 1}
+            ]
+          }
+        },
+        {
+          "task_id": "3.3_navigate_attempt_1",
+          "task_type": "mcp.config.usrlocalmcp.browsermcp/browser_navigate",
+          "description": "Attempt 1: Navigate to the current URL.",
+          "inputs": {
+            "url": "{{current_url}}"
+          },
+          "outputs": {
+            "result_variable_name": "navigate_attempt_1_result"
+          },
+          "on_failure": "continue_to_next_task_in_loop_item"
+        },
+        {
+          "task_id": "3.4_check_navigate_attempt_1",
+          "task_type": "mcp.taskmanager.conditional_execution",
+          "description": "Check if navigation in Attempt 1 succeeded.",
+          "inputs": {
+            "condition_template": "{{'navigate_attempt_1_result' in globals() and navigate_attempt_1_result.success == True}}"
+          },
+          "on_true": [
+            {
+              "task_id": "3.4.1_update_report_nav1_success",
+              "task_type": "mcp.taskmanager.update_variable",
+              "inputs": {
+                "variable_name": "current_url_report",
+                "update_actions": [
+                  {"action": "set_value", "key": "最终状态", "value": "成功"},
+                  {"action": "set_value", "key": "成功方式", "value": "导航 (尝试 1)"}
+                ]
+              }
+            },
+            {
+              "task_id": "3.4.2_add_report_and_continue_nav1_success",
+              "task_type": "mcp.taskmanager.update_variable",
+              "description": "Add report to list and continue to next URL.",
+              "inputs": {
+                "variable_name": "processing_status_reports",
+                "update_actions": [
+                  {"action": "append_value", "value_from_variable": "current_url_report"}
+                ]
+              }
+            },
+            {
+              "task_id": "3.4.3_continue_loop_nav1_success",
+              "task_type": "mcp.taskmanager.continue_loop",
+              "description": "URL processed successfully in attempt 1 (navigation)."
+            }
+          ],
+          "on_false": [
+            {
+              "task_id": "3.4.4_snapshot_attempt_1",
+              "task_type": "mcp.config.usrlocalmcp.browsermcp/browser_snapshot",
+              "description": "Attempt 1: Take snapshot after failed navigation.",
+              "inputs": {
+                "url": "{{current_url}}"
+              },
+              "outputs": {
+                "result_variable_name": "snapshot_attempt_1_result"
+              },
+              "on_failure": "continue_to_next_task_in_loop_item"
+            },
+            {
+              "task_id": "3.4.5_check_snapshot_attempt_1",
+              "task_type": "mcp.taskmanager.conditional_execution",
+              "description": "Check if snapshot in Attempt 1 succeeded.",
+              "inputs": {
+                "condition_template": "{{'snapshot_attempt_1_result' in globals() and snapshot_attempt_1_result.success == True}}"
+              },
+              "on_true": [
+                {
+                  "task_id": "3.4.5.1_update_report_snap1_success",
+                  "task_type": "mcp.taskmanager.update_variable",
+                  "inputs": {
+                    "variable_name": "current_url_report",
+                    "update_actions": [
+                      {"action": "set_value", "key": "最终状态", "value": "成功"},
+                      {"action": "set_value", "key": "成功方式", "value": "快照 (尝试 1)"}
+                    ]
+                  }
+                },
+                {
+                  "task_id": "3.4.5.2_add_report_and_continue_snap1_success",
+                  "task_type": "mcp.taskmanager.update_variable",
+                  "description": "Add report to list and continue to next URL.",
+                  "inputs": {
+                    "variable_name": "processing_status_reports",
+                    "update_actions": [
+                      {"action": "append_value", "value_from_variable": "current_url_report"}
+                    ]
+                  }
+                },
+                {
+                  "task_id": "3.4.5.3_continue_loop_snap1_success",
+                  "task_type": "mcp.taskmanager.continue_loop",
+                  "description": "URL processed successfully in attempt 1 (snapshot)."
+                }
+              ],
+              "on_false": [
+                // Attempt 1 (Nav & Snap) FAILED. Proceed to Attempt 2.
+                // No action needed here, flow will continue to Attempt 2 tasks.
+              ]
+            }
+          ]
+        },
+
+        // --- ATTEMPT 2 (Only runs if Attempt 1 Nav and Snapshot failed) ---
+        {
+          "task_id": "3.5_increment_attempt_counter_2",
+          "task_type": "mcp.taskmanager.update_variable",
+          "description": "Set attempt counter to 2 for current URL.",
+          "inputs": {
+            "variable_name": "current_url_report",
+            "update_actions": [
+              {"action": "set_value", "key": "尝试次数", "value": 2}
+            ]
+          }
+        },
+        {
+          "task_id": "3.6_navigate_attempt_2",
+          "task_type": "mcp.config.usrlocalmcp.browsermcp/browser_navigate",
+          "description": "Attempt 2: Navigate to the current URL.",
+          "inputs": {
+            "url": "{{current_url}}"
+          },
+          "outputs": {
+            "result_variable_name": "navigate_attempt_2_result"
+          },
+          "on_failure": "continue_to_next_task_in_loop_item"
+        },
+        {
+          "task_id": "3.7_check_navigate_attempt_2",
+          "task_type": "mcp.taskmanager.conditional_execution",
+          "description": "Check if navigation in Attempt 2 succeeded.",
+          "inputs": {
+            "condition_template": "{{'navigate_attempt_2_result' in globals() and navigate_attempt_2_result.success == True}}"
+          },
+          "on_true": [ // Navigation Attempt 2 Succeeded
+            {
+              "task_id": "3.7.1_update_report_nav2_success",
+              "task_type": "mcp.taskmanager.update_variable",
+              "inputs": {
+                "variable_name": "current_url_report",
+                "update_actions": [
+                  {"action": "set_value", "key": "最终状态", "value": "成功"},
+                  {"action": "set_value", "key": "成功方式", "value": "导航 (尝试 2)"}
+                ]
+              }
+            }
+            // Report will be added by the final step (3.9) for this URL.
+            // Do NOT use continue_loop here, let it flow to add report.
+          ],
+          "on_false": [ // Navigation Attempt 2 Failed, try Snapshot for Attempt 2
+            {
+              "task_id": "3.7.2_snapshot_attempt_2",
+              "task_type": "mcp.config.usrlocalmcp.browsermcp/browser_snapshot",
+              "description": "Attempt 2: Take snapshot after failed navigation.",
+              "inputs": {
+                "url": "{{current_url}}"
+              },
+              "outputs": {
+                "result_variable_name": "snapshot_attempt_2_result"
+              },
+              "on_failure": "continue_to_next_task_in_loop_item"
+            },
+            {
+              "task_id": "3.7.3_check_snapshot_attempt_2",
+              "task_type": "mcp.taskmanager.conditional_execution",
+              "description": "Check if snapshot in Attempt 2 succeeded.",
+              "inputs": {
+                "condition_template": "{{'snapshot_attempt_2_result' in globals() and snapshot_attempt_2_result.success == True}}"
+              },
+              "on_true": [
+                {
+                  "task_id": "3.7.3.1_update_report_snap2_success",
+                  "task_type": "mcp.taskmanager.update_variable",
+                  "inputs": {
+                    "variable_name": "current_url_report",
+                    "update_actions": [
+                      {"action": "set_value", "key": "最终状态", "value": "成功"},
+                      {"action": "set_value", "key": "成功方式", "value": "快照 (尝试 2)"}
+                    ]
+                  }
+                }
+                // Report will be added by the final step (3.9) for this URL.
+                // Do NOT use continue_loop here, let it flow to add report.
+              ],
+              "on_false": [
+                // Attempt 2 (Nav & Snap) FAILED. This URL failed after all attempts.
+                // The '最终状态' and '成功方式' will remain empty, indicating failure.
+                // Error message can be added here if needed, based on tool outputs.
+                {
+                  "task_id": "3.7.3.2_update_report_failure",
+                  "task_type": "mcp.taskmanager.update_variable",
+                  "description": "Update report for failed URL.",
+                  "inputs": {
+                    "variable_name": "current_url_report",
+                    "update_actions": [
+                      {"action": "set_value", "key": "最终状态", "value": "失败"},
+                      {"action": "set_value", "key": "错误信息", "value": "导航和快照尝试均失败"}
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "task_id": "3.8_add_report_after_attempts",
+          "task_type": "mcp.taskmanager.update_variable",
+          "description": "Add the final report for the current URL to the list.",
+          "inputs": {
+            "variable_name": "processing_status_reports",
+            "update_actions": [
+              {"action": "append_value", "value_from_variable": "current_url_report"}
+            ]
+          }
+        }
+        // The loop automatically continues to the next item after the last task in the loop's tasks array.
+      ]
+    },
+    {
+      "task_id": "4_finalize_and_report",
+      "task_type": "mcp.taskmanager.log",
+      "description": "Log the final processing status reports.",
+      "inputs": {
+        "message_template": "URL Processing Complete. Reports: {{processing_status_reports}}"
+      }
+    }
+  ]
+}

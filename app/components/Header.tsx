@@ -3,7 +3,11 @@ import Link from 'next/link'; // Use Next.js Link for internal navigation
 import Image from 'next/image'; // Use Next.js Image for optimized images
 import { MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
-function Header() {
+interface HeaderProps {
+  themeToggleComponent?: React.ReactNode;
+}
+
+function Header({ themeToggleComponent }: HeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,21 +46,23 @@ function Header() {
 
           {/* Navigation and Auth Section */}
           <div className="flex items-center justify-end space-x-4 md:space-x-6 lg:space-x-8">
+
             {/* Main Navigation - Hidden on small screens */}
             <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
-              <Link href="/explore" className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                  Explore
-                  <ChevronDownIcon className="ml-1 h-4 w-4 text-gray-400" aria-hidden="true" />
-              </Link>
+            <ChevronDownIcon className="ml-1 h-4 w-4 text-gray-400" aria-hidden="true" />
+            {themeToggleComponent}
+
               <Link href="/hire" className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                  Hire a Designer
-                  <ChevronDownIcon className="ml-1 h-4 w-4 text-gray-400" aria-hidden="true" />
+              <ChevronDownIcon className="ml-1 h-4 w-4 text-gray-400" aria-hidden="true" />
               </Link>
               <Link href="/jobs" className="text-sm font-medium text-gray-600 hover:text-gray-900">
                   Find Jobs
               </Link>
               <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-gray-900">
                   Blog
+              </Link>
+              <Link href="/news-saas-pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                  新闻SaaS定价
               </Link>
             </nav>
 

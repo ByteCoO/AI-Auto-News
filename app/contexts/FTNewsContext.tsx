@@ -17,6 +17,7 @@ interface FTNewsItem {
   subheadline?: string;
   published_timestamp?: string; // Corresponds to publishedTimestamp
   created_at?: string; // Assuming this field exists for ordering
+  publishedtimestamputc?: string; // UTC timestamp for ordering
 }
 
 // Define the shape for a single detailed FT news article
@@ -57,7 +58,11 @@ interface FTNewsContextType {
   setLoading: Dispatch<SetStateAction<boolean>>;
   error: string | null;
   setError: Dispatch<SetStateAction<string | null>>;
-  fetchInitialFTNews: () => Promise<void>; // Function to fetch initial news
+  fetchInitialFTNews: () => Promise<void>;
+  fetchMoreFTNews: () => Promise<void>;
+  hasMore: boolean;
+  page: number;
+  pageSize: number;
   currentArticle: FTNewsDetail | null;
   setCurrentArticle: Dispatch<SetStateAction<FTNewsDetail | null>>;
   articleLoading: boolean;
@@ -65,34 +70,38 @@ interface FTNewsContextType {
   articleError: string | null;
   setArticleError: Dispatch<SetStateAction<string | null>>;
   fetchArticleById: (id: string) => Promise<void>;
+  manualLoadTriggered: boolean;
+  setManualLoadTriggered: Dispatch<SetStateAction<boolean>>;
 }
 
 const FTNewsContext = createContext<FTNewsContextType | undefined>(undefined);
 
 export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
   const [newsItems, setNewsItems] = useState<FTNewsItem[]>([]);
-  const [loading, setLoading] = useState(true); // For news list
-  const [error, setError] = useState<string | null>(null); // For news list
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentArticle, setCurrentArticle] = useState<FTNewsDetail | null>(null);
-  const [articleLoading, setArticleLoading] = useState(true); // For single article
-  const [articleError, setArticleError] = useState<string | null>(null); // For single article
+  const [articleLoading, setArticleLoading] = useState(true);
+  const [articleError, setArticleError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(6);
+  const [hasMore, setHasMore] = useState(true);
+  const [manualLoadTriggered, setManualLoadTriggered] = useState(false);
 
   const fetchInitialFTNews = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setPage(1);
     try {
       const { data, error: dbError } = await supabase
-        .from('FT_articles') // Ensure this is your actual table name
-        .select('id, page_url, page_title, category, headline, subheadline, published_timestamp, created_at') // Select unnested fields
-        .order('created_at', { ascending: false }); // Order by creation timestamp
-        // .limit(10); // Example: limit initial load if needed
-
+        .from('FT_articles')
+        .select('id, page_url, page_title, category, headline, subheadline, published_timestamp, created_at, publishedtimestamputc')
+        .order('publishedtimestamputc', { ascending: false })
+        .range(0, pageSize - 1);
       if (dbError) throw dbError;
-
       setNewsItems((data as FTNewsItem[]) || []);
+      setHasMore((data as FTNewsItem[]).length === pageSize);
     } catch (err) {
-      console.error('Error fetching FT news in Context:', err);
       let specificMessage = 'An unknown error occurred while fetching news.';
       if (typeof err === 'object' && err !== null && 'message' in err && typeof (err as any).message === 'string') {
         specificMessage = `Failed to load news: ${(err as any).message}`;
@@ -104,7 +113,42 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
       setError(specificMessage);
     }
     setLoading(false);
-  }, []);
+  }, [pageSize]);
+
+  const fetchMoreFTNews = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const nextPage = page + 1;
+      const from = (nextPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      const { data, error: dbError } = await supabase
+        .from('FT_articles')
+        .select('id, page_url, page_title, category, headline, subheadline, published_timestamp, created_at, publishedtimestamputc')
+        .order('publishedtimestamputc', { ascending: false })
+        .range(from, to);
+      if (dbError) throw dbError;
+      if (data && data.length > 0) {
+        setNewsItems(prev => [...prev, ...data]);
+        setPage(nextPage);
+        setHasMore(data.length === pageSize);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      let specificMessage = 'An unknown error occurred while loading more news.';
+      if (typeof err === 'object' && err !== null && 'message' in err && typeof (err as any).message === 'string') {
+        specificMessage = `Failed to load more news: ${(err as any).message}`;
+      } else if (err instanceof Error) {
+        specificMessage = `Failed to load more news: ${err.message}`;
+      } else if (typeof err === 'string') {
+        specificMessage = `Failed to load more news: ${err}`;
+      }
+      setError(specificMessage);
+    }
+    setLoading(false);
+  }, [page, pageSize, loading, hasMore]);
 
   const fetchArticleById = useCallback(async (id: string) => {
     if (!id) {
@@ -148,8 +192,10 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <FTNewsContext.Provider value={{
-      newsItems, setNewsItems, loading, setLoading, error, setError, fetchInitialFTNews,
-      currentArticle, setCurrentArticle, articleLoading, setArticleLoading, articleError, setArticleError, fetchArticleById
+      newsItems, setNewsItems, loading, setLoading, error, setError,
+      fetchInitialFTNews, fetchMoreFTNews, hasMore, page, pageSize,
+      currentArticle, setCurrentArticle, articleLoading, setArticleLoading, articleError, setArticleError, fetchArticleById,
+      manualLoadTriggered, setManualLoadTriggered
     }}>
       {children}
     </FTNewsContext.Provider>

@@ -18,11 +18,7 @@ export default async function FTNewsPage() {
           try {
             cookieStore.set({ name, value, ...options })
           } catch (error) {
-            // The `set` method was called from a Server Component. Cookies can't be set
-            // from Server Components. This can happen if you're using a Supabase client
-            // in a Server Component with `revalidatePath` or similar.
-            // For more details: https://nextjs.org/docs/app/api-reference/functions/cookies#cookiesdotset
-          }
+              }
         },
         remove(name: string, options: CookieOptions) {
           try {
@@ -37,11 +33,11 @@ export default async function FTNewsPage() {
       },
     }
   )
-
+/* 
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login') // Redirect to a login page if user is not logged in
-  }
+  } */
   return <FTNewsClientPage />;
 }
