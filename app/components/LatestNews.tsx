@@ -9,6 +9,7 @@ interface NewsItem {
   headline?: string;
   page_title?: string;
   publishedtimestamputc?: string;
+  created_at?: string; // Add created_at property
 }
 
 interface GroupedNews {
