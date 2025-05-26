@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { useFTNewsContext } from '../../contexts/FTNewsContext';
-import { supabase } from '../../lib/supabase_Saas';
+import { supabase } from '../../lib/supabase';
 import Link from 'next/link';
 import { Metadata, ResolvingMetadata } from 'next';
 

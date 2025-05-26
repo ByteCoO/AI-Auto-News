@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   const cookieStore = cookies();
 
   // 1. 读取你自定义的环境变量
-  const supabaseUrl = process.env.SAAS_NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.SAAS_NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // 2. 检查变量是否存在，以防配置错误
   if (!supabaseUrl || !supabaseAnonKey) {

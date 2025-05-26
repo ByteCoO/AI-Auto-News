@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase_Saas'; // Adjusted path for Supabase client
+import { supabase } from '../lib/supabase'; // Adjusted path for Supabase client
 
 // Define the shape of an FT news item, similar to what's in ft-news/page.tsx
 interface FTNewsItem {
