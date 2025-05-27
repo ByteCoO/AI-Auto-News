@@ -46,6 +46,8 @@ interface FTNewsDetail {
     url: string;
   }[];
   published_timestamp?: string; // Corresponds to publishedTimestamp
+  publishedtimestamputc?: string; // UTC timestamp for ordering
+  snapshot_capture_timestamp?: string;
   updated_at?: string; // Corresponds to updatedTimestamp (from db: updated_at)
   body?: FTArticleBodyItem[];
   created_at?: string;
@@ -163,7 +165,7 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data, error: dbError } = await supabase
         .from('FT_articles') // Ensure this is your actual table name
-        .select('id, page_url, page_title, category, headline, subheadline, main_image, authors, published_timestamp, updated_at, body, created_at') // Select all relevant unnested fields
+        .select('id, page_url, page_title, category, headline, subheadline, main_image, authors, published_timestamp, publishedtimestamputc, updated_at, body, created_at') // Select all relevant unnested fields
         .eq('id', id)
         .single();
 

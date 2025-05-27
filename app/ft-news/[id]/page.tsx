@@ -3,8 +3,12 @@
 
 import { useEffect } from 'react';
 import { useFTNewsContext } from '../../contexts/FTNewsContext';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabase'; // supabase is used in fetchFTNewsDetailServerSide
 import Link from 'next/link';
+// Metadata and ResolvingMetadata are typically for Server Components or generateMetadata functions.
+// Since this is a client component, their direct use here might be for a specific setup or can be reviewed.
 import { Metadata, ResolvingMetadata } from 'next';
 
 interface FTArticleBodyItem {
@@ -31,11 +35,14 @@ interface FTNewsDetail {
     name: string;
     url: string;
   }[];
-  published_timestamp?: string;
+  published_timestamp?: string; // May still be fetched by context or used elsewhere
+  publishedtimestamputc?: string; // Ensured this is in the interface
   updated_at?: string;
   body?: FTArticleBodyItem[];
 }
 
+// This server-side function is defined here. If the FTNewsContext uses a similar
+// fetching mechanism, ensure 'publishedtimestamputc' is selected there too.
 async function fetchFTNewsDetailServerSide(id: string): Promise<FTNewsDetail | null> {
   console.log(`Fetching FT news detail from Supabase for ID: ${id}`);
   try {
@@ -51,6 +58,7 @@ async function fetchFTNewsDetailServerSide(id: string): Promise<FTNewsDetail | n
         main_image,
         authors,
         published_timestamp,
+        publishedtimestamputc, 
         updated_at,
         body
       `)
@@ -62,8 +70,7 @@ async function fetchFTNewsDetailServerSide(id: string): Promise<FTNewsDetail | n
       if (error.code === 'PGRST116') return null;
       throw error;
     }
-    
-    return data as FTNewsDetail;
+    return data as unknown as FTNewsDetail;
 
   } catch (err) {
     console.error('Error in fetchFTNewsDetail function:', err);
@@ -77,19 +84,27 @@ type Props = {
 
 export default function FTNewsDetailPage({ params }: Props) {
   const id = params?.id;
+  const router = useRouter();
+  const { user, isLoading: loading } = useAuth();
 
-  const { 
-    currentArticle: newsItem, 
-    articleLoading, 
-    articleError, 
-    fetchArticleById 
+  const {
+    currentArticle: newsItem,
+    articleLoading,
+    articleError,
+    fetchArticleById
   } = useFTNewsContext();
 
   useEffect(() => {
-    if (id) {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    if (id && user) {
       fetchArticleById(id);
     }
-  }, [id, fetchArticleById]);
+  }, [id, user, fetchArticleById]);
 
   if (!id) {
     return (
@@ -102,7 +117,7 @@ export default function FTNewsDetailPage({ params }: Props) {
     );
   }
 
-  if (articleLoading) {
+  if (loading || articleLoading) {
     return (
       <div className="min-h-screen dark:bg-gray-900 bg-white dark:text-white text-gray-900 flex flex-col justify-center items-center p-4">
         <p className="text-xl">Loading article...</p>
@@ -132,13 +147,26 @@ export default function FTNewsDetailPage({ params }: Props) {
     );
   }
 
-  const { headline, subheadline, category, authors, published_timestamp, updated_at, main_image, body, page_title, page_url } = newsItem;
+  // 修改点 1: 从解构中移除 published_timestamp (如果不再使用), 并确保 publishedtimestamputc 被解构
+  const { 
+    headline, 
+    subheadline, 
+    category, 
+    authors, 
+     published_timestamp, // 从解构中移除，因为它未被使用
+    publishedtimestamputc, // 解构 publishedtimestamputc 以便使用
+    updated_at, 
+    main_image, 
+    body, 
+    page_title, 
+    page_url 
+  } = newsItem;
 
   return (
     <div className="min-h-screen dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-900 py-10 px-4">
       <div className="container mx-auto max-w-3xl dark:bg-gray-800 bg-gray-100 p-6 sm:p-8 rounded-lg shadow-xl">
         <Link href="/ft-news" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline mb-6 inline-block">
-          &larr; Back to FT News List
+          ← Back to FT News List
         </Link>
 
         {category && (
@@ -156,19 +184,14 @@ export default function FTNewsDetailPage({ params }: Props) {
           {authors && authors.length > 0 && (
             <span className="mr-3">By {authors.map(author => author.name).join(', ')}</span>
           )}
-          {published_timestamp && (
-            <span className="mr-3">Published: {new Date(published_timestamp).toLocaleString()}</span>
-          )}
-          {updated_at && (
-            <span className="mr-3">Updated: {new Date(updated_at).toLocaleString()}</span>
+          {publishedtimestamputc && (
+            <span className="mr-3">Published: {new Date(publishedtimestamputc).toLocaleString('en-GB', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
           )}
          
-          {newsItem.created_at && (
-            <span>Added: {new Date(newsItem.created_at).toLocaleString()}</span> 
-          )}
+        
         </div>
 
-        {main_image && main_image.caption && (
+        {main_image && main_image.caption && ( // 或者 main_image && main_image.url 如果图片是必须的
           <figure className="my-6">
             {main_image.url && <img src={main_image.url} alt={main_image.altText || headline} className="w-full h-auto rounded-md mb-2" />}
             <figcaption className="text-xs dark:text-gray-500 text-gray-600 italic text-center">

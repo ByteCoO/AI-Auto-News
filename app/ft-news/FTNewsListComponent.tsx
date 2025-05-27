@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useFTNewsContext } from '../contexts/FTNewsContext'; // Adjusted path
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 // Define the shape of an FT news item, consistent with context
 interface FTNewsItem {
@@ -25,6 +25,7 @@ export default function FTNewsListComponent() {
   const { newsItems, loading, error, fetchInitialFTNews, fetchMoreFTNews, hasMore, manualLoadTriggered, setManualLoadTriggered } = useFTNewsContext();
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [searchValue, setSearchValue] = useState('');
 
   // 首次点击按钮后才允许滚动加载
   const handleManualLoadMore = useCallback(async () => {
@@ -82,7 +83,26 @@ export default function FTNewsListComponent() {
 
   return (
     <div className="space-y-6">
-      {newsItems.map((item: FTNewsItem, index) => (
+      {/* 搜索框 */}
+      <div className="flex justify-center mb-4">
+        <input
+          type="search"
+          className="border rounded px-4 py-2 w-full max-w-md dark:bg-gray-700 dark:text-white"
+          placeholder="搜索标题..."
+          value={searchValue}
+          onChange={e => setSearchValue(e.target.value)}
+        />
+      </div>
+      {newsItems
+        .filter(item => item.page_title && item.page_title.toLowerCase().includes(searchValue.toLowerCase()))
+        .slice() // 复制数组避免副作用
+        .sort((a, b) => {
+          // 按publishedtimestamputc倒序排列，若无则排后
+          const dateA = a.publishedtimestamputc ? new Date(a.publishedtimestamputc).getTime() : 0;
+          const dateB = b.publishedtimestamputc ? new Date(b.publishedtimestamputc).getTime() : 0;
+          return dateB - dateA;
+        })
+        .map((item: FTNewsItem, index) => (
         <div key={`${item.id}-${index}`} className="dark:bg-gray-800 bg-gray-100 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
           {item.category && (
             <p className="text-sm text-orange-400 mb-1">
@@ -98,8 +118,10 @@ export default function FTNewsListComponent() {
             <p className="dark:text-gray-400 text-gray-600 mb-3 text-md">{item.subheadline}</p>
           )}
           <div className="text-xs dark:text-gray-500 text-gray-600">
-            <span className='mx-4'>Published: {item.publishedtimestamputc ? new Date(item.publishedtimestamputc).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }) : (item.published_timestamp ? new Date(item.published_timestamp).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }) : 'N/A')}</span>
-            {/* <span>Added: {item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }) : 'N/A'}</span> */}
+            <span className='mx-4'>发布时间: {item.created_at ? new Date(item.created_at).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : 'N/A'}</span>
+            {item.publishedtimestamputc && (
+              <span className='mx-4'>UTC时间: {new Date(item.publishedtimestamputc).toLocaleString('en-GB', { timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+            )}
             <span className="mx-2">|</span>
             <a href={item.page_url} target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 underline">
               Read on FT.com
