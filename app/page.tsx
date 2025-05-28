@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: '首页 - 我们的网站',
-  description: '欢迎来到我们的网站。发现最新新闻、热门内容和更多信息。',
+  title: 'Game Visiong',
+  description: 'Welcome to our website. Discover the latest news, hot content and more.',
   
 };
 

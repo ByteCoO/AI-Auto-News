@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${location.origin}/api/auth/callback`, // <--- 修改在这里
       },
     });
     // Supabase handles redirection, loading state will be managed by onAuthStateChange

@@ -1,7 +1,7 @@
 // app/news-saas-pricing/page.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 
 interface PricingTierProps {
@@ -14,7 +14,7 @@ interface PricingTierProps {
   description?: string;
 }
 
-const PricingTier: React.FC<PricingTierProps> = ({ name, price, priceSuffix = '/month', features, ctaText, highlighted = false, description }) => {
+const PricingTier: React.FC<PricingTierProps & { onButtonClick: () => void }> = ({ name, price, priceSuffix = '/month', features, ctaText, highlighted = false, description, onButtonClick }) => {
   return (
     <div className={`border rounded-lg p-6 flex flex-col ${highlighted ? 'bg-indigo-600 text-white shadow-xl transform scale-105 dark:border-indigo-500' : 'bg-white dark:bg-slate-800 shadow-lg border-gray-200 dark:border-slate-700'}`}>
       <h3 className={`text-2xl font-semibold ${highlighted ? 'text-white' : 'text-gray-900 dark:text-slate-100'}`}>{name}</h3>
@@ -34,6 +34,7 @@ const PricingTier: React.FC<PricingTierProps> = ({ name, price, priceSuffix = '/
         ))}
       </ul>
       <button 
+        onClick={onButtonClick}
         className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-300 
                     ${highlighted 
                       ? 'bg-white text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-100'
@@ -45,7 +46,40 @@ const PricingTier: React.FC<PricingTierProps> = ({ name, price, priceSuffix = '/
   );
 };
 
+const UnderDevelopmentModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Feature Under Development</h3>
+        <p className="text-gray-700 dark:text-slate-300 mb-2">
+          The SaaS API is currently under development. Please check back later for updates.
+        </p>
+        <p className="text-gray-700 dark:text-slate-300 mb-6">
+          We are working hard to bring you the best news API service!
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const NewsSaasPricingPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showDevelopmentModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeDevelopmentModal = () => {
+    setIsModalOpen(false);
+  };
   const pricingTiers = [
     {
       name: 'Free Plan',
@@ -95,6 +129,7 @@ const NewsSaasPricingPage = () => {
 
   return (
     <>
+      <UnderDevelopmentModal isOpen={isModalOpen} onClose={closeDevelopmentModal} />
       <Head>
         <title>News SaaS API Pricing - Get Real-Time News Data</title>
         <meta name="description" content="Explore our flexible News SaaS API pricing plans to meet your needs from personal projects to enterprise applications." />
@@ -112,7 +147,7 @@ const NewsSaasPricingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {pricingTiers.map((tier) => (
-              <PricingTier key={tier.name} {...tier} />
+              <PricingTier key={tier.name} {...tier} onButtonClick={showDevelopmentModal} />
             ))}
           </div>
 
@@ -121,7 +156,7 @@ const NewsSaasPricingPage = () => {
             <p className="text-gray-700 dark:text-slate-300 mb-6 max-w-xl mx-auto">
               If the above plans do not fully meet your needs, or you require larger call volumes or customized features, please contact us and we will tailor a solution for you.
             </p>
-            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 dark:bg-green-600 dark:hover:bg-green-700">
+            <button onClick={showDevelopmentModal} className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 dark:bg-green-600 dark:hover:bg-green-700">
               Contact Sales Team
             </button>
           </div>

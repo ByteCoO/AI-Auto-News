@@ -11,8 +11,8 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './contexts/AuthContext'; // <--- 1. 导入 AuthProvider
 
 export const metadata: Metadata = {
-  title: 'GameVerse',
-  description: '游戏社区平台',
+  title: 'Game Visioning',
+  description: 'FT-NEWS - Game Starting',
 };
 
 export default async function RootLayout({
@@ -75,7 +75,7 @@ export default async function RootLayout({
              {/*  </div> */}
              <Navbar/>
               {children} {/* 你的页面内容会在这里渲染，它们也能访问 AuthContext */}
-              {/* <Footer /> You might want to render the Footer here or within children */}
+              <Footer /> 
             </main>
             </FTNewsProvider>
           </AuthProvider>

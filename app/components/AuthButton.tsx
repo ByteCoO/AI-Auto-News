@@ -1,54 +1,64 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation'; // 导入 usePathname
+import { useEffect } from 'react'; // 导入 useEffect
 import { useAuth } from '../contexts/AuthContext'; // 导入 useAuth
-import { User } from '@supabase/supabase-js'; // User 类型可能仍然需要，或者由 AuthContext 提供
 
-export default function AuthButton({ user: initialUserProp }: { user: User | null }) { // initialUserProp 可以用于初始判断，但主要依赖 context
-  const { user, signInWithGoogle, signOut, mockLogin, isLoading } = useAuth();
+// Google SVG Icon (taken from Google's branding guidelines)
+const GoogleIcon = () => (
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+    <path fill="none" d="M0 0h48v48H0z"></path>
+  </svg>
+);
+
+export default function AuthButton() { 
+  const { user, signInWithGoogle, signOut, isLoading } = useAuth();
   const router = useRouter();
-
-  const handleMockLogin = async () => {
-    await mockLogin();
-    router.push('/protected-page'); // 跳转到受保护页面
-    router.refresh(); // 确保UI状态更新
-  };
+  const pathname = usePathname(); // 获取当前路径
 
   const handleSignIn = async () => {
     await signInWithGoogle();
-    // router.refresh(); // signInWithGoogle 内部或 AuthContext 的 onAuthStateChange 会处理状态和可能的刷新
+    // 重定向逻辑将由下面的 useEffect 处理
   };
+
+  useEffect(() => {
+    if (!isLoading && user && pathname !== '/') {
+      router.push('/');
+    }
+  }, [user, isLoading, router, pathname]);
 
   const handleSignOut = async () => {
     await signOut();
-    router.refresh(); // Context的signOut已经处理了状态更新，这里刷新页面确保UI同步
+    router.refresh(); 
   };
 
-  // isLoading 可以用来显示加载状态，避免用户在操作过程中重复点击
   if (isLoading) {
-    return <div className="flex items-center gap-4">Loading...</div>;
+    return <div className="flex items-center justify-center p-2">Loading...</div>;
   }
 
-  // 现在直接使用来自 context 的 user
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
+      <span className="text-sm text-gray-700 dark:text-gray-300">Hey, {user.email}!</span>
       <button
-        className="py-2 px-4 rounded-md no-underline bg-btn-back hover:bg-btn-background-hover"
-        onClick={handleSignOut} disabled={isLoading}
+        className="py-2 px-4 rounded-md no-underline bg-red-500 hover:bg-red-600 text-white transition-colors duration-200"
+        onClick={handleSignOut} 
+        disabled={isLoading}
       >
         Logout
       </button>
     </div>
   ) : (
-    <div className="flex gap-4">
-      <button
-        className="py-2 px-4 rounded-md no-underline bg-btn-back hover:bg-btn-background-hover"
-        onClick={handleSignIn} disabled={isLoading}
-      >
-        Login with Google
-      </button>
-    
-    </div>
+    <button
+      className="flex items-center justify-center gap-2 py-2 px-4 rounded-md no-underline bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-500 text-gray-700 dark:text-gray-200 transition-colors duration-200 shadow-sm"
+      onClick={handleSignIn} 
+      disabled={isLoading}
+    >
+      <GoogleIcon />
+      <span>Login with Google</span>
+    </button>
   );
 }
