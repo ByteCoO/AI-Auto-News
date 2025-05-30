@@ -18,7 +18,6 @@ export default async function Home() {
       {/* <Header themeToggleComponent={<ThemeToggle />} /> */}
       <LatestNews />
 
-      <Footer/>
     </main>
   );
 }

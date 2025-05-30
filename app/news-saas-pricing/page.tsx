@@ -33,10 +33,10 @@ const PricingTier: React.FC<PricingTierProps & { onButtonClick: () => void }> = 
           </li>
         ))}
       </ul>
-      <button 
+      <button
         onClick={onButtonClick}
-        className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-300 
-                    ${highlighted 
+        className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-300
+                    ${highlighted
                       ? 'bg-white text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-100'
                       : 'bg-indigo-500 text-white hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700'}`}
       >
@@ -52,16 +52,24 @@ const UnderDevelopmentModal: React.FC<{ isOpen: boolean; onClose: () => void }> 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Feature Under Development</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Welcome to the FT News API!</h3>
         <p className="text-gray-700 dark:text-slate-300 mb-2">
-          The SaaS API is currently under development. Please check back later for updates.
+          Explore real-time financial news data with our powerful API.
         </p>
         <p className="text-gray-700 dark:text-slate-300 mb-6">
-          We are working hard to bring you the best news API service!
+          Click the button below to visit the API documentation and get started.
         </p>
+        <a
+          href="https://rapidapi.com/fanspan6/api/ft-news-api"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-center block"
+        >
+          Go to API Website
+        </a>
         <button
           onClick={onClose}
-          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+          className="w-full bg-indigo-500 hover:bg-indigo-600 my-4 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700"
         >
           OK
         </button>
@@ -80,50 +88,47 @@ const NewsSaasPricingPage = () => {
   const closeDevelopmentModal = () => {
     setIsModalOpen(false);
   };
+
+  // Updated pricingTiers data
   const pricingTiers = [
     {
-      name: 'Free Plan',
-      price: 'Free',
-      priceSuffix: '',
-      description: 'Daily, up to 250 API calls per day, 5 years of historical data.',
+      name: 'Basic',
+      price: '$0.00',
+      priceSuffix: '/mo',
+      description: '', 
       features: [
-        'Financial Modeling Prep API',
-        'Free usage',
-        'Daily updates',
-        '250 API calls per day',
-        'Up to 5 years of historical data'
+        'Requests: 8 / Day',
+        'Limit Type: Hard Limit',
+        'Rate Limit: 1000 requests per hour',
       ],
-      ctaText: 'Choose Free',
+      ctaText: 'Cancel Plan', // Assuming this means it's the current plan or an example
+      highlighted: false,
     },
     {
-      name: 'Starter Plan',
-      price: '$19.00',
-      priceSuffix: '/month (billed annually)',
-      description: 'Up to 300 API calls per minute, up to 5 years of historical data, US market.',
+      name: 'Pro',
+      price: '$4.99',
+      priceSuffix: '/mo',
+      description: '',
       features: [
-        'Financial Modeling Prep API',
-        'Starter plan',
-        '300 API calls per minute',
-        'Up to 5 years of historical data',
-        'US market'
+        'Requests: 1,500 / Month',
+        'Overage: + $0.004 per additional request',
+        'Rate Limit: 2 requests per second',
       ],
-      ctaText: 'Choose Starter',
+      ctaText: 'Upgrade Plan',
+      highlighted: false,
+    },
+    {
+      name: 'Ultra',
+      price: '$14.99',
+      priceSuffix: '/mo',
+      description: '⭐ Recommended',
+      features: [
+        'Requests: 10,000 / Month',
+        'Overage: + $0.0025 per additional request',
+        'Rate Limit: 5 requests per second',
+      ],
+      ctaText: 'Upgrade Plan',
       highlighted: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 'Contact Us',
-      priceSuffix: '',
-      description: 'Tailored for large enterprises to meet complex needs.',
-      features: [
-        'Unlimited API calls (on demand)',
-        'Customized news sources',
-        'In-depth industry analysis reports',
-        'Dedicated customer success manager',
-        'SLA guarantee',
-        'Private deployment options'
-      ],
-      ctaText: 'Contact Sales',
     },
   ];
 

@@ -27,7 +27,7 @@ export default function FTNewsListComponent() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [searchValue, setSearchValue] = useState('');
 
-  // 首次点击按钮后才允许滚动加载
+  // Allow scroll loading only after the first button click
   const handleManualLoadMore = useCallback(async () => {
     setManualLoadTriggered(true);
     await fetchMoreFTNews();
@@ -83,21 +83,21 @@ export default function FTNewsListComponent() {
 
   return (
     <div className="space-y-6">
-      {/* 搜索框 */}
+      {/* Search Box */}
       <div className="flex justify-center mb-4">
         <input
           type="search"
           className="border rounded px-4 py-2 w-full max-w-md dark:bg-gray-700 dark:text-white"
-          placeholder="搜索标题..."
+          placeholder="Search by title..."
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
         />
       </div>
       {newsItems
         .filter(item => item.page_title && item.page_title.toLowerCase().includes(searchValue.toLowerCase()))
-        .slice() // 复制数组避免副作用
+        .slice() // Copy array to avoid side effects
         .sort((a, b) => {
-          // 按publishedtimestamputc倒序排列，若无则排后
+          // Sort by publishedtimestamputc in descending order, if not available, place at the end
           const dateA = a.publishedtimestamputc ? new Date(a.publishedtimestamputc).getTime() : 0;
           const dateB = b.publishedtimestamputc ? new Date(b.publishedtimestamputc).getTime() : 0;
           return dateB - dateA;
@@ -118,9 +118,9 @@ export default function FTNewsListComponent() {
             <p className="dark:text-gray-400 text-gray-600 mb-3 text-md">{item.subheadline}</p>
           )}
           <div className="text-xs dark:text-gray-500 text-gray-600">
-            <span className='mx-4'>发布时间: {item.created_at ? new Date(item.created_at).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : 'N/A'}</span>
+            <span className='mx-4'>Published: {item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' }) : 'N/A'}</span>
             {item.publishedtimestamputc && (
-              <span className='mx-4'>UTC时间: {new Date(item.publishedtimestamputc).toLocaleString('en-GB', { timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+              <span className='mx-4'>UTC Time: {new Date(item.publishedtimestamputc).toLocaleString('en-GB', { timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
             )}
             <span className="mx-2">|</span>
             <a href={item.page_url} target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 underline">
@@ -129,7 +129,7 @@ export default function FTNewsListComponent() {
           </div>
         </div>
       ))}
-      {/* 加载更多按钮与滚动加载锚点 */}
+      {/* Load More Button and Scroll Anchor */}
       {!manualLoadTriggered && hasMore && (
         <div className="flex justify-center mt-8">
           <button
@@ -137,17 +137,17 @@ export default function FTNewsListComponent() {
             className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded shadow-lg text-lg font-semibold transition-colors duration-150"
             disabled={loading}
           >
-            {loading ? '加载中...' : '加载更多'}
+            {loading ? 'Loading...' : 'Load More'}
           </button>
         </div>
       )}
       {manualLoadTriggered && hasMore && (
         <div ref={loadMoreRef} className="flex justify-center mt-8">
-          <span className="dark:text-gray-400 text-gray-600">{loading ? '加载中...' : '下拉加载更多'}</span>
+          <span className="dark:text-gray-400 text-gray-600">{loading ? 'Loading...' : 'Scroll to load more'}</span>
         </div>
       )}
       {!hasMore && (
-        <div className="text-center dark:text-gray-500 text-gray-600 py-10">没有更多新闻了</div>
+        <div className="text-center dark:text-gray-500 text-gray-600 py-10">No more news</div>
       )}
     </div>
   );
