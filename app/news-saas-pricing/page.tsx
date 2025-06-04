@@ -97,11 +97,11 @@ const NewsSaasPricingPage = () => {
       priceSuffix: '/mo',
       description: '', 
       features: [
-        'Requests: 8 / Day',
+        'Requests: 100 / mo',
         'Limit Type: Hard Limit',
         'Rate Limit: 1000 requests per hour',
       ],
-      ctaText: 'Cancel Plan', // Assuming this means it's the current plan or an example
+      ctaText: 'Start Free Plan', // Assuming this means it's the current plan or an example
       highlighted: false,
     },
     {
@@ -114,7 +114,7 @@ const NewsSaasPricingPage = () => {
         'Overage: + $0.004 per additional request',
         'Rate Limit: 2 requests per second',
       ],
-      ctaText: 'Upgrade Plan',
+      ctaText: 'Choose This Plan',
       highlighted: false,
     },
     {
@@ -127,7 +127,7 @@ const NewsSaasPricingPage = () => {
         'Overage: + $0.0025 per additional request',
         'Rate Limit: 5 requests per second',
       ],
-      ctaText: 'Upgrade Plan',
+      ctaText: 'Choose This Plan',
       highlighted: true,
     },
   ];

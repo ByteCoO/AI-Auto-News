@@ -39,8 +39,11 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-6">
             <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">Home</Link>
+{/*             <Link href="/archive" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">Archive</Link>
+ */}            
             <Link href="/ft-news" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">FT-News</Link>
             <Link href="/news-saas-pricing" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">Pricing</Link>
+
           </div>
         </div>
         
@@ -118,6 +121,13 @@ export default function Navbar() {
             >
               Home
             </Link>
+           {/*  <Link 
+              href="/archive"
+              className="block text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white py-2 transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Archive
+            </Link> */}
             <Link 
               href="/ft-news" 
               className="block text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white py-2 transition-colors duration-200"

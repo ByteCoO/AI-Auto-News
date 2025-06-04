@@ -25,9 +25,9 @@ const formatDate = (dateString: string): string => {
       // console.log('formatDate: Invalid date for string:', dateString);
       return 'Invalid Date';
     }
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
+    const year = date.getFullYear(); // Changed to getFullYear
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Changed to getMonth
+    const day = date.getDate().toString().padStart(2, '0'); // Changed to getDate
     const formatted = `${year}-${month}-${day}`;
     // console.log(`formatDate: ${dateString} -> ${formatted}`); // Debug formatDate output
     return formatted;
@@ -72,7 +72,8 @@ export default function LatestNews() {
           headline: apiItem.headline,
           page_title: apiItem.page_title,
           publishedtimestamputc: apiItem.publishedtimestamputc,
-          created_at: apiItem.publishedtimestamputc, // Proxy
+          created_at: apiItem.created_at, // Proxy
+
         };
       });
       // console.log(`Transformed Data (page ${page}):`, JSON.stringify(transformedData.slice(0,2))); // Log first few
@@ -238,7 +239,33 @@ export default function LatestNews() {
                         <span className="select-none mr-2 sm:mr-3" aria-hidden="true">•</span>
                         <span className="group-hover:underline">
                           {item.headline || item.page_title || 'Untitled News'}
+                          {item.publishedtimestamputc && (
+                            <span className="text-xs text-gray-500 ml-2">
+                            {(() => {
+                              const date = new Date(item.publishedtimestamputc);
+
+                              // 月份缩写数组
+                              const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                              const monthAbbr = monthNames[date.getMonth()]; // getMonth() 返回 0-11
+
+                              const day = date.getDate(); // 日期，不需要前导0
+
+                              let hours = date.getHours(); // 0-23
+                              const minutes = String(date.getMinutes()).padStart(2, '0'); // 分钟，需要前导0
+
+                              const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                              hours = hours % 12;
+                              hours = hours ? hours : 12; // 0点（午夜或中午）应显示为12
+
+
+                              return `— ${monthAbbr} ${day}, ${hours}:${minutes} ${ampm}`;
+                            })()}
+                            </span>
+                          )}
                         </span>
+                       
                       </Link>
                     </li>
                   );
