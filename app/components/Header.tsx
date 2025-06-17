@@ -61,7 +61,7 @@ function Header({ themeToggleComponent }: HeaderProps) {
               <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-gray-900">
                   Blog
               </Link>
-              <Link href="/news-saas-pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              <Link href="/price" className="text-sm font-medium text-gray-600 hover:text-gray-900">
                   新闻SaaS定价
               </Link>
             </nav>

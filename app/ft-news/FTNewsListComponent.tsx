@@ -5,15 +5,11 @@ import Link from 'next/link';
 import { useFTNewsContext } from '../contexts/FTNewsContext'; // Adjusted path
 import { useEffect, useRef, useCallback, useState } from 'react';
 
-// Define the shape of an FT news item, consistent with context
 interface FTNewsItem {
   id: string;
-  page_url: string; 
+  page_url: string;
   page_title: string;
-  category?: {
-    text: string;
-    url: string;
-  };
+  category?: { text: string; url: string };
   headline: string;
   subheadline?: string;
   published_timestamp?: string;
@@ -21,13 +17,46 @@ interface FTNewsItem {
   created_at?: string;
 }
 
-export default function FTNewsListComponent() {
-  const { newsItems, loading, error, fetchInitialFTNews, fetchMoreFTNews, hasMore, manualLoadTriggered, setManualLoadTriggered } = useFTNewsContext();
+interface FTNewsListComponentProps {
+  initialNewsItems: FTNewsItem[];
+  initialHasMore: boolean;
+  initialSortOrder: 'asc' | 'desc';
+}
+
+export default function FTNewsListComponent({
+  initialNewsItems,
+  initialHasMore,
+  initialSortOrder,
+}: FTNewsListComponentProps) {
+  const {
+    newsItems: contextNewsItems,
+    setNewsItems: setContextNewsItems,
+    loading,
+    error,
+    fetchMoreFTNews,
+    hasMore: contextHasMore,
+    setHasMore: setContextHasMore,
+    manualLoadTriggered,
+    setManualLoadTriggered,
+    sortOrder: contextSortOrder,
+    setSortOrder: setContextSortOrder,
+    fetchInitialFTNews: contextFetchInitialFTNews,
+    setPage: setContextPage,
+    setLoading: setContextLoading,
+  } = useFTNewsContext();
+
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [searchValue, setSearchValue] = useState('');
 
-  // Allow scroll loading only after the first button click
+  useEffect(() => {
+    setContextNewsItems(initialNewsItems);
+    setContextHasMore(initialHasMore);setContextSortOrder(initialSortOrder);
+    setContextPage(1); 
+    setContextLoading(false); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialNewsItems, initialHasMore, initialSortOrder]);
+
   const handleManualLoadMore = useCallback(async () => {
     setManualLoadTriggered(true);
     await fetchMoreFTNews();
@@ -35,23 +64,33 @@ export default function FTNewsListComponent() {
 
   useEffect(() => {
     if (!manualLoadTriggered) return;
-    if (!hasMore || loading) return;
+    if (!contextHasMore || loading) return;
     if (!loadMoreRef.current) return;
+
     if (observer.current) observer.current.disconnect();
     observer.current = new window.IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !loading && hasMore) {
+      if (entries[0].isIntersecting && !loading && contextHasMore) {
         fetchMoreFTNews();
       }
     });
     observer.current.observe(loadMoreRef.current);
+
     return () => {
       if (observer.current) {
         observer.current.disconnect();
       }
     };
-  }, [manualLoadTriggered, hasMore, loading, fetchMoreFTNews]);
+  }, [manualLoadTriggered, contextHasMore, loading, fetchMoreFTNews]);
 
-  if (loading && newsItems.length === 0) {
+  const handleSortChange = async (newSortOrder: 'asc' | 'desc') => {
+    setContextSortOrder(newSortOrder);
+    setManualLoadTriggered(false); 
+  };
+
+  const displayedNewsItems = contextNewsItems
+    .filter(item => item.page_title && item.page_title.toLowerCase().includes(searchValue.toLowerCase()));
+
+  if (loading && displayedNewsItems.length === 0 && !initialNewsItems.length) {
     return (
       <div className="min-h-screen dark:bg-gray-900 bg-white dark:text-white text-gray-900 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -68,23 +107,28 @@ export default function FTNewsListComponent() {
         </Link>
       </div>
     );
-  }
-
-  if (newsItems.length === 0) {
-    return (
+  }if (displayedNewsItems.length === 0 && !loading && !searchValue) {
+     return (
       <div className="min-h-screen dark:bg-gray-900 bg-white dark:text-white text-gray-900 flex flex-col justify-center items-center p-4">
         <p className="dark:text-gray-400 text-gray-600 text-xl">No FT news articles found.</p>
+        {!manualLoadTriggered && contextHasMore && (
+          <button
+            onClick={handleManualLoadMore}
+            className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded shadow-lg text-lg font-semibold transition-colors duration-150"
+          >
+            Try Load More
+          </button>
+        )}
         <Link href="/" className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">
           Go Home
         </Link>
       </div>
     );
   }
-
+  
   return (
     <div className="space-y-6">
-      {/* Search Box */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center items-center gap-4 mb-4">
         <input
           type="search"
           className="border rounded px-4 py-2 w-full max-w-md dark:bg-gray-700 dark:text-white"
@@ -92,17 +136,14 @@ export default function FTNewsListComponent() {
           value={searchValue}
           onChange={e => setSearchValue(e.target.value)}
         />
+        <button
+          onClick={() => handleSortChange(contextSortOrder === 'asc' ? 'desc' : 'asc')}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        >
+          Sort: {contextSortOrder === 'asc' ? 'Oldest First' : 'Newest First'}
+        </button>
       </div>
-      {newsItems
-        .filter(item => item.page_title && item.page_title.toLowerCase().includes(searchValue.toLowerCase()))
-        .slice() // Copy array to avoid side effects
-        .sort((a, b) => {
-          // Sort by publishedtimestamputc in descending order, if not available, place at the end
-          const dateA = a.publishedtimestamputc ? new Date(a.publishedtimestamputc).getTime() : 0;
-          const dateB = b.publishedtimestamputc ? new Date(b.publishedtimestamputc).getTime() : 0;
-          return dateB - dateA;
-        })
-        .map((item: FTNewsItem, index) => (
+      {displayedNewsItems.map((item: FTNewsItem, index) => (
         <div key={`${item.id}-${index}`} className="dark:bg-gray-800 bg-gray-100 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
           {item.category && (
             <p className="text-sm text-orange-400 mb-1">
@@ -113,8 +154,7 @@ export default function FTNewsListComponent() {
             <a className="text-2xl font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline transition-colors duration-200 block mb-2">
               {item.headline}
             </a>
-          </Link>
-          {item.subheadline && (
+          </Link>{item.subheadline && (
             <p className="dark:text-gray-400 text-gray-600 mb-3 text-md">{item.subheadline}</p>
           )}
           <div className="text-xs dark:text-gray-500 text-gray-600">
@@ -129,8 +169,7 @@ export default function FTNewsListComponent() {
           </div>
         </div>
       ))}
-      {/* Load More Button and Scroll Anchor */}
-      {!manualLoadTriggered && hasMore && (
+      {!manualLoadTriggered && contextHasMore && (
         <div className="flex justify-center mt-8">
           <button
             onClick={handleManualLoadMore}
@@ -141,12 +180,12 @@ export default function FTNewsListComponent() {
           </button>
         </div>
       )}
-      {manualLoadTriggered && hasMore && (
+      {manualLoadTriggered && contextHasMore && (
         <div ref={loadMoreRef} className="flex justify-center mt-8">
           <span className="dark:text-gray-400 text-gray-600">{loading ? 'Loading...' : 'Scroll to load more'}</span>
         </div>
       )}
-      {!hasMore && (
+      {!contextHasMore && contextNewsItems.length > 0 && (
         <div className="text-center dark:text-gray-500 text-gray-600 py-10">No more news</div>
       )}
     </div>

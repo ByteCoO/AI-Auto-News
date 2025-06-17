@@ -39,7 +39,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    // Transform snake_case to camelCase for the frontend
+    const camelCaseData = data.map(item => ({
+      id: item.id,
+      publicationTimeUTC: item.published_timestamp, // a.k.a. publication_time_utc in all_latest_news
+      headline: item.headline,
+      pageTitle: item.page_title,
+      // Add other field mappings here if needed
+    }));
+
+    return NextResponse.json(camelCaseData);
   } catch (e) {
     console.error('Unexpected error in API route:', e);
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 });

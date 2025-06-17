@@ -1,4 +1,4 @@
-// app/news-saas-pricing/page.tsx
+// app/price/page.tsx
 'use client';
 
 import React, { useState } from 'react';

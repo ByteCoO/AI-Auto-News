@@ -1,43 +1,68 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import FTNewsClientPage from './FTNewsClientPage';
+// app/ft-news/page.tsx
+import FTNewsListComponent from './FTNewsListComponent';
+import { supabase } from '../lib/supabase';
+import { FTNewsProvider } from '../contexts/FTNewsContext'; // Import the provider
+
+// Define the shape of an FT news item, ensure consistency
+interface FTNewsItem {
+  id: string;
+  page_url: string;
+  page_title: string;
+  category?: { text: string; url: string };
+  headline: string;
+  subheadline?: string;
+  published_timestamp?: string;
+  created_at?: string;
+  publishedtimestamputc?: string;
+}
+
+const PAGE_SIZE = 6; // Consistent with context, or make it configurable
+
+async function getInitialFTNews(sortOrder: 'asc' | 'desc' = 'desc'): Promise<FTNewsItem[]> {
+  // This logic is adapted from fetchInitialFTNews in FTNewsContext
+  // but runs on the server.
+  try {
+    const { data, error } = await supabase
+      .from('FT_articles')
+      .select('id, page_url, page_title, category, headline, subheadline, published_timestamp, created_at, publishedtimestamputc')
+      .order('publishedtimestamputc', { ascending: sortOrder === 'asc' })
+      .range(0, PAGE_SIZE - 1);
+
+    if (error) {
+      console.error('Error fetching initial FT news on server:', error);
+      throw error; // Or handle more gracefully, e.g., return empty array or error object
+    }
+    return (data as FTNewsItem[]) || [];
+  } catch (err) {
+    console.error('Server-side fetch error:', err);
+    return []; // Return empty on error to prevent breaking page render
+  }
+}
 
 export default async function FTNewsPage() {
-  const cookieStore = cookies()
+  // Fetch initial news data on the server.
+  // The default sort order can be 'desc' or fetched from searchParams if needed later
+  const initialNewsItems = await getInitialFTNews('desc');
+  const initialHasMore = initialNewsItems.length === PAGE_SIZE;
+  
+  return (
+    <FTNewsProvider> {/* Wrap with Provider */}
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-10 dark:text-white">Financial Times News</h1>
+        <FTNewsListComponent
+          initialNewsItems={initialNewsItems}
+          initialHasMore={initialHasMore}
+          initialSortOrder="desc" // Pass the initial sort order
+        />
+      </div>
+    </FTNewsProvider>
+  );
+}
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-              }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // The `delete` method was called from a Server Component. Cookies can't be set
-            // from Server Components. This can happen if you're using a Supabase client
-            // in a Server Component with `revalidatePath` or similar.
-            // For more details: https://nextjs.org/docs/app/api-reference/functions/cookies#cookiesdotdelete
-          }
-        },
-      },
-    }
-  )
-/* 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login') // Redirect to a login page if user is not logged in
-  } */
-  return <FTNewsClientPage />;
+// Optional: Add metadata for SEO
+export async function generateMetadata() {
+  return {
+    title: 'Financial Times News | Latest Updates',
+    description: 'Browse the latest news articles from the Financial Times, updated regularly.',
+  };
 }

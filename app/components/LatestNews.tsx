@@ -1,3 +1,4 @@
+// app/components/LatestNews.tsx
 'use client';
 
 import Link from 'next/link';
@@ -5,32 +6,33 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface NewsItem {
   id: string;
-  published_timestamp: string; // Relative time like "44 minutes ago", from API
+  published_timestamp: string;
   headline?: string;
   page_title?: string;
-  publishedtimestamputc?: string; // Absolute UTC timestamp string, from API
-  created_at?: string; // Using publishedtimestamputc as a proxy
+  publishedtimestamputc?: string;
+  created_at?: string;
 }
 
 interface GroupedNews {
   [date: string]: NewsItem[];
 }
 
+// Props for the component, including initial data
+interface LatestNewsProps {
+  initialNewsItems?: NewsItem[];
+  initialTotalItems?: number;
+  initialPage?: number;
+}
+
 const formatDate = (dateString: string): string => {
-  // console.log('formatDate received:', dateString); // Debug formatDate input
   if (!dateString) return 'YYYY-MM-DD';
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      // console.log('formatDate: Invalid date for string:', dateString);
-      return 'Invalid Date';
-    }
-    const year = date.getFullYear(); // Changed to getFullYear
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Changed to getMonth
-    const day = date.getDate().toString().padStart(2, '0'); // Changed to getDate
-    const formatted = `${year}-${month}-${day}`;
-    // console.log(`formatDate: ${dateString} -> ${formatted}`); // Debug formatDate output
-    return formatted;
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   } catch (e) {
     console.error("Error formatting date:", dateString, e);
     return 'Error Date';
@@ -41,84 +43,83 @@ const ITEMS_PER_PAGE = 8;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
-export default function LatestNews() {
-  const [loading, setLoading] = useState(true);
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+export default function LatestNews({
+  initialNewsItems = [], // Default to empty array if not provided
+  initialTotalItems = 0,
+  initialPage = 1,
+}: LatestNewsProps) {
+  // Initialize states with props or defaults
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [totalItems, setTotalItems] = useState(initialTotalItems);
+  const [loading, setLoading] = useState(initialNewsItems.length === 0); // Only load if no initial items
+  const [initialLoadComplete, setInitialLoadComplete] = useState(initialNewsItems.length > 0);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [manualLoadDone, setManualLoadDone] = useState(false);
+  const [manualLoadDone, setManualLoadDone] = useState(initialNewsItems.length > 0); // If initial items, consider manual load triggered
 
-  const fetchNewsFromApi = useCallback(async (page: number, retries = 0) => {
+  const fetchNewsFromApi = useCallback(async (pageToFetch: number, retries = 0) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/news?page=${page}&limit=${ITEMS_PER_PAGE}`);
+      const response = await fetch(`/api/news?page=${pageToFetch}&limit=${ITEMS_PER_PAGE}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Error: ${response.status}`);
       }
       const { data, count } = await response.json();
-      // console.log(`API response for page ${page}:`, { data, count });
 
+      const transformedData = (data || []).map((apiItem: any, index: number) => ({
+        id: apiItem.id || `fallback-id-${pageToFetch}-${index}-${Math.random()}`,
+        published_timestamp: apiItem.published_timestamp,
+        headline: apiItem.headline,
+        page_title: apiItem.page_title,
+        publishedtimestamputc: apiItem.publishedtimestamputc,
+        created_at: apiItem.created_at,
+      }));
 
-      const transformedData = (data || []).map((apiItem: any, index: number) => {
-        // console.log(`API Item ${index} (page ${page}):`, JSON.stringify(apiItem));
-        return {
-          id: apiItem.id || `fallback-id-${page}-${index}-${Math.random()}`, // Ensure ID is always present
-          published_timestamp: apiItem.published_timestamp,
-          headline: apiItem.headline,
-          page_title: apiItem.page_title,
-          publishedtimestamputc: apiItem.publishedtimestamputc,
-          created_at: apiItem.created_at, // Proxy
-
-        };
-      });
-      // console.log(`Transformed Data (page ${page}):`, JSON.stringify(transformedData.slice(0,2))); // Log first few
-
-      // Sort by the absolute UTC timestamp, descending
       const sortedData = (transformedData || []).sort((a: NewsItem, b: NewsItem) => {
         const timeA = a.publishedtimestamputc ? new Date(a.publishedtimestamputc).getTime() : 0;
         const timeB = b.publishedtimestamputc ? new Date(b.publishedtimestamputc).getTime() : 0;
-        
         if (isNaN(timeB) && isNaN(timeA)) return 0;
-        if (isNaN(timeB)) return -1; // B is invalid, A is not, A comes "before" (larger time) B for descending
-        if (isNaN(timeA)) return 1;  // A is invalid, B is not, B comes "before" A
-        
+        if (isNaN(timeB)) return -1;
+        if (isNaN(timeA)) return 1;
         return timeB - timeA;
       });
-      // console.log(`Sorted Data to be set (page ${page}):`, JSON.stringify(sortedData.slice(0,2)));
 
-      setNewsItems(prevItems => page === 1 ? sortedData : [...prevItems, ...sortedData]);
+      // Append if pageToFetch is not the initial page loaded by server, otherwise replace if it's the very first client fetch
+      setNewsItems(prevItems => (pageToFetch === 1 && prevItems.length === 0) ? sortedData : [...prevItems, ...sortedData]);
       if (count !== undefined) {
         setTotalItems(count);
       }
-      setCurrentPage(page);
+      setCurrentPage(pageToFetch);
       setRetryCount(0);
     } catch (err) {
       console.error('Error fetching news:', err);
       if (retries < MAX_RETRIES) {
         setTimeout(() => {
-          fetchNewsFromApi(page, retries + 1);
+          fetchNewsFromApi(pageToFetch, retries + 1);
         }, RETRY_DELAY * (retries + 1));
-        setRetryCount(retries + 1); // Increment retry count here
+        setRetryCount(retries + 1);
         return;
       }
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      setRetryCount(retries); // Set final retry count
+      setRetryCount(retries);
     } finally {
       setLoading(false);
       if (!initialLoadComplete) {
         setInitialLoadComplete(true);
       }
     }
-  }, [initialLoadComplete]);
+  }, [initialLoadComplete]); // Removed initialPage from deps as it's used for initial state
 
   useEffect(() => {
-    fetchNewsFromApi(1);
-  }, [fetchNewsFromApi]);
+    // Only fetch if no initial items were provided (i.e., client-side only rendering scenario or error in SSR fetch)
+    if (initialNewsItems.length === 0 && !initialLoadComplete) {
+      fetchNewsFromApi(1);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchNewsFromApi, initialNewsItems.length]); // initialLoadComplete not needed here
 
   const loadMoreItems = useCallback(() => {
     if (!loading && newsItems.length < totalItems) {
@@ -141,14 +142,10 @@ export default function LatestNews() {
   }, [loading, newsItems.length, totalItems, loadMoreItems, initialLoadComplete, manualLoadDone]);
 
   const groupedVisibleNews = useMemo(() => {
-    // console.log('Grouping newsItems:', newsItems.slice(0,5));
     const grouped = newsItems.reduce((acc, item) => {
       const dateKeySource = item.publishedtimestamputc || item.published_timestamp;
-      // console.log(`Item ID ${item.id} for grouping uses timestamp: ${dateKeySource}, headline: ${item.headline}`);
       const dateKey = formatDate(dateKeySource);
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
+      if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(item);
       return acc;
     }, {} as GroupedNews);
@@ -159,25 +156,24 @@ export default function LatestNews() {
         new Date(a.created_at || a.publishedtimestamputc || a.published_timestamp || 0).getTime()
       );
     });
-    // console.log('Grouped news:', grouped);
     return grouped;
   }, [newsItems]);
 
   const sortedVisibleDates = useMemo(() => {
     return Object.keys(groupedVisibleNews).sort((a, b) => {
-      const dateA = new Date(a); // a and b are 'YYYY-MM-DD' strings
+      const dateA = new Date(a);
       const dateB = new Date(b);
-      // Check for Invalid Date if keys could be 'Invalid Date'
       if (isNaN(dateB.getTime()) && isNaN(dateA.getTime())) return 0;
-      if (isNaN(dateB.getTime())) return 1; // Invalid dates go to the end
+      if (isNaN(dateB.getTime())) return 1;
       if (isNaN(dateA.getTime())) return -1;
-      return dateB.getTime() - dateA.getTime(); // Sort descending
+      return dateB.getTime() - dateA.getTime();
     });
   }, [groupedVisibleNews]);
 
   const canLoadMore = newsItems.length < totalItems;
 
-  if (loading && newsItems.length === 0) {
+  // Initial loading spinner for client-side only first load
+  if (loading && newsItems.length === 0 && !initialLoadComplete) {
     return (
       <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
         <div className="container mx-auto px-4 w-full max-w-3xl text-center py-20">
@@ -193,7 +189,7 @@ export default function LatestNews() {
   if (error) {
     return (
       <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
-        <div className="container mx-Avenirauto px-4 w-full max-w-3xl text-center py-10">
+        <div className="container mx-auto px-4 w-full max-w-3xl text-center py-10">
           <p className="text-red-500">
             Error loading news: {error}
             {retryCount > 0 && ` (Retry attempt ${retryCount}/${MAX_RETRIES})`}
@@ -216,9 +212,7 @@ export default function LatestNews() {
   return (
     <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
       <div className="container mx-auto px-4 w-full max-w-3xl">
-        {/* {console.log("Rendering dates:", sortedVisibleDates)} */}
         {sortedVisibleDates.length > 0 && sortedVisibleDates.map(dateKey => {
-          // Skip rendering if the dateKey is 'Invalid Date' or similar error strings
           if (dateKey === 'Invalid Date' || dateKey === 'Error Date' || dateKey === 'YYYY-MM-DD') {
             return null;
           }
@@ -229,7 +223,6 @@ export default function LatestNews() {
               </h2>
               <ul className="space-y-2 list-none p-0 m-0">
                 {groupedVisibleNews[dateKey].map((item) => {
-                  // console.log(`Rendering item ${item.id} for date ${dateKey}: headline='${item.headline}', page_title='${item.page_title}'`);
                   return (
                     <li key={item.id} className="text-base sm:text-lg leading-relaxed">
                       <Link
@@ -243,29 +236,19 @@ export default function LatestNews() {
                             <span className="text-xs text-gray-500 ml-2">
                             {(() => {
                               const date = new Date(item.publishedtimestamputc);
-
-                              // 月份缩写数组
-                              const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                              const monthAbbr = monthNames[date.getMonth()]; // getMonth() 返回 0-11
-
-                              const day = date.getDate(); // 日期，不需要前导0
-
-                              let hours = date.getHours(); // 0-23
-                              const minutes = String(date.getMinutes()).padStart(2, '0'); // 分钟，需要前导0
-
+                              const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                              const monthAbbr = monthNames[date.getMonth()];
+                              const day = date.getDate();
+                              let hours = date.getHours();
+                              const minutes = String(date.getMinutes()).padStart(2, '0');
                               const ampm = hours >= 12 ? 'PM' : 'AM';
-
                               hours = hours % 12;
-                              hours = hours ? hours : 12; // 0点（午夜或中午）应显示为12
-
-
+                              hours = hours ? hours : 12;
                               return `— ${monthAbbr} ${day}, ${hours}:${minutes} ${ampm}`;
                             })()}
                             </span>
                           )}
                         </span>
-                       
                       </Link>
                     </li>
                   );
@@ -275,7 +258,7 @@ export default function LatestNews() {
           );
         })}
 
-        {loading && newsItems.length > 0 && (
+        {loading && newsItems.length > 0 && ( // Show spinner when loading more items, but not on initial client-side load if items exist
           <div className="text-center py-8">
             <div
               className="inline-block h-8 w-8 sm:h-10 sm:w-10 animate-spin rounded-full border-4 border-solid dark:border-white border-gray-900 dark:border-r-transparent border-r-transparent"

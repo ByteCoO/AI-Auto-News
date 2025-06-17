@@ -1,5 +1,5 @@
 // app/page.tsx
-import MultiSourceNews, { RawNewsItemFromDb, SourceDisplayDetail, NewsItem as ComponentNewsItem } from './components/MultiSourceNews';
+import MultiSourceNews, { NewsSource } from './components/MultiSourceNews';
 import LatestNews from './components/LatestNews';
 import { Metadata } from 'next';
 
@@ -51,7 +51,8 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yourdomain.com';
 
 export const metadata: Metadata = {
   title: `${siteName} - Latest News, Hot Content & More`,
-  description: 'Welcome to Game Visiong. Discover the latest news, trending content, and insightful articles in the world of gaming and beyond.',alternates: {
+  description: 'Welcome to Game Visiong. Discover the latest news, trending content, and insightful articles in the world of gaming and beyond.',
+  alternates: {
     canonical: `${baseUrl}/`,
   },
   openGraph: {
@@ -97,84 +98,69 @@ async function getInitialLatestNewsData(): Promise<LatestNewsData> {
   }
 }
 
-// Fetches all raw news items for the MultiSourceNews component
-async function fetchAllRawNewsForMultiSource(): Promise<RawNewsItemFromDb[]> {
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?sourceType=multi`; // Or your endpoint for all news
+// Helper function to group news by source and format for MultiSourceNews
+async function getGroupedNewsData(): Promise<NewsSource[]> {
+  // Assuming /api/news by default fetches all sources for MultiSourceNews
+  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?sourceType=multi`; // Added sourceType to differentiate if needed
   try {
     const res = await fetch(apiUrl, { cache: 'no-store' });
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Failed to fetch multi-source raw news: ${res.status} ${res.statusText}. Response: ${errorText}`);
+      console.error(`Failed to fetch multi-source news: ${res.status} ${res.statusText}. Response: ${errorText}`);
       return [];
     }
     const apiResponse = await res.json();
-    const allNewsFromApi: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse.data || []);
+    // Adjust based on actual API response structure for multi-source.
+    // Assuming apiResponse is directly the array of all news items or { data: allNewsItems }
+    const allNews: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse.data || []);
 
-    // Transform API items to RawNewsItemFromDb structure
-    const rawNewsItems: RawNewsItemFromDb[] = allNewsFromApi.map((item: any) => ({
-      id: item.id ? String(item.id) : `fallback-raw-${Math.random()}`,
-      source: item.source || 'Unknown', // Ensure source is present
-      title: item.title || item.headline || 'No Title', // Ensure title is present
-      url: item.url,
-      original_timestamp: item.original_timestamp || item.published_timestamp, // Prefer original_timestamp if available
-      publication_time_utc: item.publishedtimestamputc || item.publicationTimeUTC, // Raw UTC timestamp string from API
-    }));
-    
-    // The MultiSourceNews component itself handles grouping by source and can also handle sorting within those groups if needed.
-    // If presorting of the flat list is desired before passing to the component, it can be done here.
-    // For example, to sort all items globally by publication time descending:
-    // rawNewsItems.sort((a, b) => {
-    //   const dateA = new Date(a.publication_time_utc || a.original_timestamp || 0).getTime();
-    //   const dateB = new Date(b.publication_time_utc || b.original_timestamp || 0).getTime();
-    //   return dateB - dateA; // Sort descending
-    // });
 
-    return rawNewsItems;
+    allNews.sort((a, b) => {
+      const dateA = new Date(a.publishedtimestamputc || a.publicationTimeUTC || 0);
+      const dateB = new Date(b.publishedtimestamputc || b.publicationTimeUTC || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    const sourceConfig: { [key: string]: Omit<NewsSource, 'newsItems'> } = {
+      'Bloomberg': { id: 'bloomberg', name: 'Bloomberg', logoLetter: 'B', updateLabel: '刚刚更新', cardBgColor: 'bg-gray-800 dark:bg-gray-700', cardTextColor: 'text-white', cardCustomStyle: { height: '400px', overflowY: 'auto' } },
+      'zaobao': { id: 'zaobao', name: '联合早报', logoLetter: '早', updateLabel: '刚刚更新', cardBgColor: 'bg-red-700 dark:bg-red-800', cardTextColor: 'text-white' },
+      'wallstreetcn': { id: 'wallstreetcn', name: '华尔街见闻', logoUrl: '/images/wallstreetcn-logo.png', updateLabel: '实时快讯', cardBgColor: 'bg-indigo-600 dark:bg-indigo-700', cardTextColor: 'text-white' },
+      'ithome': { id: 'ithome', name: 'IT之家', logoLetter: 'IT', updateLabel: '刚刚更新', cardBgColor: 'bg-rose-600 dark:bg-rose-700', cardTextColor: 'text-white' },
+    };
+
+    const grouped = allNews.reduce((acc, item) => {
+      const sourceKey = item.source || 'Unknown';
+      if (!acc[sourceKey]) acc[sourceKey] = [];
+      acc[sourceKey].push({
+        id: item.id ? item.id.toString() : `fallback-multi-${Math.random()}`,
+        timestamp: item.original_timestamp,
+        headline: item.title || item.headline,
+        url: item.url,
+        publicationTimeUTC: (item.publishedtimestamputc || item.publicationTimeUTC) ? formatPublicationTime(item.publishedtimestamputc || item.publicationTimeUTC) : 'N/A',
+        rawPublicationTimeUTC: item.publishedtimestamputc || item.publicationTimeUTC, // Keep original for JSON-LD
+      });
+      return acc;
+    }, {} as Record<string, NewsItem[]>);
+
+    const formattedNewsData = Object.keys(sourceConfig)
+      .map(key => ({
+        ...sourceConfig[key],
+        newsItems: grouped[key] || [],
+      }))
+      .filter(source => source.newsItems.length > 0);
+
+    return formattedNewsData;
   } catch (error) {
-    console.error("Error fetching or processing raw news for MultiSourceNews:", error);
+    console.error("Error fetching or processing multi-source news:", error);
     return [];
   }
 }
 
 export default async function Home() {
-  // Define sourceDisplayDetails - this comes from your old sourceConfig
-  // Ensure this matches the SourceDisplayDetail interface from MultiSourceNews.tsx
-  // The 'name' property in SourceDisplayDetail must match the 'source' field in RawNewsItemFromDb for custom details to apply.
-  const multiSourceDisplayDetails: SourceDisplayDetail[] = [
-    {
-      name: 'Bloomberg',
-      logoLetter: 'B',
-      updateLabel: 'Updated Recently',
-      cardBgColor: 'bg-gray-800 dark:bg-gray-700',
-      cardCustomStyle: { height: '400px', overflowY: 'auto' }
-    },
-    {
-      name: 'FT', // Financial Times
-      logoLetter: 'F', 
-      updateLabel: 'Articles', 
-      cardCustomStyle: { height: '400px', overflowY: 'auto' }
-    },
-    {
-      name: 'Reuters',
-      logoLetter: 'R', 
-      updateLabel: 'Updates', 
-      cardCustomStyle: { height: '400px', overflowY: 'auto' }
-    }
-  ];
-
-  const [allRawMultiSourceNews, latestNewsInitialData] = await Promise.all([
-    fetchAllRawNewsForMultiSource(), // Changed function call
+  const [multiSourceNewsData, latestNewsInitialData] = await Promise.all([
+    getGroupedNewsData(),
     getInitialLatestNewsData()
   ]);
-
-  // ***** DEBUG LOG *****
-  console.log("All Raw Multi-Source News Items (page.tsx):", JSON.stringify(allRawMultiSourceNews, null, 2));
-  // You can also filter for items you think should be Bloomberg or Reuters:
-  // const allegedBloombergItems = allRawMultiSourceNews.filter(item => item.source?.toLowerCase() === "bloomberg");
-  // console.log("Alleged Bloomberg Items in raw data:", JSON.stringify(allegedBloombergItems, null, 2));
-  // const allegedReutersItems = allRawMultiSourceNews.filter(item => item.source?.toLowerCase() === "reuters");
-  // console.log("Alleged Reuters Items in raw data:", JSON.stringify(allegedReutersItems, null, 2));
-  // ***** END DEBUG LOG *****
 
   const jsonLdWebSite = {
     '@context': 'https://schema.org',
@@ -220,31 +206,27 @@ export default async function Home() {
     });
   }
 
-  // JSON-LD for MultiSourceNews (now using allRawMultiSourceNews)
-  allRawMultiSourceNews.forEach(item => {
-    // Ensure item.url and item.publication_time_utc are valid before creating LD
-    if (item.title && item.url && item.publication_time_utc) {
-      try {
-        const datePublished = new Date(item.publication_time_utc).toISOString();
+  // JSON-LD for MultiSourceNews
+  multiSourceNewsData.forEach(source => {
+    (source.newsItems as NewsItem[]).forEach(item => { // Cast newsItems to NewsItem[]
+      if (item.headline && item.url && item.rawPublicationTimeUTC) {
         allNewsArticlesLd.push({
           '@type': 'NewsArticle',
           mainEntityOfPage: { '@type': 'WebPage', '@id': item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}` },
-          headline: item.title,
-          datePublished: datePublished,
-          dateModified: datePublished, // Assuming same as published, or use a different field if available
-          author: { '@type': 'Organization', name: item.source || siteName },
+          headline: item.headline,
+          datePublished: new Date(item.rawPublicationTimeUTC).toISOString(),
+          dateModified: new Date(item.rawPublicationTimeUTC).toISOString(),
+          author: { '@type': 'Organization', name: source.name || siteName },
           publisher: {
             '@type': 'Organization', name: siteName,
             logo: { '@type': 'ImageObject', url: `${baseUrl}/logo.png` },
           },
         });
-      } catch (e) {
-        console.error("Error creating JSON-LD for multi-source item:", item, e);
       }
-    }
+    });
   });
 
-  const jsonLdNewsGraph = allNewsArticlesLd.length > 0 ? { // Renamed variable
+  const jsonLdNews = allNewsArticlesLd.length > 0 ? {
     '@context': 'https://schema.org',
     '@graph': allNewsArticlesLd
   } : null;
@@ -259,26 +241,21 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
       />
-      {jsonLdNewsGraph && ( // Using renamed variable
+      {jsonLdNews && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNewsGraph) }} // Using renamed variable
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNews) }}
         />
       )}
       <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <div className="p-4">
-        
-          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1> {/* Added mt-8 for spacing */}
-          {/* Updated MultiSourceNews call */}
-          <MultiSourceNews 
-            rawNewsItems={allRawMultiSourceNews} 
-            sourceDisplayDetails={multiSourceDisplayDetails} 
-          />
-         {/*  <LatestNews 
+          <LatestNews 
             initialNewsItems={latestNewsInitialData.newsItems} 
             initialTotalItems={latestNewsInitialData.totalItems}
             initialPage={1} 
-          /> */}
+          />
+          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1> {/* Added mt-8 for spacing */}
+          <MultiSourceNews sources={multiSourceNewsData} />
         </div>
       </main>
     </>

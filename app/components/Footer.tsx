@@ -11,17 +11,7 @@ export default function Footer() {
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {/* Column 1: Brand/About */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-              {/* Replace with your Brand Name or Logo */}
-              The Developer's Choice for Financial News Integration.
-              </h3>
-            <p className="mb-4">
-            With the FT-News API, unlock a world of financial insights directly within your applications. We provide a scalable and reliable SaaS solution for accessing breaking financial news, historical data, and expert analysis. Build innovative fintech products, inform investment strategies, and provide your users with the timely information they need, all powered by FT-News.
-            </p>
-           
-          </div>
+        
 
           {/* Column 2: Quick Links */}
           <div>
@@ -35,12 +25,12 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/news-saas-pricing" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   About Us
                 </a>
               </li>
               <li>
-                <a href="/news-saas-pricing" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   Services
                 </a>
               </li>
