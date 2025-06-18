@@ -9,64 +9,95 @@ export async function GET(request: NextRequest) { // Add NextRequest
     const searchParams = request.nextUrl.searchParams;
     const sourceType = searchParams.get('sourceType');
 
-    let page, limit, from, to;
-
     if (sourceType === 'multi') {
-      // For 'multi', fetch a larger set of recent articles across all sources
-      // Let MultiSourceNews component handle the filtering by specific source
-      page = 1; 
-      limit = 100; // Fetch more items for 'multi' display, e.g., latest 100 across all sources
-                   // Adjust this number based on how many total items you want to process client-side
-      from = 0;
-      to = limit - 1;
+      const sourcesToFetch = [
+        { name: 'Bloomberg', identifiers: ['Bloomberg', 'bloomberg'] },
+        { name: 'FT', identifiers: ['FT'] },
+        { name: 'Reuters', identifiers: ['Reuters'] }
+      ];
+      const itemsPerSource = 10; // 每个来源获取10条新闻
+      let allNewsData: any[] = [];
+      let cumulativeCount = 0;
+
+      for (const sourceInfo of sourcesToFetch) {
+        const queryResponse = await supabase
+          .from('all_latest_news')
+          .select('*', { count: 'exact' })
+          .in('source', sourceInfo.identifiers)
+          .order('publication_time_utc', { ascending: false })
+          .limit(itemsPerSource);
+        
+        const sourceData = queryResponse.data;
+        const sourceError = queryResponse.error;
+        const sourceDbCount = queryResponse.count;
+
+        if (sourceError) {
+          console.error(`Supabase error fetching ${sourceInfo.name}:`, sourceError.message);
+          // 如果一个来源失败，继续获取其他来源
+        } else if (sourceData) {
+          allNewsData = allNewsData.concat(sourceData);
+          cumulativeCount += sourceDbCount || 0; 
+        }
+      }
+
+      // 按发布日期对所有收集到的新闻进行降序排序
+      allNewsData.sort((a, b) => {
+        const dateA = a.publication_time_utc ? new Date(a.publication_time_utc).getTime() : 0;
+        const dateB = b.publication_time_utc ? new Date(b.publication_time_utc).getTime() : 0;
+        if (isNaN(dateA) && isNaN(dateB)) return 0; // 两者都无效，视为相等
+        if (isNaN(dateA)) return 1; // 无效的 A 排在有效的 B 之后
+        if (isNaN(dateB)) return -1; // 无效的 B 排在有效的 A 之后
+        return dateB - dateA;
+      });
+      
+      const camelCaseData = allNewsData.map(item => ({
+        id: item.id,
+        source: item.source,
+        title: item.title,
+        url: item.url,
+        published_timestamp: item.original_timestamp,
+        headline: item.title,
+        page_title: item.title,
+        publishedtimestamputc: item.publication_time_utc,
+        created_at: item.created_at,
+        rawPublicationTimeUTC: item.publication_time_utc,
+      }));
+      return NextResponse.json({ data: camelCaseData, count: cumulativeCount });
+
     } else {
-      // For 'latest' or other types (like default when no sourceType is provided), use provided page/limit or defaults
-      page = parseInt(searchParams.get('page') || '1', 10);
-      limit = parseInt(searchParams.get('limit') || '10', 10); // Default limit 10 for 'latest'
-      from = (page - 1) * limit;
-      to = from + limit - 1;
+      // “latest”或其他类型的逻辑 (默认分页) - 这部分保持不变
+      let page = parseInt(searchParams.get('page') || '1', 10);
+      let limit = parseInt(searchParams.get('limit') || '10', 10);
+      let from = (page - 1) * limit;
+      let to = from + limit - 1;
+
+      let query = supabase
+        .from('all_latest_news')
+        .select('*', { count: 'exact' })
+        .order('publication_time_utc', { ascending: false })
+        .range(from, to);
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        console.error('Supabase error:', error);
+        return NextResponse.json({ error: error.message, data: [], count: 0 }, { status: 500 });
+      }
+
+      const camelCaseData = data.map(item => ({
+        id: item.id,
+        source: item.source,
+        title: item.title,
+        url: item.url,
+        published_timestamp: item.original_timestamp,
+        headline: item.title,
+        page_title: item.title,
+        publishedtimestamputc: item.publication_time_utc,
+        created_at: item.created_at,
+        rawPublicationTimeUTC: item.publication_time_utc,
+      }));
+      return NextResponse.json({ data: camelCaseData, count: count || 0 });
     }
-
-    let query = supabase
-      .from('all_latest_news')
-      .select('*', { count: 'exact' }) // Fetch count
-      .order('publication_time_utc', { ascending: false }); // Order by publication time
-
-    if (sourceType === 'multi') {
-      query = query.in('source', ['Bloomberg', 'FT', 'Reuters']);
-    }
-
-    query = query.range(from, to); // Apply pagination
-
-    // Placeholder for future sourceType differentiation if needed for 'all_latest_news' has been addressed by the logic above.
-    // If sourceType is 'multi', we fetch a larger dataset.
-    // If sourceType is 'latest' (or other/default), we use standard pagination.
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json({ error: error.message, data: [], count: 0 }, { status: 500 });
-    }
-
-    const camelCaseData = data.map(item => ({
-      id: item.id,
-      source: item.source,
-      title: item.title,
-      url: item.url,
-      // Ensure field names match what page.tsx expects for dates
-      published_timestamp: item.original_timestamp, // Assuming original_timestamp is what page.tsx's published_timestamp expects
-      headline: item.title, // Assuming title can serve as headline
-      page_title: item.title, // Assuming title can serve as page_title
-      publishedtimestamputc: item.publication_time_utc, // This is crucial for formatPublicationTime
-      created_at: item.created_at, // Keep original if needed by page.tsx
-      // Add any other fields page.tsx might require, like rawPublicationTimeUTC
-      rawPublicationTimeUTC: item.publication_time_utc, // For JSON-LD
-    }));
-
-    // Return data and count
-    return NextResponse.json({ data: camelCaseData, count: count || 0 });
-
   } catch (error) {
     console.error('API route error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';

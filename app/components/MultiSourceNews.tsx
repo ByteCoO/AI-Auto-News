@@ -1,7 +1,8 @@
+"use client";
 // app/components/MultiSourceNews.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import { ArrowPathIcon, StarIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 
@@ -74,6 +75,15 @@ const MultiSourceNews: React.FC<MultiSourceNewsProps> = ({
   rawNewsItems = [],
   sourceDisplayDetails = [],
 }) => {
+  useEffect(() => {
+    if (rawNewsItems && rawNewsItems.length > 0) {
+      const uniqueSources = Array.from(new Set(rawNewsItems.map(item => item.source).filter(Boolean))); // Filter out undefined/null sources
+      console.log('[MultiSourceNews Component] Received unique source values in rawNewsItems:', uniqueSources);
+    } else {
+      console.log('[MultiSourceNews Component] Received empty or no rawNewsItems, or rawNewsItems contains items with no source field.');
+    }
+  }, [rawNewsItems]);
+
   // Create a map of the provided display details for easy lookup by source name (case-insensitive)
   const displayDetailsMap = new Map(
     sourceDisplayDetails.map(detail => [detail.name.toLowerCase(), detail])

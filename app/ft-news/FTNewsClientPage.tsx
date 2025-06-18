@@ -10,7 +10,7 @@ export default function FTNewsClientPage() {
       <div className="min-h-screen dark:bg-gray-900 w-full bg-white dark:text-white text-gray-900 py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold mb-8 text-center text-orange-400">FT News</h1>
-          <FTNewsListComponent />
+          <FTNewsListComponent initialNewsItems={[]} initialHasMore={true} initialSortOrder={'desc'} />
         </div>
         <div className="fixed bottom-6 right-6 z-50">
           <Link href="/" className="block p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150">
