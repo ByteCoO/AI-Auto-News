@@ -233,7 +233,7 @@ export default async function Home() {
     // Ensure item.url and item.publication_time_utc are valid before creating LD
     if (item.headline && item.url && item.publicationTimeUTC) {
       try {
-        const datePublished = new Date(item.publication_time_utc).toISOString();
+        const datePublished = new Date(item.publicationTimeUTC).toISOString();
         allNewsArticlesLd.push({
           '@type': 'NewsArticle',
           mainEntityOfPage: { '@type': 'WebPage', '@id': item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}` },
