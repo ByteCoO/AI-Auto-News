@@ -97,49 +97,62 @@ async function getInitialLatestNewsData(): Promise<LatestNewsData> {
   }
 }
 
-// Fetches all raw news items for the MultiSourceNews component
-async function fetchAllRawNewsForMultiSource(): Promise<RawNewsItemFromDb[]> {
-  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?sourceType=multi`; // Or your endpoint for all news
-  try {
-    const res = await fetch(apiUrl, { cache: 'no-store' });
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`Failed to fetch multi-source raw news: ${res.status} ${res.statusText}. Response: ${errorText}`);
-      return [];
+import { supabase } from '@/lib/supabaseClient'; // Import supabase client directly
+
+// Define a minimal config for data fetching in page.tsx
+const PAGE_TARGET_SOURCES_CONFIG = [
+  { key: 'bloomberg', name: 'Bloomberg' },
+  { key: 'ft', name: 'FT' },
+  { key: 'reuters', name: 'Reuters' },
+];
+
+// This function now fetches data DIRECTLY from Supabase on the server-side.
+async function getInitialMultiSourceData(): Promise<Record<string, { items: ComponentNewsItem[], page: number, hasMore: boolean, isLoading: boolean }>> {
+  const initialNewsData: Record<string, any> = {};
+  const itemsPerPage = 10;
+
+  for (const config of PAGE_TARGET_SOURCES_CONFIG) {
+    try {
+      // Direct database query instead of fetch()
+      const { data, error, count } = await supabase
+        .from('all_latest_news')
+        .select('*', { count: 'exact' })
+        .ilike('source', `%${config.name}%`)
+        .order('publication_time_utc', { ascending: false })
+        .range(0, itemsPerPage - 1);
+
+      if (error) {
+        throw new Error(`Supabase query failed for ${config.name}: ${error.message}`);
+      }
+
+      // Transform data for the component
+      const items: ComponentNewsItem[] = (data || []).map((item: any) => ({
+        id: String(item.id),
+        headline: item.title,
+        url: item.url,
+        timestamp: item.original_timestamp || 'N/A',
+        publicationTimeUTC: item.publication_time_utc,
+      }));
+      
+      initialNewsData[config.name] = {
+        items: items,
+        page: 1,
+        hasMore: items.length < (count || 0),
+        isLoading: false,
+      };
+
+    } catch (error) {
+      console.error(`Error fetching initial data for ${config.name} directly from Supabase:`, error);
+      // Provide a default empty state on error to prevent crashing the page
+      initialNewsData[config.name] = { items: [], page: 1, hasMore: false, isLoading: false };
     }
-    const apiResponse = await res.json();
-    const allNewsFromApi: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse.data || []);
-
-    // Transform API items to RawNewsItemFromDb structure
-    const rawNewsItems: RawNewsItemFromDb[] = allNewsFromApi.map((item: any) => ({
-      id: item.id ? String(item.id) : `fallback-raw-${Math.random()}`,
-      source: item.source || 'Unknown', // Ensure source is present
-      title: item.title || item.headline || 'No Title', // Ensure title is present
-      url: item.url,
-      original_timestamp: item.original_timestamp || item.published_timestamp, // Prefer original_timestamp if available
-      publication_time_utc: item.publishedtimestamputc || item.publicationTimeUTC, // Raw UTC timestamp string from API
-    }));
-    
-    // The MultiSourceNews component itself handles grouping by source and can also handle sorting within those groups if needed.
-    // If presorting of the flat list is desired before passing to the component, it can be done here.
-    // For example, to sort all items globally by publication time descending:
-    // rawNewsItems.sort((a, b) => {
-    //   const dateA = new Date(a.publication_time_utc || a.original_timestamp || 0).getTime();
-    //   const dateB = new Date(b.publication_time_utc || b.original_timestamp || 0).getTime();
-    //   return dateB - dateA; // Sort descending
-    // });
-
-    return rawNewsItems;
-  } catch (error) {
-    console.error("Error fetching or processing raw news for MultiSourceNews:", error);
-    return [];
   }
+  return initialNewsData;
 }
 
+
 export default async function Home() {
-  // Define sourceDisplayDetails - this comes from your old sourceConfig
-  // Ensure this matches the SourceDisplayDetail interface from MultiSourceNews.tsx
-  // The 'name' property in SourceDisplayDetail must match the 'source' field in RawNewsItemFromDb for custom details to apply.
+  // Define sourceDisplayDetails
   const multiSourceDisplayDetails: SourceDisplayDetail[] = [
     {
       name: 'Bloomberg',
@@ -149,7 +162,7 @@ export default async function Home() {
       cardCustomStyle: { height: '400px', overflowY: 'auto' }
     },
     {
-      name: 'FT', // Financial Times
+      name: 'FT',
       logoLetter: 'F', 
       updateLabel: 'Articles', 
       cardCustomStyle: { height: '400px', overflowY: 'auto' }
@@ -162,19 +175,11 @@ export default async function Home() {
     }
   ];
 
-  const [allRawMultiSourceNews, latestNewsInitialData] = await Promise.all([
-    fetchAllRawNewsForMultiSource(), // Changed function call
+  // Fetch initial data directly, and for latest news
+  const [initialMultiSourceData, latestNewsInitialData] = await Promise.all([
+    getInitialMultiSourceData(),
     getInitialLatestNewsData()
   ]);
-
-  // ***** DEBUG LOG *****
-  console.log("All Raw Multi-Source News Items (page.tsx):", JSON.stringify(allRawMultiSourceNews, null, 2));
-  // You can also filter for items you think should be Bloomberg or Reuters:
-  // const allegedBloombergItems = allRawMultiSourceNews.filter(item => item.source?.toLowerCase() === "bloomberg");
-  // console.log("Alleged Bloomberg Items in raw data:", JSON.stringify(allegedBloombergItems, null, 2));
-  // const allegedReutersItems = allRawMultiSourceNews.filter(item => item.source?.toLowerCase() === "reuters");
-  // console.log("Alleged Reuters Items in raw data:", JSON.stringify(allegedReutersItems, null, 2));
-  // ***** END DEBUG LOG *****
 
   const jsonLdWebSite = {
     '@context': 'https://schema.org',
@@ -220,8 +225,11 @@ export default async function Home() {
     });
   }
 
-  // JSON-LD for MultiSourceNews (now using allRawMultiSourceNews)
-  allRawMultiSourceNews.forEach(item => {
+  // Flatten the initial data from all sources into a single array for JSON-LD
+  const allInitialMultiSourceItems = Object.values(initialMultiSourceData).flatMap(source => source.items);
+
+  // JSON-LD for MultiSourceNews
+  allInitialMultiSourceItems.forEach(item => {
     // Ensure item.url and item.publication_time_utc are valid before creating LD
     if (item.title && item.url && item.publication_time_utc) {
       try {
@@ -244,7 +252,7 @@ export default async function Home() {
     }
   });
 
-  const jsonLdNewsGraph = allNewsArticlesLd.length > 0 ? { // Renamed variable
+  const jsonLdNewsGraph = allNewsArticlesLd.length > 0 ? {
     '@context': 'https://schema.org',
     '@graph': allNewsArticlesLd
   } : null;
@@ -259,21 +267,23 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
       />
-      {jsonLdNewsGraph && ( // Using renamed variable
+      {jsonLdNewsGraph && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNewsGraph) }} // Using renamed variable
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNewsGraph) }}
         />
       )}
       <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <div className="p-4">
         
-          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1> {/* Added mt-8 for spacing */}
-          {/* Updated MultiSourceNews call */}
+          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1>
+          
+          {/* Pass the initial data fetched on the server to the client component */}
           <MultiSourceNews 
-            rawNewsItems={allRawMultiSourceNews} 
+            initialNewsData={initialMultiSourceData} 
             sourceDisplayDetails={multiSourceDisplayDetails} 
           />
+          
          {/*  <LatestNews 
             initialNewsItems={latestNewsInitialData.newsItems} 
             initialTotalItems={latestNewsInitialData.totalItems}

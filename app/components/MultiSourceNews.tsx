@@ -45,42 +45,26 @@ const TARGET_SOURCES_CONFIG = [
 ];
 
 // --- Main Component ---
-const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ rawNewsItems, sourceDisplayDetails = [] }) => {
-  const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>(() => {
-    const initialState: Record<string, NewsSourceState> = {};
-    TARGET_SOURCES_CONFIG.forEach(config => {
-      const sourceItems = rawNewsItems
-        .filter(item => item.source.toLowerCase() === config.key.toLowerCase())
-        .map(item => ({
-          id: String(item.id),
-          headline: item.title,
-          url: item.url,
-          timestamp: item.original_timestamp || 'N/A',
-          publicationTimeUTC: item.publication_time_utc
-        }));
-      
-      initialState[config.name] = {
-        items: sourceItems.slice(0, 10), // Initial page size
-        page: 1,
-        hasMore: sourceItems.length > 10,
-        isLoading: false
-      };
-    });
-    return initialState;
-  });
+const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceState>, sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ initialNewsData, sourceDisplayDetails = [] }) => {
+  const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>(initialNewsData);
   const observers = useRef(new Map());
 
   const fetchNews = useCallback(async (sourceName: string, page: number = 1) => {
+    // Prevent multiple simultaneous fetches for the same source
     if (newsSources[sourceName]?.isLoading) return;
 
     setNewsSources(prev => ({
       ...prev,
-      [sourceName]: { ...prev[sourceName], isLoading: true },
+      [sourceName]: {
+        ...(prev[sourceName] || { items: [], page: 0, hasMore: true }),
+        isLoading: true,
+      },
     }));
 
     try {
       const response = await fetch(`/api/news?source=${sourceName}&page=${page}&limit=10`);
       if (!response.ok) throw new Error(`Failed to fetch news for ${sourceName}`);
+      
       const { data, count } = await response.json();
 
       const newItems: NewsItem[] = data.map((rawItem: any) => ({
@@ -93,7 +77,7 @@ const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDispl
 
       setNewsSources(prev => {
         const existingItems = prev[sourceName]?.items || [];
-        const allItems = [...existingItems, ...newItems];
+        const allItems = page === 1 ? newItems : [...existingItems, ...newItems];
         return {
           ...prev,
           [sourceName]: {
@@ -108,10 +92,12 @@ const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDispl
       console.error(error);
       setNewsSources(prev => ({
         ...prev,
-        [sourceName]: { ...(prev[sourceName] || { items:[], page:1, hasMore: false }), isLoading: false },
+        [sourceName]: { ...(prev[sourceName] || { items: [], page: 1, hasMore: false }), isLoading: false },
       }));
     }
-  }, [newsSources]);
+  }, [newsSources]); // Dependency on newsSources to access isLoading state
+
+  // Initial fetch for all sources is removed, as data is now passed via props.
 
   const loadMoreTriggerRef = useCallback((node: HTMLDivElement | null) => {
     if (!node) return;
@@ -172,15 +158,18 @@ const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDispl
                 </div>
 
                 {/* News Items List - with fixed height and scroll */}
-                <div className="flex-grow h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 dark:hover:scrollbar-thumb-slate-500">
+                <div className="h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 dark:hover:scrollbar-thumb-slate-500">
                   {sourceState.isLoading && sourceState.items.length === 0 ? (
                       <div className="flex h-full items-center justify-center text-slate-500">Loading...</div>
                   ) : sourceState.items.length > 0 ? (
                     <ul className="space-y-3">
                       {sourceState.items.map((item) => (
                         <li key={item.id} className="border-l-2 border-slate-200 dark:border-slate-700 pl-3 py-1 dark:text-amber-300">
-                          <div className="text-xs opacity-70 mb-0.5 dark:text-white">
-                            {item.publicationTimeUTC ? format(new Date(item.publicationTimeUTC), 'dd MMM') : item.timestamp}
+                          <div className="flex items-center text-xs opacity-70 mb-0.5 dark:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {item.publicationTimeUTC ? format(new Date(item.publicationTimeUTC), 'dd MMMM yyyy') : item.timestamp}
                           </div>
                           {item.url ? (
                             <Link href={item.url} className="text-sm sm:text-base hover:underline">{item.headline}</Link>
@@ -203,6 +192,7 @@ const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDispl
                 
                 {/* Footer for status display */}
                 <div className="h-6 mt-3 text-center text-sm text-slate-500">
+                  
                   {sourceState.isLoading && sourceState.items.length > 0 && (
                     <p>Loading more...</p>
                   )}
@@ -211,7 +201,7 @@ const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDispl
                   )}
                 </div>
 
-              </div>
+               </div>
             );
           })}
         </div>
