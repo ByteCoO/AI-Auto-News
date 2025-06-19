@@ -132,6 +132,7 @@ async function getInitialMultiSourceData(): Promise<Record<string, { items: Comp
         url: item.url,
         timestamp: item.original_timestamp || 'N/A',
         publicationTimeUTC: item.publication_time_utc,
+        source: item.source, // Add the 'source' field that was missing
       }));
       
       initialNewsData[config.name] = {
