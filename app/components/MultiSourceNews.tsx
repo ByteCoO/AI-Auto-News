@@ -12,6 +12,7 @@ export interface NewsItem {
   url?: string;
   details?: string;
   publicationTimeUTC?: string;
+  source?: string;
 }
 export interface RawNewsItemFromDb {
   id: number | string;

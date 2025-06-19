@@ -30,8 +30,10 @@ export function getSupabaseServerClient(): SupabaseClient {
   }
   
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) {
-    throw new Error('Supabase service role key is missing. Check your environment variables.');
+
+  // Re-check variables inside the function scope to satisfy TypeScript
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Supabase URL or service role key is missing. Check your environment variables.');
   }
 
   // Create a new client with the service role key
