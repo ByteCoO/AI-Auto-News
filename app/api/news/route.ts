@@ -8,6 +8,41 @@ export async function GET(request: NextRequest) { // Add NextRequest
   try {
     const searchParams = request.nextUrl.searchParams;
     const sourceType = searchParams.get('sourceType');
+    const source = searchParams.get('source'); // Check for single source request
+
+    // Handle single source fetching with pagination
+    if (source) {
+      const page = parseInt(searchParams.get('page') || '1', 10);
+      const limit = parseInt(searchParams.get('limit') || '10', 10);
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      // Ensure case-insensitivity for source matching
+      const sourceIdentifiers = [source, source.toLowerCase(), source.toUpperCase()];
+
+      const { data, error, count } = await supabase
+        .from('all_latest_news')
+        .select('*', { count: 'exact' })
+        .in('source', sourceIdentifiers) // Filter by the specific source, case-insensitively
+        .order('publication_time_utc', { ascending: false })
+        .range(from, to);
+
+      if (error) {
+        console.error(`Supabase error fetching ${source}:`, error);
+        return NextResponse.json({ error: error.message, data: [], count: 0 }, { status: 500 });
+      }
+      
+      const camelCaseData = data.map(item => ({
+        id: item.id,
+        source: item.source,
+        title: item.title,
+        url: item.url,
+        timestamp: item.original_timestamp,
+        publicationTimeUTC: item.publication_time_utc,
+        headline: item.title,
+      }));
+      return NextResponse.json({ data: camelCaseData, count: count || 0 });
+    }
 
     if (sourceType === 'multi') {
       const sourcesToFetch = [

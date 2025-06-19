@@ -1,135 +1,148 @@
 "use client";
-// app/components/MultiSourceNews.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, type CSSProperties } from 'react';
-import { ArrowPathIcon, StarIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState, useRef, useCallback, type CSSProperties } from 'react';
 import { format } from 'date-fns';
 
-// Interface for individual news items displayed in the cards
+// --- Interfaces (no changes) ---
 export interface NewsItem {
-  id: string; // Transformed from RawNewsItemFromDb.id
-  timestamp: string; // Corresponds to RawNewsItemFromDb.original_timestamp
-  headline: string; // Corresponds to RawNewsItemFromDb.title
-  url?: string; // Corresponds to RawNewsItemFromDb.url
-  details?: string; // This field is kept, but not directly in all_latest_news schema
-  publicationTimeUTC?: string; // Corresponds to RawNewsItemFromDb.publication_time_utc
+  id: string;
+  timestamp: string;
+  headline: string;
+  url?: string;
+  details?: string;
+  publicationTimeUTC?: string;
 }
-
-// Interface for the raw news data, resembling the all_latest_news table structure
-// This is the new input data format for the component.
 export interface RawNewsItemFromDb {
-  id: number | string; // bigint in DB, can be string or number
-  source: string; // "Bloomberg", "Reuters", "FT", etc.
+  id: number | string;
+  source: string;
   title: string;
   url?: string;
-  original_timestamp?: string; // Raw timestamp string from DB
-  publication_time_utc?: string; // Timestamp string with time zone from DB
-  // image_alt_text?: string; // Available in DB, not used in NewsItem currently
-  // category?: string; // Available in DB, not used in NewsItem currently
+  original_timestamp?: string;
+  publication_time_utc?: string;
 }
-
-// This interface defines display-specific details for each source (logos, colors, etc.)
-// It can be passed via props to customize appearance beyond defaults.
 export interface SourceDisplayDetail {
-  name: string; // Must match "Bloomberg", "FT", "Reuters" to be applied
+  name: string;
   logoUrl?: string;
   logoLetter?: string;
-  updateLabel?: string;
   cardBgColor?: string;
   cardCustomStyle?: CSSProperties;
-  // cardTextColor is derived from cardBgColor, so not needed here
 }
 
-// Props for the MultiSourceNews component
-interface MultiSourceNewsProps {
-  rawNewsItems?: RawNewsItemFromDb[]; // The flat list of all news items from the database
-  sourceDisplayDetails?: SourceDisplayDetail[]; // Optional array for custom display properties per source
+// --- State and Config (no changes) ---
+interface NewsSourceState {
+  items: NewsItem[];
+  page: number;
+  hasMore: boolean;
+  isLoading: boolean;
 }
 
-// Configuration for the target sources that will always be displayed
 const TARGET_SOURCES_CONFIG = [
-  {
-    key: 'bloomberg',name: 'Bloomberg',
-    defaultLogoLetter: 'B',
-    defaultColorHint: 'indigo-600',
-    defaultLogoUrl: '', // Optional: e.g., '/logos/bloomberg.svg'
-  },
-  {
-    key: 'ft',
-    name: 'FT', // Financial Times
-    defaultLogoLetter: 'F',
-    defaultColorHint: 'rose-500',
-    defaultLogoUrl: '', // Optional: e.g., '/logos/ft.png'
-  },
-  {
-    key: 'reuters',
-    name: 'Reuters',
-    defaultLogoLetter: 'R',
-    defaultColorHint: 'gray-700',
-    defaultLogoUrl: '', // Optional: e.g., '/logos/reuters.svg'
-  },
+  { key: 'bloomberg', name: 'Bloomberg', defaultLogoLetter: 'B' },
+  { key: 'ft', name: 'FT', defaultLogoLetter: 'F' },
+  { key: 'reuters', name: 'Reuters', defaultLogoLetter: 'R' },
 ];
 
-const MultiSourceNews: React.FC<MultiSourceNewsProps> = ({
-  rawNewsItems = [],
-  sourceDisplayDetails = [],
-}) => {
-  useEffect(() => {
-    if (rawNewsItems && rawNewsItems.length > 0) {
-      const uniqueSources = Array.from(new Set(rawNewsItems.map(item => item.source).filter(Boolean))); // Filter out undefined/null sources
-      console.log('[MultiSourceNews Component] Received unique source values in rawNewsItems:', uniqueSources);
-    } else {
-      console.log('[MultiSourceNews Component] Received empty or no rawNewsItems, or rawNewsItems contains items with no source field.');
-    }
-  }, [rawNewsItems]);
+// --- Main Component ---
+const MultiSourceNews: React.FC<{ sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ sourceDisplayDetails = [] }) => {
+  const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>({});
+  const observers = useRef(new Map());
 
-  // Create a map of the provided display details for easy lookup by source name (case-insensitive)
-  const displayDetailsMap = new Map(
-    sourceDisplayDetails.map(detail => [detail.name.toLowerCase(), detail])
-  );
+  const fetchNews = useCallback(async (sourceName: string, page: number = 1) => {
+    // Prevent multiple simultaneous fetches for the same source
+    if (newsSources[sourceName]?.isLoading) return;
+
+    setNewsSources(prev => ({
+      ...prev,
+      [sourceName]: {
+        ...(prev[sourceName] || { items: [], page: 0, hasMore: true }),
+        isLoading: true,
+      },
+    }));
+
+    try {
+      const response = await fetch(`/api/news?source=${sourceName}&page=${page}&limit=10`);
+      if (!response.ok) throw new Error(`Failed to fetch news for ${sourceName}`);
+      
+      const { data, count } = await response.json();
+
+      const newItems: NewsItem[] = data.map((rawItem: any) => ({
+        id: String(rawItem.id),
+        headline: rawItem.title,
+        url: rawItem.url,
+        timestamp: rawItem.timestamp || 'N/A',
+        publicationTimeUTC: rawItem.publicationTimeUTC,
+      }));
+
+      setNewsSources(prev => {
+        const existingItems = prev[sourceName]?.items || [];
+        const allItems = page === 1 ? newItems : [...existingItems, ...newItems];
+        return {
+          ...prev,
+          [sourceName]: {
+            items: allItems,
+            page: page,
+            hasMore: allItems.length < count,
+            isLoading: false,
+          },
+        };
+      });
+    } catch (error) {
+      console.error(error);
+      setNewsSources(prev => ({
+        ...prev,
+        [sourceName]: { ...(prev[sourceName] || { items: [], page: 1, hasMore: false }), isLoading: false },
+      }));
+    }
+  }, [newsSources]); // Dependency on newsSources to access isLoading state
+
+  // Initial fetch for all sources
+  useEffect(() => {
+    TARGET_SOURCES_CONFIG.forEach(config => {
+      fetchNews(config.name, 1);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
+
+  const loadMoreTriggerRef = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const sourceName = node.dataset.sourcename;
+    if (!sourceName) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const sourceState = newsSources[sourceName];
+        if (entries[0].isIntersecting && sourceState && sourceState.hasMore && !sourceState.isLoading) {
+          fetchNews(sourceName, sourceState.page + 1);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    observer.observe(node);
+    
+    // Cleanup previous observer for this source if it exists
+    if (observers.current.has(sourceName)) {
+      observers.current.get(sourceName).disconnect();
+    }
+    observers.current.set(sourceName, observer);
+
+  }, [newsSources, fetchNews]); // Re-create observer if state or fetch function changes
+
+  const displayDetailsMap = new Map(sourceDisplayDetails.map(detail => [detail.name.toLowerCase(), detail]));
 
   return (
     <section className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TARGET_SOURCES_CONFIG.map((targetConfig) => {
-            // Find any custom display details for the current target source
+            const sourceState = newsSources[targetConfig.name] || { items: [], page: 1, hasMore: false, isLoading: true };
             const customDisplay = displayDetailsMap.get(targetConfig.name.toLowerCase());
-
-            // Filter rawNewsItems for the current target source
-            const itemsForThisSource = rawNewsItems.filter(
-              (item) => item.source?.toLowerCase() === targetConfig.name.toLowerCase()
-            );
-
-            // Transform filtered items into the NewsItem format for rendering
-            const newsItems: NewsItem[] = itemsForThisSource.map((rawItem) => ({
-              id: String(rawItem.id), // Ensure id is a string
-              headline: rawItem.title,
-              url: rawItem.url,
-              timestamp: rawItem.original_timestamp || 'N/A', // Use original_timestamp
-              publicationTimeUTC: rawItem.publication_time_utc,
-              // details can be added if available from rawItem or derived
-            }));
-
-            // Prepare properties for display, using custom details, then targetConfig defaults
+            
             const displayName = targetConfig.name;
-            const logoUrl = customDisplay?.logoUrl || targetConfig.defaultLogoUrl;
+            const logoUrl = customDisplay?.logoUrl;
             const logoLetter = customDisplay?.logoLetter || targetConfig.defaultLogoLetter;
             
-            // Dynamic updateLabel based on news count, or custom if provided
-            const updateLabel = customDisplay?.updateLabel || 
-                                (newsItems.length > 0 ? `${newsItems.length} articles` : 'No data');
-            
-            const colorHintForLogo = customDisplay?.cardBgColor || targetConfig.defaultColorHint;
-            const cardCustomStyle = customDisplay?.cardCustomStyle || {};
-
-            // Logic for logo letter text color
-            const logoLetterTextColorClass = 
-              colorHintForLogo.includes('red') || colorHintForLogo.includes('rose') ? 'text-red-600' :
-              colorHintForLogo.includes('indigo') ? 'text-indigo-600' :
-              'text-gray-700';
-
             return (
               <div
                 key={targetConfig.key}
@@ -137,58 +150,62 @@ const MultiSourceNews: React.FC<MultiSourceNewsProps> = ({
               >
                 {/* Card Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="flex items-center space-x-3">
                     {logoUrl ? (
                       <Image src={logoUrl} alt={`${displayName} logo`} width={28} height={28} className="rounded-sm object-contain" />
-                    ) : logoLetter ? (
-                      <div className={`w-7 h-7 flex items-center justify-center bg-white ${logoLetterTextColorClass} rounded-sm font-bold text-lg`} title={displayName}>
+                    ) : (
+                      <div className={`w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-slate-800 text-indigo-600 rounded-sm font-bold text-lg`} title={displayName}>
                         {logoLetter}
                       </div>
-                    ) : (
-                      <div className="w-7 h-7 bg-slate-200 dark:bg-slate-700 rounded-sm"></div> // Placeholder
                     )}
-                    <span className="font-semibold text-md sm:text-lg whitespace-nowrap">{displayName}</span>
-                    <span className={`text-xs px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md whitespace-nowrap ${newsItems.length === 0 && 'opacity-70'}`}>
-                      {updateLabel}
-                    </span>
+                    <span className="font-semibold text-lg">{displayName}</span>
                   </div>
-                {/*   <div className="flex items-center space-x-1.5 sm:space-x-2 opacity-80">
-                    <ArrowPathIcon className="h-5 w-5 cursor-pointer hover:opacity-100" />
-                    <StarIcon className="h-5 w-5 cursor-pointer hover:opacity-100" />
-                    <EllipsisVerticalIcon className="h-5 w-5 cursor-pointer hover:opacity-100" />
-                  </div> */}
                 </div>
 
-                {/* News Items List */}
-                {newsItems.length > 0 ? (
-                  <ul 
-                    className="space-y-3 flex-grow scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent hover:scrollbar-thumb-slate-400 active:scrollbar-thumb-slate-500 dark:hover:scrollbar-thumb-slate-600 dark:active:scrollbar-thumb-slate-500" 
-                    style={cardCustomStyle}
-                  >
-                    {newsItems.map((item) => (
-                      <li key={item.id} className="border-l-2 border-slate-200 dark:border-slate-700 pl-3 py-1 dark:text-[#FFD700]">
-                        <div className="text-xs opacity-70 mb-0.5 dark:text-white">
-                          {item.publicationTimeUTC
-                            ? format(new Date(item.publicationTimeUTC), 'dd MMM')
-                            : item.timestamp}
-                        </div>
-                        {item.url ? (
-                          <Link href={item.url} className="text-sm sm:text-base hover:underline">
-                            {item.headline}
-                          </Link>) : (
-                          <span className="text-sm sm:text-base">{item.headline}</span>
-                        )}
-                        {item.details && <p className="text-xs opacity-60 mt-0.5">{item.details}</p>}
-                      </li>
-                    ))}</ul>
-                ) : (
-                  <div className="flex-grow flex items-center justify-center text-slate-500 dark:text-slate-400">
-                    No news items available for {displayName}.
-                  </div>
-                )}
+                {/* News Items List - with fixed height and scroll */}
+                <div className="flex-grow h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-600 dark:hover:scrollbar-thumb-slate-500">
+                  {sourceState.isLoading && sourceState.items.length === 0 ? (
+                      <div className="flex h-full items-center justify-center text-slate-500">Loading...</div>
+                  ) : sourceState.items.length > 0 ? (
+                    <ul className="space-y-3">
+                      {sourceState.items.map((item) => (
+                        <li key={item.id} className="border-l-2 border-slate-200 dark:border-slate-700 pl-3 py-1 dark:text-amber-300">
+                          <div className="text-xs opacity-70 mb-0.5 dark:text-white">
+                            {item.publicationTimeUTC ? format(new Date(item.publicationTimeUTC), 'dd MMM') : item.timestamp}
+                          </div>
+                          {item.url ? (
+                            <Link href={item.url} className="text-sm sm:text-base hover:underline">{item.headline}</Link>
+                          ) : (
+                            <span className="text-sm sm:text-base">{item.headline}</span>
+                          )}
+                        </li>
+                      ))}
+                      {/* Invisible trigger for infinite scroll */}
+                      {sourceState.hasMore && (
+                        <div ref={loadMoreTriggerRef} data-sourcename={displayName} style={{ height: '1px' }} />
+                      )}
+                    </ul>
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-slate-500">
+                      No news items available.
+                    </div>
+                  )}
+                </div>
+                
+                {/* Footer for status display */}
+                <div className="h-6 mt-3 text-center text-sm text-slate-500">
+                  {sourceState.isLoading && sourceState.items.length > 0 && (
+                    <p>Loading more...</p>
+                  )}
+                  {!sourceState.hasMore && sourceState.items.length > 0 && (
+                    <p>No more news</p>
+                  )}
+                </div>
+
               </div>
             );
-          })}</div>
+          })}
+        </div>
       </div>
     </section>
   );
