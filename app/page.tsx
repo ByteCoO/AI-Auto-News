@@ -231,7 +231,7 @@ export default async function Home() {
   // JSON-LD for MultiSourceNews
   allInitialMultiSourceItems.forEach(item => {
     // Ensure item.url and item.publication_time_utc are valid before creating LD
-    if (item.title && item.url && item.publication_time_utc) {
+    if (item.headline && item.url && item.publicationTimeUTC) {
       try {
         const datePublished = new Date(item.publication_time_utc).toISOString();
         allNewsArticlesLd.push({
