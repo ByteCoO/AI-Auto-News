@@ -25,6 +25,7 @@ export interface SourceDisplayDetail {
   name: string;
   logoUrl?: string;
   logoLetter?: string;
+  updateLabel?: string;
   cardBgColor?: string;
   cardCustomStyle?: CSSProperties;
 }
