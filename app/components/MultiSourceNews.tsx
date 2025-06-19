@@ -45,26 +45,42 @@ const TARGET_SOURCES_CONFIG = [
 ];
 
 // --- Main Component ---
-const MultiSourceNews: React.FC<{ sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ sourceDisplayDetails = [] }) => {
-  const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>({});
+const MultiSourceNews: React.FC<{ rawNewsItems: RawNewsItemFromDb[], sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ rawNewsItems, sourceDisplayDetails = [] }) => {
+  const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>(() => {
+    const initialState: Record<string, NewsSourceState> = {};
+    TARGET_SOURCES_CONFIG.forEach(config => {
+      const sourceItems = rawNewsItems
+        .filter(item => item.source.toLowerCase() === config.key.toLowerCase())
+        .map(item => ({
+          id: String(item.id),
+          headline: item.title,
+          url: item.url,
+          timestamp: item.original_timestamp || 'N/A',
+          publicationTimeUTC: item.publication_time_utc
+        }));
+      
+      initialState[config.name] = {
+        items: sourceItems.slice(0, 10), // Initial page size
+        page: 1,
+        hasMore: sourceItems.length > 10,
+        isLoading: false
+      };
+    });
+    return initialState;
+  });
   const observers = useRef(new Map());
 
   const fetchNews = useCallback(async (sourceName: string, page: number = 1) => {
-    // Prevent multiple simultaneous fetches for the same source
     if (newsSources[sourceName]?.isLoading) return;
 
     setNewsSources(prev => ({
       ...prev,
-      [sourceName]: {
-        ...(prev[sourceName] || { items: [], page: 0, hasMore: true }),
-        isLoading: true,
-      },
+      [sourceName]: { ...prev[sourceName], isLoading: true },
     }));
 
     try {
       const response = await fetch(`/api/news?source=${sourceName}&page=${page}&limit=10`);
       if (!response.ok) throw new Error(`Failed to fetch news for ${sourceName}`);
-      
       const { data, count } = await response.json();
 
       const newItems: NewsItem[] = data.map((rawItem: any) => ({
@@ -77,7 +93,7 @@ const MultiSourceNews: React.FC<{ sourceDisplayDetails?: SourceDisplayDetail[] }
 
       setNewsSources(prev => {
         const existingItems = prev[sourceName]?.items || [];
-        const allItems = page === 1 ? newItems : [...existingItems, ...newItems];
+        const allItems = [...existingItems, ...newItems];
         return {
           ...prev,
           [sourceName]: {
@@ -92,18 +108,10 @@ const MultiSourceNews: React.FC<{ sourceDisplayDetails?: SourceDisplayDetail[] }
       console.error(error);
       setNewsSources(prev => ({
         ...prev,
-        [sourceName]: { ...(prev[sourceName] || { items: [], page: 1, hasMore: false }), isLoading: false },
+        [sourceName]: { ...(prev[sourceName] || { items:[], page:1, hasMore: false }), isLoading: false },
       }));
     }
-  }, [newsSources]); // Dependency on newsSources to access isLoading state
-
-  // Initial fetch for all sources
-  useEffect(() => {
-    TARGET_SOURCES_CONFIG.forEach(config => {
-      fetchNews(config.name, 1);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+  }, [newsSources]);
 
   const loadMoreTriggerRef = useCallback((node: HTMLDivElement | null) => {
     if (!node) return;
