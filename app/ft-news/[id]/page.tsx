@@ -78,33 +78,29 @@ export async function generateMetadata(
   const description = article.subheadline || (article.body && typeof article.body[0]?.content === 'string' ? article.body[0].content.substring(0, 160).trim() + '...' : `Read the article: ${article.headline}`);
 
   return {
-    title: `${article.headline} | FT News`, // Or use article.page_title if more appropriate
+    title: `${article.headline} | FT News`,
     description: description,
-    canonical: article.page_url, // Assuming page_url is the canonical URL for this article
+    alternates: {
+      canonical: article.page_url,
+    },
     openGraph: {
       title: article.headline,
       description: description,
       url: article.page_url,
-      siteName: 'Your Site Name', // Replace with your actual site name
+      siteName: 'Your Site Name', 
       images: article.main_image?.url ? [
         {
           url: article.main_image.url,
           alt: article.main_image.altText || article.headline,
         },
       ] : [],
-      locale: 'en_US', // Adjust if your content is in a different language
+      locale: 'en_US', 
       type: 'article',
       publishedTime: article.publishedtimestamputc,
       modifiedTime: article.updated_at || article.publishedtimestamputc,
       authors: article.authors?.map(author => author.name),
     },
-    // You can add Twitter specific tags as well
-    // twitter: {
-    //   card: 'summary_large_image',
-    //   title: article.headline,
-    //   description: description,
-    //   images: article.main_image?.url ? [article.main_image.url] : [],
-    // },
+   
   };
 }
 
