@@ -237,7 +237,7 @@ export default async function Home() {
         allNewsArticlesLd.push({
           '@type': 'NewsArticle',
           mainEntityOfPage: { '@type': 'WebPage', '@id': item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}` },
-          headline: item.title,
+          headline: item.headline,
           datePublished: datePublished,
           dateModified: datePublished, // Assuming same as published, or use a different field if available
           author: { '@type': 'Organization', name: item.source || siteName },
