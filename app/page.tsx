@@ -1,6 +1,7 @@
 // app/page.tsx
 import MultiSourceNews, { RawNewsItemFromDb, SourceDisplayDetail, NewsItem as ComponentNewsItem } from './components/MultiSourceNews';
 import LatestNews from './components/LatestNews';
+import NewsClientComponent from './components/NewsClientComponent'; // Assuming this path and component name
 import { Metadata } from 'next';
 
 // Interface for news items, consistent with LatestNews.tsx and /api/news response
@@ -285,6 +286,9 @@ export default async function Home() {
             sourceDisplayDetails={multiSourceDisplayDetails} 
           />
           
+          {/* Placeholder for the new NewsClientComponent */}
+          <NewsClientComponent />
+
          {/*  <LatestNews 
             initialNewsItems={latestNewsInitialData.newsItems} 
             initialTotalItems={latestNewsInitialData.totalItems}
