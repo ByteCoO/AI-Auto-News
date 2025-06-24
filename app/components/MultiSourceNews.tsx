@@ -48,12 +48,8 @@ const TARGET_SOURCES_CONFIG = [
 // --- Main Component ---
 const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceState>, sourceDisplayDetails?: SourceDisplayDetail[] }> = ({ initialNewsData, sourceDisplayDetails = [] }) => {
   const [newsSources, setNewsSources] = useState<Record<string, NewsSourceState>>(initialNewsData);
-  const observers = useRef(new Map());
-
-  const fetchNews = useCallback(async (sourceName: string, page: number = 1) => {
-    // Prevent multiple simultaneous fetches for the same source
-    if (newsSources[sourceName]?.isLoading) return;
-
+  // The fetchNews function is now simplified and doesn't need to be a useCallback with complex dependencies
+  const fetchNews = async (sourceName: string, page: number = 1) => {
     setNewsSources(prev => ({
       ...prev,
       [sourceName]: {
@@ -96,34 +92,14 @@ const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceStat
         [sourceName]: { ...(prev[sourceName] || { items: [], page: 1, hasMore: false }), isLoading: false },
       }));
     }
-  }, [newsSources]); // Dependency on newsSources to access isLoading state
+  };
 
-  // Initial fetch for all sources is removed, as data is now passed via props.
-
-  const loadMoreTriggerRef = useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    const sourceName = node.dataset.sourcename;
-    if (!sourceName) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const sourceState = newsSources[sourceName];
-        if (entries[0].isIntersecting && sourceState && sourceState.hasMore && !sourceState.isLoading) {
-          fetchNews(sourceName, sourceState.page + 1);
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    observer.observe(node);
-    
-    // Cleanup previous observer for this source if it exists
-    if (observers.current.has(sourceName)) {
-      observers.current.get(sourceName).disconnect();
+  const handleLoadMore = (sourceName: string) => {
+    const sourceState = newsSources[sourceName];
+    if (sourceState && !sourceState.isLoading && sourceState.hasMore) {
+      fetchNews(sourceName, sourceState.page + 1);
     }
-    observers.current.set(sourceName, observer);
-
-  }, [newsSources, fetchNews]); // Re-create observer if state or fetch function changes
+  };
 
   const displayDetailsMap = new Map(sourceDisplayDetails.map(detail => [detail.name.toLowerCase(), detail]));
 
@@ -179,10 +155,7 @@ const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceStat
                           )}
                         </li>
                       ))}
-                      {/* Invisible trigger for infinite scroll */}
-                      {sourceState.hasMore && (
-                        <div ref={loadMoreTriggerRef} data-sourcename={displayName} style={{ height: '1px' }} />
-                      )}
+                      {/* Infinite scroll trigger removed */}
                     </ul>
                   ) : (
                     <div className="flex h-full items-center justify-center text-slate-500">
@@ -193,12 +166,19 @@ const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceStat
                 
                 {/* Footer for status display */}
                 <div className="h-6 mt-3 text-center text-sm text-slate-500">
-                  
                   {sourceState.isLoading && sourceState.items.length > 0 && (
                     <p>Loading more...</p>
                   )}
                   {!sourceState.hasMore && sourceState.items.length > 0 && (
                     <p>No more news</p>
+                  )}
+                  {sourceState.hasMore && !sourceState.isLoading && (
+                    <button
+                      onClick={() => handleLoadMore(targetConfig.name)}
+                      className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50 text-sm font-semibold"
+                    >
+                      Load more
+                    </button>
                   )}
                 </div>
 
