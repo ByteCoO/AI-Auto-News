@@ -24,21 +24,22 @@ export default function Footer() {
                   Home
                 </a>
               </li>
-              <li>
-                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Services
-                </a>
-              </li>
-              <li>
+            {/*   <li>
                 <a href="/ft-news" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Blog
+                  FT-News
+                </a>
+              </li> */}
+              <li>
+                <a href="/Channels" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  News Channels
                 </a>
               </li>
+              <li>
+                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  Pricing
+                </a>
+              </li>
+              
             </ul>
           </div>
 

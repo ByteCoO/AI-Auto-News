@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 // Interface for news items, aligned with your database structure
 interface NewsItem {
@@ -115,7 +116,20 @@ const uiChannels: ChannelUI[] = [
 ];
 
 const NewsClientComponent: React.FC = () => {
-  const [selectedChannelId, setSelectedChannelId] = useState<string>(uiChannels[0].id);
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category');
+
+  const getInitialChannelId = () => {
+    if (category) {
+      const channel = uiChannels.find(c => c.name === category);
+      if (channel) {
+        return channel.id;
+      }
+    }
+    return uiChannels[0].id;
+  };
+
+  const [selectedChannelId, setSelectedChannelId] = useState<string>(getInitialChannelId());
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState(true);

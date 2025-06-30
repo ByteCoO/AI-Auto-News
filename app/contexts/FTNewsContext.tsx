@@ -54,7 +54,8 @@ interface FTNewsContextType {
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
   error: string | null;
-  setError: Dispatch<SetStateAction<string | null>>;fetchInitialFTNews: () => Promise<void>;
+  setError: Dispatch<SetStateAction<string | null>>;
+  fetchInitialFTNews: () => Promise<void>;
   fetchMoreFTNews: () => Promise<void>;
   hasMore: boolean;
   setHasMore: Dispatch<SetStateAction<boolean>>;
@@ -104,7 +105,8 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
       
       setNewsItems(data || []);
       setHasMore((data || []).length === pageSize);
-      setManualLoadTriggered(false);} catch (err) {
+      setManualLoadTriggered(false);
+    } catch (err) {
       const specificMessage = err instanceof Error ? `Failed to load news: ${err.message}` : String(err);
       console.error('fetchInitialFTNews error:', specificMessage, err);
       setError(specificMessage);
@@ -149,7 +151,9 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, loading, hasMore, sortOrder, setNewsItems, setPage, setHasMore, setLoading, setError]);useEffect(() => {
+  }, [page, pageSize, loading, hasMore, sortOrder, setNewsItems, setPage, setHasMore, setLoading, setError]);
+
+  useEffect(() => {
     // This effect handles re-fetching when sortOrder changes,
     // but only if newsItems have been populated (e.g., by initial props or a previous fetch)
     // or if a manual load was triggered, to avoid fetching on initial mount if data is coming via props.
@@ -194,7 +198,9 @@ export const FTNewsProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setArticleLoading(false);
     }
-  }, [setArticleLoading, setArticleError, setCurrentArticle]);return (
+  }, [setArticleLoading, setArticleError, setCurrentArticle]);
+  
+  return (
     <FTNewsContext.Provider value={{
       newsItems, setNewsItems, loading, setLoading, error, setError,
       fetchInitialFTNews, fetchMoreFTNews, hasMore, setHasMore, page, setPage, pageSize,

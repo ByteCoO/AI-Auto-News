@@ -1,7 +1,7 @@
 // app/page.tsx
 import MultiSourceNews, { RawNewsItemFromDb, SourceDisplayDetail, NewsItem as ComponentNewsItem } from './components/MultiSourceNews';
 import LatestNews from './components/LatestNews';
-import NewsClientComponent from './components/NewsClientComponent'; // Assuming this path and component name
+
 import { Metadata } from 'next';
 
 // Interface for news items, consistent with LatestNews.tsx and /api/news response
@@ -206,6 +206,7 @@ export default async function Home() {
   const allNewsArticlesLd: object[] = [];
 
   // JSON-LD for LatestNews
+  {/* 
   if (latestNewsInitialData && latestNewsInitialData.newsItems) {
     latestNewsInitialData.newsItems.forEach(item => {
       if (item.id && (item.headline || item.page_title) && item.rawPublicationTimeUTC) {
@@ -226,7 +227,7 @@ export default async function Home() {
       }
     });
   }
-
+*/}
   // Flatten the initial data from all sources into a single array for JSON-LD
   const allInitialMultiSourceItems = Object.values(initialMultiSourceData).flatMap(source => source.items);
 
@@ -277,7 +278,29 @@ export default async function Home() {
       )}
       <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <div className="p-4">
-        
+          {/* Channels Section */}
+          <section className="py-12">
+            <h2 className="text-3xl font-bold text-center mb-8">Featured Channels</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <a href="/Channels?category=Market%20%26%20Finance" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Market & Finance</h3>
+                <p className="text-gray-600 dark:text-gray-400">Latest market news and financial analysis.</p>
+              </a>
+              <a href="/Channels?category=Business" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Business</h3>
+                <p className="text-gray-600 dark:text-gray-400">In-depth business coverage and market trends.</p>
+              </a>
+              <a href="/Channels?category=Politics%20%26%20Policy" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Politics & Policy</h3>
+                <p className="text-gray-600 dark:text-gray-400">Insights on government and global policy.</p>
+              </a>
+              <a href="/Channels?category=Technology" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Technology</h3>
+                <p className="text-gray-600 dark:text-gray-400">The latest news and analysis in tech.</p>
+              </a>
+            </div>
+          </section>
+          
           <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1>
           
           {/* Pass the initial data fetched on the server to the client component */}
@@ -285,11 +308,12 @@ export default async function Home() {
             initialNewsData={initialMultiSourceData} 
             sourceDisplayDetails={multiSourceDisplayDetails} 
           />
-          
-          {/* Placeholder for the new NewsClientComponent */}
-          <NewsClientComponent />
 
-         {/*  <LatestNews 
+        
+          
+          
+{/* 
+         <LatestNews 
             initialNewsItems={latestNewsInitialData.newsItems} 
             initialTotalItems={latestNewsInitialData.totalItems}
             initialPage={1} 

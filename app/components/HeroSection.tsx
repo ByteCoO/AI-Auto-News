@@ -35,7 +35,7 @@ export default function HeroSection() {
       <div className="absolute right-0 top-0 p-6 z-20 space-y-4">
         <div className="bg-[#1a1a1a] bg-opacity-80 rounded-lg p-3 flex items-start space-x-3 w-[300px]">
           <div className="w-16 h-16 flex-shrink-0">
-            <Image src="/news-1.jpg" alt="News" width={64} height={64} className="rounded-md object-cover w-full h-full" />
+            <Image src="/news-1.jpg" alt="The Witcher 4 Polaris: Latest updates" width={64} height={64} className="rounded-md object-cover w-full h-full" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">The Witcher 4 Polaris: Latest updates</h3>
@@ -46,7 +46,7 @@ export default function HeroSection() {
         
         <div className="bg-[#1a1a1a] bg-opacity-80 rounded-lg p-3 flex items-start space-x-3 w-[300px]">
           <div className="w-16 h-16 flex-shrink-0">
-            <Image src="/news-2.jpg" alt="News" width={64} height={64} className="rounded-md object-cover w-full h-full" />
+            <Image src="/news-2.jpg" alt="Little nightmares III: First look" width={64} height={64} className="rounded-md object-cover w-full h-full" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Little nightmares III: First look</h3>
@@ -57,7 +57,7 @@ export default function HeroSection() {
         
         <div className="bg-[#1a1a1a] bg-opacity-80 rounded-lg p-3 flex items-start space-x-3 w-[300px]">
           <div className="w-16 h-16 flex-shrink-0">
-            <Image src="/news-3.jpg" alt="News" width={64} height={64} className="rounded-md object-cover w-full h-full" />
+            <Image src="/news-3.jpg" alt="Wolf among us 2: Release date" width={64} height={64} className="rounded-md object-cover w-full h-full" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Wolf among us 2: Release date</h3>
@@ -68,7 +68,7 @@ export default function HeroSection() {
         
         <div className="bg-[#1a1a1a] bg-opacity-80 rounded-lg p-3 flex items-start space-x-3 w-[300px]">
           <div className="w-16 h-16 flex-shrink-0">
-            <Image src="/news-4.jpg" alt="News" width={64} height={64} className="rounded-md object-cover w-full h-full" />
+            <Image src="/news-4.jpg" alt="Indiana Jones and the Great Circle" width={64} height={64} className="rounded-md object-cover w-full h-full" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Indiana Jones and the Great Circle</h3>
