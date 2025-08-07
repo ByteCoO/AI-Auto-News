@@ -1,6 +1,8 @@
 // app/page.tsx
 import MultiSourceNews, { RawNewsItemFromDb, SourceDisplayDetail, NewsItem as ComponentNewsItem } from './components/MultiSourceNews';
 import LatestNews from './components/LatestNews';
+import SEOHome from './components/Seo_Home';
+
 
 import { Metadata } from 'next';
 
@@ -277,7 +279,8 @@ export default async function Home() {
         />
       )}
       <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <div className="p-4">
+        <div>
+        <SEOHome/>
           {/* Channels Section */}
           <section className="py-12">
             <h2 className="text-3xl font-bold text-center mb-8">Featured Channels</h2>
@@ -300,14 +303,15 @@ export default async function Home() {
               </a>
             </div>
           </section>
-          
+
+         
+        {/*   
           <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1>
           
-          {/* Pass the initial data fetched on the server to the client component */}
           <MultiSourceNews 
             initialNewsData={initialMultiSourceData} 
             sourceDisplayDetails={multiSourceDisplayDetails} 
-          />
+          /> */}
 
         
           
