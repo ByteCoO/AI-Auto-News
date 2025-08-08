@@ -1,5 +1,6 @@
 import React from 'react';
 import { marked } from 'marked';
+import { supabase } from '@/lib/supabaseClient';
 
 // --- 类型定义和工具函数 (无变化) ---
 interface Post {
@@ -31,48 +32,68 @@ function getYoutubeVideoId(url: string): string | null {
 
 // --- 数据获取函数 (有修改和新增) ---
 
-// 1. 新增: 获取所有文章 ID 的函数，供 generateStaticParams 使用
-async function getAllPosts(): Promise<{ id: string }[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+// 1. 修改: 获取所有已发布文章的 ID，供 generateStaticParams 使用
+async function getAllPublishedPostIds(): Promise<{ id: string }[]> {
   try {
-    const res = await fetch(`${baseUrl}/api/posts`, { next: { revalidate: 300 } }); // 也为列表本身添加缓存
-    if (!res.ok) return [];
-    const posts: Post[] = await res.json();
-    return posts.map(post => ({ id: post.id }));
+    // 只查询 id 列，非常高效
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select('id') // 只选择 id 列
+      .eq('status', 'published'); // 只选择已发布的文章
+
+    if (error) {
+      console.error("Failed to fetch all post IDs for static generation:", error.message);
+      return [];
+    }
+
+    // data 的格式是 [{id: '...'}, {id: '...'}]，正是我们需要的
+    return posts || [];
+
   } catch (error) {
-    console.error("Failed to fetch all posts for static generation:", error);
+    if (error instanceof Error) {
+      console.error("An unexpected error occurred during static param generation:", error.message);
+    }
     return [];
   }
 }
 
+
 async function getPostById(id: string): Promise<Post | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   try {
-    const res = await fetch(`${baseUrl}/api/posts/${id}`, {
-      // 修改: 设置5分钟的重新验证周期
-      next: { revalidate: 300 }, 
-    });
-    if (!res.ok) {
-      console.error(`Failed to fetch post ${id}: ${res.status} ${res.statusText}`);
+    const { data: post, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('id', id)
+      .eq('status', 'published') // 重要：确保只有已发布的文章才能通过 URL 访问
+      .single(); // 使用 .single() 因为我们期望只返回一条记录
+
+    if (error) {
+      // 'PGRST116' 是 Supabase/PostgREST 在 .single() 找不到记录时返回的特定错误码
+      if (error.code !== 'PGRST116') {
+        console.error(`Error fetching post ${id} from Supabase:`, error.message);
+      }
       return null;
     }
-    return res.json();
+
+    return post;
+
   } catch (error) {
-    console.error(`Network or fetch error for post ${id}:`, error);
+    if (error instanceof Error) {
+        console.error(`An unexpected error occurred for post ${id}:`, error.message);
+    }
     return null;
   }
 }
 
 // --- 静态页面生成配置 (核心新增部分) ---
 
-// 2. 新增: 在构建时生成所有已知文章的静态页面
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getAllPublishedPostIds();
+  // 将 id 转换为字符串，因为 params 必须是字符串
   return posts.map((post) => ({
     id: post.id.toString(),
   }));
 }
-
 // 3. 新增: 允许动态生成未在构建时生成的页面 (例如新发布的文章)
 export const dynamicParams = true;
 

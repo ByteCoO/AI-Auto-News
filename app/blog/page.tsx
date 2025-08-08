@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { supabase } from '../lib/supabase';
 
 // ============================================================================
 // 1. TYPE DEFINITIONS
@@ -36,27 +37,24 @@ export interface Post {
  */
 const getPosts = async (): Promise<Array<Post>> => {
   try {
-    // In a Server Component, it's best to fetch from the absolute URL of the API route.
-    // The NEXT_PUBLIC_BASE_URL should be set in your .env.local file (e.g., http://localhost:3000).
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/posts`, {
-      // 'no-store' ensures that the data is fetched dynamically on every request.
-      // This is crucial for seeing new posts immediately without needing to rebuild.
-      cache: 'no-store',
-    });
+    // 直接从数据库查询
+    const { data: posts, error } = await supabase
+      .from('posts') // 你的表名
+      .select('*')
+      .eq('status', 'published') // 只获取已发布的文章
+      .order('created_at', { ascending: false }); // 按时间排序
 
-    if (!res.ok) {
-      // Log the error for server-side debugging.
-      console.error(`Failed to fetch posts: ${res.status} ${res.statusText}`);
-      // Return an empty array to prevent the page from crashing on a failed fetch.
-      return []; 
+    if (error) {
+      console.error('Error fetching posts directly from Supabase:', error.message);
+      return [];
     }
 
-    const posts: Array<Post> = await res.json();
-    return posts;
+    return posts || [];
+    
   } catch (error) {
-    console.error('An unexpected error occurred while fetching posts:', error);
-    // Gracefully handle network errors or other exceptions.
+    if (error instanceof Error) {
+        console.error('An unexpected error occurred while fetching posts:', error.message);
+    }
     return [];
   }
 };

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { supabase } from '../lib/supabase';
 
 // ============================================================================
 // 1. TYPE DEFINITIONS
@@ -37,24 +38,27 @@ export interface Post {
  */
 const getLatestPosts = async (): Promise<Array<Post>> => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    // We append the '?limit=3' query to tell the API to only fetch 3 posts.
-    // This is highly efficient.
-    const res = await fetch(`${baseUrl}/api/posts?limit=3`, {
-      // For a homepage, revalidating every hour (3600s) is a good balance.
-      // It keeps the content fresh without hitting the DB on every visit.
-      next: { revalidate: 60 },
-    });
+    // 直接使用 Supabase 客户端查询数据库
+    const { data: posts, error } = await supabase
+      .from('posts') // 确保这是你的表名
+      .select('*')
+      .eq('status', 'published') // 只获取已发布的文章
+      .order('created_at', { ascending: false }) // 按创建时间降序排序
+      .limit(3); // 限制返回数量为 3
 
-    if (!res.ok) {
-      console.error(`Failed to fetch latest posts: ${res.status} ${res.statusText}`);
+    if (error) {
+      console.error('Error fetching latest posts from Supabase:', error.message);
       return [];
     }
 
-    const posts: Array<Post> = await res.json();
-    return posts;
+    // 'posts' 已经是我们需要的格式了
+    return posts || [];
+
   } catch (error) {
-    console.error('An unexpected error occurred while fetching latest posts:', error);
+    // 这个 catch 块现在主要用于捕获意外的、非 Supabase 的错误
+    if (error instanceof Error) {
+        console.error('An unexpected error occurred while fetching latest posts:', error.message);
+    }
     return [];
   }
 };
