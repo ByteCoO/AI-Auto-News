@@ -30,6 +30,11 @@ export default function Footer() {
                 </a>
               </li> */}
               <li>
+                <a href="/blog" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  Blog
+                </a>
+              </li>
+              <li>
                 <a href="/Channels" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   News Channels
                 </a>

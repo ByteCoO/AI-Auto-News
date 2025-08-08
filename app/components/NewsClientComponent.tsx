@@ -117,7 +117,7 @@ const uiChannels: ChannelUI[] = [
 
 const NewsClientComponent: React.FC = () => {
   const searchParams = useSearchParams();
-  const category = searchParams.get('category');
+  const category = searchParams?.get('category');
 
   const getInitialChannelId = () => {
     if (category) {

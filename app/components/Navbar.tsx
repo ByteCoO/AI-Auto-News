@@ -124,6 +124,13 @@ export default function Navbar() {
             >
               Home
             </Link>
+            <Link 
+              href="/blog"
+              className="block text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white py-2 transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Blog
+            </Link>
            {/*  <Link 
               href="/archive"
               className="block text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white py-2 transition-colors duration-200"
