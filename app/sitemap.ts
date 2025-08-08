@@ -1,67 +1,45 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
-import { supabase } from './lib/supabase'; // Assuming this path is correct
 
-// IMPORTANT: Replace 'https://yourdomain.com' with your actual production domain
-// or better, set NEXT_PUBLIC_BASE_URL in your environment variables.
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://yourdomain.com';
+// 假设你有一个函数可以获取所有已发布的文章
+// 这个函数可以从你的 /blog/page.tsx 中提取出来放到一个共享文件中
+// async function getAllPublishedPosts() { ... return posts; }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const sitemapEntries: MetadataRoute.Sitemap = [
+  const baseUrl = 'https://visionong.dpdns.org'; // 请使用你的真实域名
+
+  // 示例：添加博客文章 URL
+  // const posts = await getAllPublishedPosts();
+  // const postUrls = posts.map(post => ({
+  //   url: `${baseUrl}/blog/${post.slug}`, 
+  //   lastModified: new Date(post.created_at),
+  // }));
+
+  return [
     {
-      url: `${BASE_URL}/`,
+      url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: 'yearly',
       priority: 1,
     },
     {
-      url: `${BASE_URL}/ft-news`, // Main FT News listing page
+      url: `${baseUrl}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 0.8,
     },
-    // Add other important static pages here if any
-    // Example:
-    // {
-    //   url: `${BASE_URL}/about`,
-    //   lastModified: new Date(),
-    //   changeFrequency: 'monthly',
-    //   priority: 0.5,
-    // },
+    {
+      url: `${baseUrl}/Channels`, // 你的 Channels 页面
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/price`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // ...postUrls, // 把动态生成的文章 URL 加进来
   ];
-
-  try {// Fetch all articles for the sitemap
-    const { data: articles, error } = await supabase
-      .from('FT_articles')
-      .select('id, updated_at, publishedtimestamputc') // Select fields for URL and lastModified
-      .order('publishedtimestamputc', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching articles for sitemap:', error.message);
-      // Still return static entries if dynamic fetch fails
-      return sitemapEntries;
-    }
-
-    if (articles) {
-      articles.forEach(article => {
-        const lastModifiedDate = article.updated_at || article.publishedtimestamputc;
-        if (article.id && lastModifiedDate) {
-          sitemapEntries.push({
-            url: `${BASE_URL}/ft-news/${article.id}`,
-            lastModified: new Date(lastModifiedDate),
-            changeFrequency: 'weekly', // Adjust based on how often articles change
-            priority: 0.7,
-          });
-        }
-      });
-    }
-  } catch (e: unknown) { // Catch unknown for broader error handling
-    if (e instanceof Error) {
-      console.error('Unexpected error generating sitemap entries:', e.message);
-    } else {
-      console.error('An unknown error occurred in sitemap generation:', e);
-    }
-  }
-
-  return sitemapEntries;
 }
