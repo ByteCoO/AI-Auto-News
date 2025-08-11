@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -20,6 +21,13 @@ interface ChannelUI {
   id: string;
   displayName: string;
   name: string;
+}
+
+// Props for the component, now including initial data from SSR
+interface NewsClientComponentProps {
+  initialNewsItems?: NewsItem[];
+  initialTotalCount?: number;
+  initialChannelId?: string;
 }
 
 // Configuration mapping channel names to their associated keywords/categories
@@ -100,7 +108,7 @@ const channelKeywordsConfig: Record<string, string[]> = {
      "null", "", "Climate graphic of the week", "Sustainability", "News", "Transcript",
      "FT subscriber event", "Special Report", "FT News Briefing podcast"
   ]
-};// Define the channels for UI display in English
+};
 const uiChannels: ChannelUI[] = [
   { id: "market_finance", displayName: "Market & Finance", name: "Market & Finance" },
   { id: "international", displayName: "International", name: "International" },
@@ -115,33 +123,36 @@ const uiChannels: ChannelUI[] = [
   { id: "all", displayName: "All News", name: "All News" },
 ];
 
-const NewsClientComponent: React.FC = () => {
+const NewsClientComponent: React.FC<NewsClientComponentProps> = ({
+  initialNewsItems = [],
+  initialTotalCount = 0,
+  initialChannelId,
+}) => {
   const searchParams = useSearchParams();
   const category = searchParams?.get('category');
 
   const getInitialChannelId = () => {
+    if (initialChannelId) return initialChannelId;
     if (category) {
       const channel = uiChannels.find(c => c.name === category);
-      if (channel) {
-        return channel.id;
-      }
+      if (channel) return channel.id;
     }
     return uiChannels[0].id;
   };
 
   const [selectedChannelId, setSelectedChannelId] = useState<string>(getInitialChannelId());
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);const fetchNewsForChannel = useCallback(async (page: number, channelId: string) => {
+  const [hasMore, setHasMore] = useState(initialNewsItems.length < initialTotalCount);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const fetchNewsForChannel = useCallback(async (page: number, channelId: string, isNewChannel: boolean = false) => {
     const currentChannel = uiChannels.find(c => c.id === channelId);
     if (!currentChannel) return;
 
     setIsLoading(true);
     
     let keywords: string[] = [];
-    // If the channel is not "All News", get its specific keywords.
-    // Otherwise, keywords remains an empty array, which the API now handles correctly.
     if (currentChannel.name !== "All News") {
       keywords = channelKeywordsConfig[currentChannel.name] || [];
     }
@@ -149,56 +160,58 @@ const NewsClientComponent: React.FC = () => {
     try {
       const response = await fetch(`/api/news-by-channel?page=${page}&limit=10`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keywords }),
       });
 
-      if (!response.ok) {
-        throw new Error(`API call failed with status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
 
       const { data, count } = await response.json();
-
-      setNewsItems(prevItems => (page === 1 ? data : [...prevItems, ...data]));
       
-      // Determine if there are more items to load based on the page and the total count from the API.
-      // Assuming a limit of 10 items per page, which is hardcoded in the API.
+      setNewsItems(prevItems => (isNewChannel || page === 1) ? data : [...prevItems, ...data]);
       setHasMore((page * 10) < count);
+      setCurrentPage(page);
 
     } catch (error) {
       console.error("Failed to fetch news:", error);
-      // Optionally set an error state to show in the UI
     } finally {
       setIsLoading(false);
     }
-  }, []); // Empty dependency array is correct as this function is now stable.
+  }, []);
 
-  // Effect to fetch news when the channel changes
+  // This effect now only runs if no initial data was provided by the server.
   useEffect(() => {
-    setCurrentPage(1);
-    setNewsItems([]);
-    setHasMore(true);
-    fetchNewsForChannel(1, selectedChannelId);
-  }, [selectedChannelId, fetchNewsForChannel]);
+    if (initialNewsItems.length === 0) {
+      fetchNewsForChannel(1, selectedChannelId, true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChannelId]); // We only want this to re-run on channel change, not on initial fetch function change.
+
+  const handleChannelClick = (channelId: string) => {
+    if (channelId === selectedChannelId) return;
+    setSelectedChannelId(channelId);
+    setNewsItems([]); // Clear old items immediately
+    setHasMore(true); // Assume new channel has items
+    fetchNewsForChannel(1, channelId, true);
+  };
 
   const handleLoadMore = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    fetchNewsForChannel(nextPage, selectedChannelId);
-  };return (
+    if (!isLoading && hasMore) {
+      fetchNewsForChannel(currentPage + 1, selectedChannelId);
+    }
+  };
+
+  return (
     <div className="py-8 px-4">
       <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">
         News Channels
       </h2>
 
-      {/* Channel Buttons */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {uiChannels.map((channel) => (
           <button
             key={channel.id}
-            onClick={() => setSelectedChannelId(channel.id)}
+            onClick={() => handleChannelClick(channel.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out
                         focus:outline-none focus:ring-2 focus:ring-opacity-50
                         ${selectedChannelId === channel.id
@@ -211,7 +224,6 @@ const NewsClientComponent: React.FC = () => {
         ))}
       </div>
 
-      {/* News Items Display */}
       <div className="max-w-4xl mx-auto">
         {newsItems.length > 0 ? (
           <div className="space-y-4">

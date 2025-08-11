@@ -1,21 +1,37 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
-
-// 假设你有一个函数可以获取所有已发布的文章
-// 这个函数可以从你的 /blog/page.tsx 中提取出来放到一个共享文件中
-// async function getAllPublishedPosts() { ... return posts; }
+import { supabase } from './lib/supabase'; // 导入 Supabase 客户端
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://visionong.dpdns.org'; // 请使用你的真实域名
 
-  // 示例：添加博客文章 URL
-  // const posts = await getAllPublishedPosts();
-  // const postUrls = posts.map(post => ({
-  //   url: `${baseUrl}/blog/${post.slug}`, 
-  //   lastModified: new Date(post.created_at),
-  // }));
+  // 1. 获取所有已发布的博客文章
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('id, created_at')
+    .eq('status', 'published');
 
-  return [
+  const postUrls = posts?.map(post => ({
+    url: `${baseUrl}/blog/${post.id}`,
+    lastModified: new Date(post.created_at),
+    changeFrequency: 'weekly' as 'weekly',
+    priority: 0.7,
+  })) || [];
+
+  // 2. 获取所有 FT 新闻文章
+  const { data: ftArticles } = await supabase
+    .from('FT_articles')
+    .select('id, publishedtimestamputc');
+
+  const ftArticleUrls = ftArticles?.map(article => ({
+    url: `${baseUrl}/ft-news/${article.id}`,
+    lastModified: new Date(article.publishedtimestamputc || Date.now()),
+    changeFrequency: 'daily' as 'daily',
+    priority: 0.7,
+  })) || [];
+
+  // 3. 定义静态页面
+  const staticUrls: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -29,17 +45,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/Channels`, // 你的 Channels 页面
+      url: `${baseUrl}/Channels`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/price`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
-    // ...postUrls, // 把动态生成的文章 URL 加进来
+  ];
+
+  // 4. 合并所有 URL
+  return [
+    ...staticUrls,
+    ...postUrls,
+    ...ftArticleUrls,
   ];
 }
