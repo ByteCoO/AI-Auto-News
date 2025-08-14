@@ -1,6 +1,45 @@
+import { Metadata, ResolvingMetadata } from 'next';
 import React from 'react';
 import { marked } from 'marked';
 import { supabase } from '@/lib/supabaseClient';
+
+// --- Dynamic Metadata Generation ---
+
+type Props = {
+  params: { id: string }
+}
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.id;
+  const post = await getPostById(id);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found',
+      description: 'The post you are looking for does not exist.',
+    }
+  }
+
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: post.title,
+    description: post.excerpt || 'An insightful article from Game Visioning.',
+    alternates: {
+      canonical: `/blog/${post.id}`,
+    },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || 'An insightful article from Game Visioning.',
+      url: `/blog/${post.id}`,
+      images: post.cover_image_url ? [post.cover_image_url, ...previousImages] : [...previousImages],
+    },
+  }
+}
+
 
 // --- 类型定义和工具函数 (无变化) ---
 interface Post {

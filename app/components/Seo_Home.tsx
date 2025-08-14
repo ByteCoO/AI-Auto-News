@@ -44,7 +44,7 @@ const getLatestPosts = async (): Promise<Array<Post>> => {
       .select('*')
       .eq('status', 'published') // 只获取已发布的文章
       .order('created_at', { ascending: false }) // 按创建时间降序排序
-      .limit(3); // 限制返回数量为 3
+      .limit(6); // 限制返回数量为 3
 
     if (error) {
       console.error('Error fetching latest posts from Supabase:', error.message);

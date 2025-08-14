@@ -60,6 +60,7 @@ type Props = {
 };
 
 // 1. Implement generateMetadata for dynamic SEO tags
+// 1. Implement generateMetadata for dynamic SEO tags
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
@@ -68,17 +69,16 @@ export async function generateMetadata(
   const article = await fetchFTNewsDetailServerSide(id);
 
   if (!article) {
-    // Return metadata for a "not found" state or allow notFound() in page to handle it
     return {
       title: 'Article Not Found',
-      description: 'The article you are looking for could not be found.',
     };
   }
 
   const description = article.subheadline || (article.body && typeof article.body[0]?.content === 'string' ? article.body[0].content.substring(0, 160).trim() + '...' : `Read the article: ${article.headline}`);
+  const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: `${article.headline} | FT News`,
+    title: article.headline, // The layout will add "| Game Visioning"
     description: description,
     alternates: {
       canonical: article.page_url,
@@ -87,20 +87,22 @@ export async function generateMetadata(
       title: article.headline,
       description: description,
       url: article.page_url,
-      siteName: 'Your Site Name', 
-      images: article.main_image?.url ? [
-        {
-          url: article.main_image.url,
-          alt: article.main_image.altText || article.headline,
-        },
-      ] : [],
+      siteName: 'Game Visioning',
+      images: article.main_image?.url ? 
+        [
+          {
+            url: article.main_image.url,
+            alt: article.main_image.altText || article.headline,
+          },
+          ...previousImages
+        ] : 
+        [...previousImages],
       locale: 'en_US', 
       type: 'article',
       publishedTime: article.publishedtimestamputc,
       modifiedTime: article.updated_at || article.publishedtimestamputc,
       authors: article.authors?.map(author => author.name),
     },
-   
   };
 }
 
@@ -126,12 +128,15 @@ export default async function FTNewsDetailPage({ params }: Props) {
   } = article;
 
   // 3. Structured Data (JSON-LD)
+  const siteName = 'Game Visioning';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://visionong.dpdns.org';
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': page_url || `https://yourdomain.com/ft-news/${id}`, // Fallback, replace yourdomain.com
+      '@id': page_url || `${baseUrl}/ft-news/${id}`,
     },
     headline: headline,
     description: subheadline || (body && typeof body[0]?.content === 'string' ? body[0].content.substring(0, 250).trim() + '...' : undefined),
@@ -141,14 +146,14 @@ export default async function FTNewsDetailPage({ params }: Props) {
     author: authors?.map(author => ({
       '@type': 'Person',
       name: author.name,
-      ...(author.url && { url: author.url }), // Include URL if available
+      ...(author.url && { url: author.url }),
     })),
     publisher: {
       '@type': 'Organization',
-      name: 'Your Site Name', // Replace
+      name: siteName,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://yourdomain.com/logo.png', // Replace with your logo URL
+        url: `${baseUrl}/logo.png`,
       },
     },
   };

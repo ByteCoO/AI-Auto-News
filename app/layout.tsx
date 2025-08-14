@@ -11,8 +11,12 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './contexts/AuthContext'; // <--- 1. 导入 AuthProvider
 
 export const metadata: Metadata = {
-  title: 'Game Visioning',
-  description: 'FT-NEWS - Game Starting',
+  metadataBase: new URL('https://visionong.dpdns.org'),
+  title: {
+    default: 'Game Visioning: News, Analysis, and Community',
+    template: `%s | Game Visioning`,
+  },
+  description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions. Stay informed with our comprehensive coverage and expert insights.',
 };
 
 export default async function RootLayout({

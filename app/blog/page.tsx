@@ -1,7 +1,17 @@
 
+import { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
+
+export const metadata: Metadata = {
+  title: 'AI Content & Resources Blog',
+  description: 'Explore our comprehensive collection of articles, research, and resources on Artificial Intelligence. Stay updated with the latest trends, tools, and discussions in the AI world.',
+  alternates: {
+    canonical: '/blog',
+  },
+};
+
 
 // ============================================================================
 // 1. TYPE DEFINITIONS

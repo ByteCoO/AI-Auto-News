@@ -136,8 +136,8 @@ const NewsSaasPricingPage = () => {
     <>
       <UnderDevelopmentModal isOpen={isModalOpen} onClose={closeDevelopmentModal} />
       <Head>
-        <title>News SaaS API Pricing - Get Real-Time News Data</title>
-        <meta name="description" content="Explore our flexible News SaaS API pricing plans to meet your needs from personal projects to enterprise applications." />
+        <title>News API Pricing for Developers & Businesses | Game Visioning</title>
+        <meta name="description" content="Find the perfect API plan for your project. We offer flexible, scalable, and affordable pricing tiers for our real-time News API, from free developer plans to enterprise solutions." />
       </Head>
       <div className="min-h-screen bg-white dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-white">
         <div className="max-w-7xl mx-auto">

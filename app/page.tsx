@@ -53,13 +53,14 @@ const siteName = "Game Visiong";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yourdomain.com';
 
 export const metadata: Metadata = {
-  title: `${siteName} - Latest News, Hot Content & More`,
-  description: 'Welcome to Game Visiong. Discover the latest news, trending content, and insightful articles in the world of gaming and beyond.',alternates: {
+  title: 'Game Visioning: Unbiased News & In-Depth Analysis',
+  description: 'Get real-time, unbiased news from multiple trusted sources. We cover technology, finance, business, and politics with expert insights and in-depth analysis. Your source for a complete worldview.',
+  alternates: {
     canonical: `${baseUrl}/`,
   },
   openGraph: {
-    title: `${siteName} - Latest News & Insights`,
-    description: 'Stay updated with the newest articles, discussions, and trends on Game Visiong.',
+    title: 'Game Visioning: Unbiased News & In-Depth Analysis',
+    description: 'Get real-time, unbiased news from multiple trusted sources. We cover technology, finance, business, and politics with expert insights and in-depth analysis.',
     url: `${baseUrl}/`,
     siteName: siteName,
     images: [{ url: `${baseUrl}/default-og-image.png`, width: 1200, height: 630, alt: `${siteName} Homepage` }],
@@ -305,23 +306,23 @@ export default async function Home() {
           </section>
 
          
-        {/*   
+          
           <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1>
           
           <MultiSourceNews 
             initialNewsData={initialMultiSourceData} 
             sourceDisplayDetails={multiSourceDisplayDetails} 
-          /> */}
+          />
 
         
           
           
-{/* 
+
          <LatestNews 
             initialNewsItems={latestNewsInitialData.newsItems} 
             initialTotalItems={latestNewsInitialData.totalItems}
             initialPage={1} 
-          /> */}
+          />
         </div>
       </main>
     </>
