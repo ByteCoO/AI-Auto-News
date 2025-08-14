@@ -136,6 +136,9 @@ export async function generateStaticParams() {
 // 3. 新增: 允许动态生成未在构建时生成的页面 (例如新发布的文章)
 export const dynamicParams = true;
 
+// 4. 新增: 设置页面的重新验证周期为8分钟 (ISR)
+export const revalidate = 480;
+
 
 // --- 页面组件 (无变化) ---
 export default async function PostDetailPage({ params }: { params: { id: string } }) {

@@ -1,5 +1,8 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
+
+// 设置 sitemap 的重新验证周期为8分钟 (ISR)
+export const revalidate = 480;
 import { supabase } from './lib/supabase'; // 导入 Supabase 客户端
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
