@@ -118,9 +118,7 @@ const Sidebar: React.FC = () => {
 // MODIFIED: This component now accepts a 'post' of type 'Post'
 const ArticleCard: React.FC<{ post: Post }> = ({ post }) => (
   <div className="bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300 overflow-hidden">
-    {post.cover_image_url && (
-      <img src={post.cover_image_url} alt={`Cover image for ${post.title}`} className="w-full h-40 object-cover" />
-    )}
+    <img src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'} alt={`Cover image for ${post.title}`} className="w-full h-40 object-cover" />
     <div className="p-6 flex flex-col flex-grow">
       <div className="flex justify-between items-center mb-3 text-gray-500">
         <span className="flex items-center text-sm font-medium">

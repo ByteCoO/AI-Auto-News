@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
@@ -13,7 +11,7 @@ import { supabase } from '../lib/supabase';
  * This should be consistent with the data structure in your database.
  */
 export interface Post {
-  id: number;
+  id: string; // ID 应该是字符串 (UUID)
   created_at: string;
   title: string;
   slug: string;
@@ -32,32 +30,43 @@ export interface Post {
 // ============================================================================
 
 /**
- * Fetches the 3 most recent posts from the internal API endpoint.
- * This will be used by the LatestNewsGrid server component.
- * @returns A promise that resolves to an array of up to 3 Post objects.
+ * Fetches the most recent posts from one or more specified categories.
+ * This function is now more flexible and powerful.
+ * @param categories - A string for a single category or an array of strings for multiple categories.
+ * @param limit - The maximum number of posts to return.
+ * @returns A promise that resolves to an array of Post objects.
  */
-const getLatestPosts = async (): Promise<Array<Post>> => {
+const getPostsByCategories = async (
+  categories: string | string[],
+  limit: number = 3
+): Promise<Array<Post>> => {
   try {
-    // 直接使用 Supabase 客户端查询数据库
-    const { data: posts, error } = await supabase
-      .from('posts') // 确保这是你的表名
+    let query = supabase
+      .from('posts')
       .select('*')
-      .eq('status', 'published') // 只获取已发布的文章
-      .order('created_at', { ascending: false }) // 按创建时间降序排序
-      .limit(6); // 限制返回数量为 3
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    // Dynamically apply the category filter
+    if (Array.isArray(categories)) {
+      query = query.in('category', categories);
+    } else {
+      query = query.eq('category', categories);
+    }
+
+    const { data: posts, error } = await query;
 
     if (error) {
-      console.error('Error fetching latest posts from Supabase:', error.message);
+      console.error(`Error fetching posts for categories [${categories}] from Supabase:`, error.message);
       return [];
     }
 
-    // 'posts' 已经是我们需要的格式了
     return posts || [];
 
   } catch (error) {
-    // 这个 catch 块现在主要用于捕获意外的、非 Supabase 的错误
     if (error instanceof Error) {
-        console.error('An unexpected error occurred while fetching latest posts:', error.message);
+        console.error('An unexpected error occurred while fetching posts:', error.message);
     }
     return [];
   }
@@ -95,23 +104,34 @@ const HeroSection = () => (
 );
 
 /**
- * This is now an async Server Component. It fetches only the latest 3
- * posts by calling the getLatestPosts function and renders them.
+ * Reusable component to display a grid of posts for a specific category.
+ * This component fetches its own data, making it self-contained and easy to use.
  */
-const LatestNewsGrid = async () => {
-  const latestPosts = await getLatestPosts();
+interface CategoryNewsGridProps {
+  title: string;
+  categories: string | string[];
+  limit?: number;
+  backgroundColor?: string;
+}
+
+const CategoryNewsGrid = async ({
+  title,
+  categories,
+  limit = 3,
+  backgroundColor = "bg-gray-800",
+}: CategoryNewsGridProps) => {
+  const posts = await getPostsByCategories(categories, limit);
 
   return (
-    <section className="bg-gray-800 py-20">
+    <section className={`${backgroundColor} py-20`}>
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-white text-center mb-12">Latest AI Headlines</h2>
+        <h2 className="text-3xl font-bold text-white text-center mb-12">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {latestPosts && latestPosts.length > 0 ? (
-            latestPosts.map(post => (
+          {posts && posts.length > 0 ? (
+            posts.map(post => (
               <Link href={`/blog/${post.id}`} key={post.id} className="block group bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                 <img 
                   src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'}
-
                   alt={`Cover for ${post.title}`} 
                   className="w-full h-48 object-cover group-hover:opacity-80 transition-opacity" 
                 />
@@ -122,20 +142,26 @@ const LatestNewsGrid = async () => {
                   <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
                     {post.title}
                   </h3>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-400 text-sm line-clamp-3">
                     {post.excerpt}
                   </p>
                 </div>
               </Link>
             ))
           ) : (
-            <p className="text-white col-span-full text-center">Could not load latest headlines.</p>
+            <p className="text-white col-span-full text-center">Could not load headlines for this category.</p>
           )}
+        </div>
+        <div className="text-center mt-12">
+            <Link href="/blog" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                View All Posts &rarr;
+            </Link>
         </div>
       </div>
     </section>
   );
 };
+
 
 const PodcastHighlight = () => (
     <section className="bg-gray-900 py-20">
@@ -202,19 +228,37 @@ const NewsletterCTA = () => (
 // ============================================================================
 
 /**
- * SeoHome is now an async Server Component because it renders LatestNewsGrid,
- * which is also an async component that fetches data.
+ * SeoHome is an async Server Component that now renders multiple CategoryNewsGrid sections,
+ * each fetching its own specific data.
  */
 export default async function SeoHome() {
   return (
     <>
       <main className="bg-gray-900">
         <HeroSection />
-        {/*
-          * This special comment tells TypeScript to ignore the fact that LatestNewsGrid
-          * returns a Promise, which is normal for async Server Components.
-          */}
-        <LatestNewsGrid />
+
+        {/* --- LATEST AI HEADLINES --- */}
+        <CategoryNewsGrid 
+            title="Latest AI Headlines"
+            categories="AI News"
+            limit={6}
+        />
+        
+        {/* --- AI IN BUSINESS & STRATEGY SECTION --- */}
+        <CategoryNewsGrid 
+            title="AI in Business & Strategy"
+            categories={["AI Business", "Business & Strategy", "Economics", "Startup Culture"]}
+            limit={6}
+            backgroundColor="bg-gray-900" // Alternate background for visual separation
+        />
+
+        {/* --- SEO & MARKETING DEEP DIVES --- */}
+        <CategoryNewsGrid 
+            title="SEO & Marketing Deep Dives"
+            categories={["SEO", "Local SEO", "AI Marketing", "SEO Case Study"]}
+            limit={6}
+        />
+        
         <PodcastHighlight />
         <TopicExplorer />
         <NewsletterCTA />

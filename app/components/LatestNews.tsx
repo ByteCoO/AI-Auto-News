@@ -1,4 +1,4 @@
-// app/components/LatestNews.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -11,6 +11,7 @@ interface NewsItem {
   page_title?: string;
   publishedtimestamputc?: string;
   created_at?: string;
+  url?: string;
 }
 
 interface GroupedNews {
@@ -52,11 +53,12 @@ export default function LatestNews({
   const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalItems, setTotalItems] = useState(initialTotalItems);
-  const [loading, setLoading] = useState(initialNewsItems.length === 0); // Only load if no initial items
+  const [loading, setLoading] = useState(false); // Changed: Don't start loading initially
   const [initialLoadComplete, setInitialLoadComplete] = useState(initialNewsItems.length > 0);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [manualLoadDone, setManualLoadDone] = useState(initialNewsItems.length > 0); // If initial items, consider manual load triggered
+  const [initialLoadTriggered, setInitialLoadTriggered] = useState(initialNewsItems.length > 0);
+
 
   const fetchNewsFromApi = useCallback(async (pageToFetch: number, retries = 0) => {
     setLoading(true);
@@ -76,6 +78,7 @@ export default function LatestNews({
         page_title: apiItem.page_title,
         publishedtimestamputc: apiItem.publishedtimestamputc,
         created_at: apiItem.created_at,
+        url: apiItem.url,
       }));
 
       const sortedData = (transformedData || []).sort((a: NewsItem, b: NewsItem) => {
@@ -113,33 +116,16 @@ export default function LatestNews({
     }
   }, [initialLoadComplete]); // Removed initialPage from deps as it's used for initial state
 
-  useEffect(() => {
-    // Only fetch if no initial items were provided (i.e., client-side only rendering scenario or error in SSR fetch)
-    if (initialNewsItems.length === 0 && !initialLoadComplete) {
-      fetchNewsFromApi(1);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchNewsFromApi, initialNewsItems.length]); // initialLoadComplete not needed here
+  const handleInitialLoad = () => {
+    setInitialLoadTriggered(true);
+    fetchNewsFromApi(1);
+  };
 
   const loadMoreItems = useCallback(() => {
     if (!loading && newsItems.length < totalItems) {
       fetchNewsFromApi(currentPage + 1);
-      if (!manualLoadDone) setManualLoadDone(true);
     }
-  }, [loading, newsItems.length, totalItems, currentPage, fetchNewsFromApi, manualLoadDone]);
-
-  useEffect(() => {
-    if (!manualLoadDone || !initialLoadComplete) return;
-    const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200) {
-        if (!loading && newsItems.length < totalItems) {
-          loadMoreItems();
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, newsItems.length, totalItems, loadMoreItems, initialLoadComplete, manualLoadDone]);
+  }, [loading, newsItems.length, totalItems, currentPage, fetchNewsFromApi]);
 
   const groupedVisibleNews = useMemo(() => {
     const grouped = newsItems.reduce((acc, item) => {
@@ -172,8 +158,26 @@ export default function LatestNews({
 
   const canLoadMore = newsItems.length < totalItems;
 
+  if (!initialLoadTriggered) {
+    return (
+      <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
+        <div className="container mx-auto px-4 w-full max-w-3xl text-center py-10">
+           <h2 className="text-2xl sm:text-3xl font-bold mb-6 dark:text-white text-gray-900">
+                Show Latest Daily Selection
+            </h2>
+            <button
+              onClick={handleInitialLoad}
+              className="px-6 py-2.5 sm:px-8 sm:py-3 dark:bg-gray-700 bg-gray-200 dark:text-white text-gray-900 rounded-md dark:hover:bg-gray-600 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-150 text-sm sm:text-base font-medium"
+            >
+              Load More
+            </button>
+        </div>
+      </div>
+    );
+  }
+
   // Initial loading spinner for client-side only first load
-  if (loading && newsItems.length === 0 && !initialLoadComplete) {
+  if (loading && newsItems.length === 0) {
     return (
       <div className="py-8 dark:bg-zinc-800 bg-gray-100 dark:text-gray-200 text-gray-900 min-h-screen">
         <div className="container mx-auto px-4 w-full max-w-3xl text-center py-20">
@@ -226,7 +230,7 @@ export default function LatestNews({
                   return (
                     <li key={item.id} className="text-base sm:text-lg leading-relaxed">
                       <Link
-                        href={`/ft-news/${item.id}`}
+                        href={item.url ? `https://www.ft.com${item.url}` : `/ft-news/${item.id}`}
                         className="dark:text-gray-200 text-gray-800 dark:hover:text-orange-400 hover:text-orange-600 transition-colors duration-150 group block py-1.5 px-2 rounded dark:hover:bg-zinc-700 hover:bg-gray-200"
                       >
                         <span className="select-none mr-2 sm:mr-3" aria-hidden="true">•</span>
@@ -267,7 +271,7 @@ export default function LatestNews({
           </div>
         )}
 
-        {!loading && canLoadMore && !manualLoadDone && (
+        {!loading && canLoadMore && (
           <div className="text-center mt-8 mb-4">
             <button
               onClick={loadMoreItems}

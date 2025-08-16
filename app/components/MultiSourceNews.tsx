@@ -40,9 +40,9 @@ interface NewsSourceState {
 }
 
 const TARGET_SOURCES_CONFIG = [
-  { key: 'bloomberg', name: 'Bloomberg', defaultLogoLetter: 'B' },
-  { key: 'ft', name: 'FT', defaultLogoLetter: 'F' },
-  { key: 'reuters', name: 'Reuters', defaultLogoLetter: 'R' },
+  { key: 'bloomberg', name: 'Bloomberg', defaultLogoLetter: 'B', domain: 'https://www.bloomberg.com' },
+  { key: 'ft', name: 'FT', defaultLogoLetter: 'F', domain: 'https://www.ft.com' },
+  { key: 'reuters', name: 'Reuters', defaultLogoLetter: 'R', domain: 'https://www.reuters.com' },
 ];
 
 // --- Main Component ---
@@ -149,7 +149,7 @@ const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceStat
                             {item.publicationTimeUTC ? format(new Date(item.publicationTimeUTC), 'dd MMMM yyyy') : item.timestamp}
                           </div>
                           {item.url ? (
-                            <Link href={item.url} className="text-sm sm:text-base hover:underline">{item.headline}</Link>
+                            <Link href={targetConfig.domain + item.url} className="text-sm sm:text-base hover:underline">{item.headline}</Link>
                           ) : (
                             <span className="text-sm sm:text-base">{item.headline}</span>
                           )}

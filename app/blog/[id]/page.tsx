@@ -198,9 +198,9 @@ export default async function PostDetailPage({ params }: { params: { id: string 
                 className="w-full h-full"
               ></iframe>
             </div>
-          ) : post.cover_image_url && (
+          ) : (
             <img 
-              src={post.cover_image_url} 
+              src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'} 
               alt={`Cover for ${post.title}`}
               className="w-full h-auto max-h-[500px] object-cover rounded-lg shadow-xl"
             />
