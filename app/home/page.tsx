@@ -7,6 +7,8 @@ import EventsSection from '../components/EventsSection';
 import WhoToWatchSection from '../components/WhoToWatchSection';
 import LatestNews from '../components/LatestNews';
 
+// SEO should be handled by a parent server component or in the root layout.
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white transition-colors duration-200">

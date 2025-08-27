@@ -49,7 +49,8 @@ const channelKeywordsConfig: Record<string, string[]> = {
     "Travel & leisure industry", "Pharmaceuticals sector", "Tech start-ups", "TikTok Inc",
     "ADAS, AV & Safety", "Autos & Transportation", "Business", "Jobs", "Governance", "World at Work",
     "Transport Fuels", "Eutelsat SA"
-  ],"Technology": [
+  ],
+  "Technology": [
     "Crypto", "Military technology", "Technology sector", "Artificial intelligence", "Energy Transition",
     "Technology", "AI", "Cyber warfare", "Biotech", "Bitcoin", "Tech start-ups", "ADAS, AV & Safety", "Sustainability"
   ],
@@ -128,13 +129,24 @@ async function getInitialNews(category: string | null) {
 
 // Dynamic metadata for the page
 export async function generateMetadata({ searchParams }: { searchParams: { category?: string } }): Promise<Metadata> {
-  const category = searchParams.category || 'All News';
-  const title = `${category} | News Channels`;
-  const description = `Browse the latest news articles in the ${category} channel.`;
+  const category = searchParams.category;
+
+  if (category) {
+    return {
+      title: `${category} 新闻频道`,
+      description: `浏览 ${category} 频道的最新新闻文章。`,
+      alternates: {
+        canonical: `/Channels?category=${encodeURIComponent(category)}`,
+      },
+    };
+  }
 
   return {
-    title,
-    description,
+    title: '所有新闻频道',
+    description: '探索我们所有的新闻频道，找到您感兴趣的主题。',
+    alternates: {
+      canonical: '/Channels',
+    },
   };
 }
 

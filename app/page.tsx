@@ -49,28 +49,24 @@ function formatPublicationTime(utcTimestamp: string): string {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const siteName = "Game Visiong";
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yourdomain.com';
+
 
 export const metadata: Metadata = {
-  title: 'Game Visioning: Unbiased News & In-Depth Analysis',
-  description: 'Get real-time, unbiased news from multiple trusted sources. We cover technology, finance, business, and politics with expert insights and in-depth analysis. Your source for a complete worldview.',
+  title: 'Homepage - Your News and Community Hub',
+  description: 'Discover the latest news, engage in popular forums, and connect with the community.',
   alternates: {
-    canonical: `${baseUrl}/`,
-  },
-  openGraph: {
-    title: 'Game Visioning: Unbiased News & In-Depth Analysis',
-    description: 'Get real-time, unbiased news from multiple trusted sources. We cover technology, finance, business, and politics with expert insights and in-depth analysis.',
-    url: `${baseUrl}/`,
-    siteName: siteName,
-    images: [{ url: `${baseUrl}/default-og-image.png`, width: 1200, height: 630, alt: `${siteName} Homepage` }],
-    locale: 'en_US',
-    type: 'website',
+    canonical: '/',
+    languages: {
+      'en-US': '/',
+      'zh-CN': '/zh-CN',
+    },
   },
 };
 
-// Fetch initial data for the LatestNews component (first page)
-const LATEST_NEWS_ITEMS_PER_PAGE = 8; // Consistent with LatestNews.tsx
+// Define constants for SEO
+const baseUrl = 'https://visionong.dpdns.org';
+const siteName = 'Game Visioning';
+const LATEST_NEWS_ITEMS_PER_PAGE = 10;
 async function getInitialLatestNewsData(): Promise<LatestNewsData> {
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?page=1&limit=${LATEST_NEWS_ITEMS_PER_PAGE}&sourceType=latest`; // Added sourceType to differentiate if needed
   try {

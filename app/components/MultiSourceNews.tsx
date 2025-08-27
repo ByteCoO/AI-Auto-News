@@ -124,7 +124,7 @@ const MultiSourceNews: React.FC<{ initialNewsData: Record<string, NewsSourceStat
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     {logoUrl ? (
-                      <Image src={logoUrl} alt={`${displayName} logo`} width={28} height={28} className="rounded-sm object-contain" />
+                      <Image src={logoUrl} alt={`${displayName} logo`} width={28} height={28} className="rounded-sm object-contain" loading="lazy" />
                     ) : (
                       <div className={`w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-slate-800 text-indigo-600 rounded-sm font-bold text-lg`} title={displayName}>
                         {logoLetter}

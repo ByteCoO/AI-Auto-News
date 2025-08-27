@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
 
+// SEO should be handled by a parent server component or in the root layout.
+
 export default function ProtectedPage() {
   const { user, isLoading, isMockUser } = useAuth();
   const router = useRouter();

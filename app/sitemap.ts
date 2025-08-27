@@ -6,7 +6,7 @@ export const revalidate = 480;
 import { supabase } from './lib/supabase'; // 导入 Supabase 客户端
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://visiong.dpdns.org'; // 请使用你的真实域名
+  const baseUrl = 'https://visionong.dpdns.org'; // Updated to match layout.tsx
 
   // 1. 获取所有已发布的博客文章
   const { data: posts } = await supabase

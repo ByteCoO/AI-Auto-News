@@ -3,6 +3,8 @@
 
 import { useState, FormEvent } from 'react';
 
+// SEO should be handled by a parent server component or in the root layout.
+
 // TypeScript 类型定义，用于描述从 Jina API 返回的数据结构
 interface JinaData {
   code: number;

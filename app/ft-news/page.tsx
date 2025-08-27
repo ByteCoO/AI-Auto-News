@@ -80,3 +80,4 @@ export async function generateMetadata() {
     description: 'Browse the latest news articles from the Financial Times, updated regularly.',
   };
 }
+

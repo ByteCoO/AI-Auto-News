@@ -17,6 +17,63 @@ export const metadata: Metadata = {
     template: `%s | Game Visioning`,
   },
   description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions. Stay informed with our comprehensive coverage and expert insights.',
+  keywords: ['news', 'analysis', 'community', 'finance', 'markets', 'technology', 'politics'],
+  authors: [{ name: 'Game Visioning Team' }],
+  creator: 'Game Visioning',
+  publisher: 'Game Visioning',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Game Visioning: News, Analysis, and Community',
+    description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions.',
+    url: 'https://visionong.dpdns.org',
+    siteName: 'Game Visioning',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Game Visioning - News, Analysis, and Community',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Game Visioning: News, Analysis, and Community',
+    description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions.',
+    images: ['/og-image.jpg'],
+    creator: '@gamevisioning',
+    site: '@gamevisioning',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/manifest.json',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default async function RootLayout({
