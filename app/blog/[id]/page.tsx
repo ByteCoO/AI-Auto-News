@@ -50,6 +50,7 @@ interface Post {
   content: string | null;
   excerpt: string | null;
   cover_image_url: string | null;
+  cover_image_alt: string | null;
   category: string | null;
   tags: string[] | null;
   status: string;
@@ -201,7 +202,7 @@ export default async function PostDetailPage({ params }: { params: { id: string 
           ) : (
             <img 
               src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'} 
-              alt={`Cover for ${post.title}`}
+              alt={post.cover_image_alt || `Cover for ${post.title}`} 
               className="w-full h-auto max-h-[500px] object-cover rounded-lg shadow-xl"
             />
           )}

@@ -18,6 +18,7 @@ export interface Post {
   content: string | null;
   excerpt: string | null;
   cover_image_url: string | null;
+  cover_image_alt: string | null;
   category: string | null;
   tags: string[] | null;
   status: string | null;
@@ -43,7 +44,7 @@ const getPostsByCategories = async (
   try {
     let query = supabase
       .from('posts')
-      .select('*')
+      .select('id, created_at, title, slug, content, excerpt, cover_image_url, cover_image_alt, category, tags, status, youtube_url, source')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -132,7 +133,7 @@ const CategoryNewsGrid = async ({
               <Link href={`/blog/${post.id}`} key={post.id} className="block group bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                 <img 
                   src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'}
-                  alt={`Cover for ${post.title}`} 
+                  alt={post.cover_image_alt || `Cover for ${post.title}`} 
                   className="w-full h-48 object-cover group-hover:opacity-80 transition-opacity" 
                 />
                 <div className="p-6">
