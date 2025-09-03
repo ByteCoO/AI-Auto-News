@@ -1,0 +1,263 @@
+// app/page.tsx
+import MultiSourceNews, { NewsSource } from './components/MultiSourceNews';
+import LatestNews from './components/LatestNews';
+import { Metadata } from 'next';
+
+// Interface for news items, consistent with LatestNews.tsx and /api/news response
+interface NewsItem {
+  id: string;
+  published_timestamp: string; // From original API if available
+  headline?: string;
+  page_title?: string;
+  publishedtimestamputc?: string; // Main field for publication date (ISO string ideally from API)
+  created_at?: string;            // Another potential date field
+  title?: string;                 // Can be same as headline, used by MultiSourceNews processing
+  url?: string;                   // URL for MultiSourceNews items or ft-news link
+  source?: string;                // Source identifier string
+  rawPublicationTimeUTC?: string; // Store original UTC timestamp for JSON-LD
+  // publicationTimeUTC field is the formatted string from formatPublicationTime, kept for MultiSourceNews display
+  publicationTimeUTC?: string;
+}
+
+interface LatestNewsData {
+  newsItems: NewsItem[];
+  totalItems: number;
+}
+
+function formatPublicationTime(utcTimestamp: string): string {
+  if (!utcTimestamp) return 'N/A';
+  try {
+    const date = new Date(utcTimestamp);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+    const month = monthNames[date.getUTCMonth()];
+    return `${hours}:${minutes} ${day} ${month}`;
+  } catch (e) {
+    console.error("Error formatting date:", utcTimestamp, e);
+    return 'Error Date';
+  }
+}
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const siteName = "Game Visiong";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yourdomain.com';
+
+export const metadata: Metadata = {
+  title: `${siteName} - Latest News, Hot Content & More`,
+  description: 'Welcome to Game Visiong. Discover the latest news, trending content, and insightful articles in the world of gaming and beyond.',
+  alternates: {
+    canonical: `${baseUrl}/`,
+  },
+  openGraph: {
+    title: `${siteName} - Latest News & Insights`,
+    description: 'Stay updated with the newest articles, discussions, and trends on Game Visiong.',
+    url: `${baseUrl}/`,
+    siteName: siteName,
+    images: [{ url: `${baseUrl}/default-og-image.png`, width: 1200, height: 630, alt: `${siteName} Homepage` }],
+    locale: 'en_US',
+    type: 'website',
+  },
+};
+
+// Fetch initial data for the LatestNews component (first page)
+const LATEST_NEWS_ITEMS_PER_PAGE = 8; // Consistent with LatestNews.tsx
+async function getInitialLatestNewsData(): Promise<LatestNewsData> {
+  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?page=1&limit=${LATEST_NEWS_ITEMS_PER_PAGE}&sourceType=latest`; // Added sourceType to differentiate if needed
+  try {
+    const res = await fetch(apiUrl, { cache: 'no-store' });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`Failed to fetch initial latest news: ${res.status} ${res.statusText}. Response: ${errorText}`);
+      return { newsItems: [], totalItems: 0 };
+    }
+    const { data, count } = await res.json();
+
+    const transformedData = (data || []).map((apiItem: any): NewsItem => ({
+      id: apiItem.id ? apiItem.id.toString() : `fallback-${Math.random()}`,
+      published_timestamp: apiItem.published_timestamp,
+      headline: apiItem.headline,
+      page_title: apiItem.page_title,
+      publishedtimestamputc: apiItem.publishedtimestamputc,
+      rawPublicationTimeUTC: apiItem.publishedtimestamputc, // Store for JSON-LD
+      created_at: apiItem.created_at,
+      title: apiItem.title || apiItem.headline, // Ensure title is present
+      url: apiItem.url || `${baseUrl}/ft-news/${apiItem.id}`, // Fallback or specific URL
+      source: apiItem.source,
+    }));
+    return { newsItems: transformedData, totalItems: count || 0 };
+  } catch (error) {
+    console.error("Error fetching or processing initial latest news:", error);
+    return { newsItems: [], totalItems: 0 };
+  }
+}
+
+// Helper function to group news by source and format for MultiSourceNews
+async function getGroupedNewsData(): Promise<NewsSource[]> {
+  // Assuming /api/news by default fetches all sources for MultiSourceNews
+  const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?sourceType=multi`; // Added sourceType to differentiate if needed
+  try {
+    const res = await fetch(apiUrl, { cache: 'no-store' });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`Failed to fetch multi-source news: ${res.status} ${res.statusText}. Response: ${errorText}`);
+      return [];
+    }
+    const apiResponse = await res.json();
+    // Adjust based on actual API response structure for multi-source.
+    // Assuming apiResponse is directly the array of all news items or { data: allNewsItems }
+    const allNews: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse.data || []);
+
+
+    allNews.sort((a, b) => {
+      const dateA = new Date(a.publishedtimestamputc || a.publicationTimeUTC || 0);
+      const dateB = new Date(b.publishedtimestamputc || b.publicationTimeUTC || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    const sourceConfig: { [key: string]: Omit<NewsSource, 'newsItems'> } = {
+      'Bloomberg': { id: 'bloomberg', name: 'Bloomberg', logoLetter: 'B', updateLabel: '刚刚更新', cardBgColor: 'bg-gray-800 dark:bg-gray-700', cardTextColor: 'text-white', cardCustomStyle: { height: '400px', overflowY: 'auto' } },
+      'zaobao': { id: 'zaobao', name: '联合早报', logoLetter: '早', updateLabel: '刚刚更新', cardBgColor: 'bg-red-700 dark:bg-red-800', cardTextColor: 'text-white' },
+      'wallstreetcn': { id: 'wallstreetcn', name: '华尔街见闻', logoUrl: '/images/wallstreetcn-logo.png', updateLabel: '实时快讯', cardBgColor: 'bg-indigo-600 dark:bg-indigo-700', cardTextColor: 'text-white' },
+      'ithome': { id: 'ithome', name: 'IT之家', logoLetter: 'IT', updateLabel: '刚刚更新', cardBgColor: 'bg-rose-600 dark:bg-rose-700', cardTextColor: 'text-white' },
+    };
+
+    const grouped = allNews.reduce((acc, item) => {
+      const sourceKey = item.source || 'Unknown';
+      if (!acc[sourceKey]) acc[sourceKey] = [];
+      acc[sourceKey].push({
+        id: item.id ? item.id.toString() : `fallback-multi-${Math.random()}`,
+        timestamp: item.original_timestamp,
+        headline: item.title || item.headline,
+        url: item.url,
+        publicationTimeUTC: (item.publishedtimestamputc || item.publicationTimeUTC) ? formatPublicationTime(item.publishedtimestamputc || item.publicationTimeUTC) : 'N/A',
+        rawPublicationTimeUTC: item.publishedtimestamputc || item.publicationTimeUTC, // Keep original for JSON-LD
+      });
+      return acc;
+    }, {} as Record<string, NewsItem[]>);
+
+    const formattedNewsData = Object.keys(sourceConfig)
+      .map(key => ({
+        ...sourceConfig[key],
+        newsItems: grouped[key] || [],
+      }))
+      .filter(source => source.newsItems.length > 0);
+
+    return formattedNewsData;
+  } catch (error) {
+    console.error("Error fetching or processing multi-source news:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const [multiSourceNewsData, latestNewsInitialData] = await Promise.all([
+    getGroupedNewsData(),
+    getInitialLatestNewsData()
+  ]);
+
+  const jsonLdWebSite = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    url: `${baseUrl}/`,
+    name: siteName,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const jsonLdOrganization = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    url: `${baseUrl}/`,
+    name: siteName,
+    logo: `${baseUrl}/logo.png`,
+  };
+  
+  const allNewsArticlesLd: object[] = [];
+
+  // JSON-LD for LatestNews
+  if (latestNewsInitialData && latestNewsInitialData.newsItems) {
+    latestNewsInitialData.newsItems.forEach(item => {
+      if (item.id && (item.headline || item.page_title) && item.rawPublicationTimeUTC) {
+        allNewsArticlesLd.push({
+          '@type': 'NewsArticle',
+          mainEntityOfPage: { '@type': 'WebPage', '@id': `${baseUrl}/ft-news/${item.id}` },
+          headline: item.headline || item.page_title,
+          datePublished: new Date(item.rawPublicationTimeUTC).toISOString(),
+          dateModified: new Date(item.rawPublicationTimeUTC).toISOString(), // Or use a separate modified date if available
+          author: { '@type': 'Organization', name: siteName },
+          publisher: {
+            '@type': 'Organization', name: siteName,
+            logo: { '@type': 'ImageObject', url: `${baseUrl}/logo.png` },
+          },
+          // Example image (replace with actual logic if images are associated)
+          // image: { '@type': 'ImageObject', url: `${baseUrl}/images/news/${item.id}.jpg`, width: 1200, height: 630 },
+        });
+      }
+    });
+  }
+
+  // JSON-LD for MultiSourceNews
+  multiSourceNewsData.forEach(source => {
+    (source.newsItems as NewsItem[]).forEach(item => { // Cast newsItems to NewsItem[]
+      if (item.headline && item.url && item.rawPublicationTimeUTC) {
+        allNewsArticlesLd.push({
+          '@type': 'NewsArticle',
+          mainEntityOfPage: { '@type': 'WebPage', '@id': item.url.startsWith('http') ? item.url : `${baseUrl}${item.url}` },
+          headline: item.headline,
+          datePublished: new Date(item.rawPublicationTimeUTC).toISOString(),
+          dateModified: new Date(item.rawPublicationTimeUTC).toISOString(),
+          author: { '@type': 'Organization', name: source.name || siteName },
+          publisher: {
+            '@type': 'Organization', name: siteName,
+            logo: { '@type': 'ImageObject', url: `${baseUrl}/logo.png` },
+          },
+        });
+      }
+    });
+  });
+
+  const jsonLdNews = allNewsArticlesLd.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@graph': allNewsArticlesLd
+  } : null;
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+      />
+      {jsonLdNews && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNews) }}
+        />
+      )}
+      <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <div className="p-4">
+          <LatestNews 
+            initialNewsItems={latestNewsInitialData.newsItems} 
+            initialTotalItems={latestNewsInitialData.totalItems}
+            initialPage={1} 
+          />
+          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1> {/* Added mt-8 for spacing */}
+          <MultiSourceNews sources={multiSourceNewsData} />
+        </div>
+      </main>
+    </>
+  );
+}

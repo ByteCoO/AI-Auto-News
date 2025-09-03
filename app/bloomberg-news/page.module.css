@@ -1,0 +1,70 @@
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.headerContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  background-color: #F0F2FF;
+  color: #4D5EEB;
+  font-weight: bold;
+  font-size: 24px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-right: 12px;
+}
+
+.header {
+  font-size: 28px;
+  font-weight: 600;
+  color: #121212;
+}
+
+.newsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.newsItem {
+  border-top: 1px solid #f0f0f0;
+  padding: 20px 0;
+}
+
+.newsItem:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  color: #666666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.clockIcon {
+  width: 16px;
+  height: 16px;
+  fill: #666666;
+  margin-right: 8px;
+}
+
+.headline {
+  font-size: 20px;
+  font-weight: 500;
+  color: #1c1c1c;
+  line-height: 1.4;
+  margin: 0;
+}

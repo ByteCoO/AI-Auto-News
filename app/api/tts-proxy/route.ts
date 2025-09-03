@@ -5,6 +5,15 @@ export async function POST(request: Request) {
     const body = await request.json(); // 获取前端发送过来的请求体
     const externalTtsUrl = 'https://fond-nina-ballpo-dba04486.koyeb.app/api/tts';
 
+    // 处理请求体格式
+    const formattedBody = {
+      text: Array.isArray(body.text) ? body.text.filter((t: string) => t.trim()).join('\n\n') : body.text,
+      voice: body.voice || 'zh-CN-XiaoxiaoNeural',
+      rate: body.rate || '-4%',
+      volume: body.volume || '+0%',
+      name: body.name
+    };
+
     // 向外部 TTS API 发送请求
     const response = await fetch(externalTtsUrl, {
       method: 'POST',
@@ -12,7 +21,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
         // 如果外部 API 需要其他特定 Header，也在这里添加
       },
-      body: JSON.stringify(body), // 将从前端收到的 body 转发
+      body: JSON.stringify(formattedBody) // 发送格式化后的请求体
     });
 
     // 检查外部 API 的响应状态

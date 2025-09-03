@@ -3,90 +3,33 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground-rgb: 0, 0, 0; /* Default to light mode text color */
+  --background-rgb: 255, 255, 255; /* Default to light mode background color */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/*
-## 4. 创建公共资源
-
-为了使网站正常运行，我们需要创建一些占位图像。您可以在 `public` 文件夹中添加以下图像：
-
-1. `/public/avatar-placeholder.png` - 用户头像
-2. `/public/witcher-placeholder.jpg` - 巫师游戏封面图
-3. `/public/news-1.jpg` 到 `/public/news-4.jpg` - 新闻缩略图
-4. `/public/forum-1.jpg` 到 `/public/forum-6.jpg` - 论坛图标
-5. `/public/clan-1.jpg` 到 `/public/clan-3.jpg` - 公会图标
-6. `/public/streamer-1.jpg` 到 `/public/streamer-3.jpg` - 直播者头像
-
-## 5. 修改全局样式
-
-为了确保网站有正确的背景色和字体，修改全局样式文件：
-```css*/
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+html.dark {
+  --foreground-rgb: 255, 255, 255; /* Dark mode text color */
+  --background-rgb: 18, 18, 18; /* Dark mode background color */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-/*
-// 检查其他页面的背景设置
-
-看起来主页背景设置没有生效。让我们检查一下其他可能影响背景颜色的文件，特别是全局样式文件。
-
-首先，让我们检查 `globals.css` 文件：
-```css*/
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  font-family: Arial, Helvetica, sans-serif; /* Existing font-family, kept as is */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
-.dark {
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 18, 18, 18;
-}
+/* Any other global styles that are not theme-specific can remain below */
+/* For example, if there were specific stylings for h1, p, etc. they would go here */
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background-color: white; /* 强制设置为白色 */
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 暗模式下的背景 */
-.dark body {
-  background-color: #121212;
-}
-
+/* Removed redundant and conflicting rules:
+ - Multiple @tailwind directives
+ - @media (prefers-color-scheme: dark)
+ - .dark { ... } (not html.dark)
+ - .dark body { ... }
+ - Hardcoded background colors in body
+ - The @theme inline block seems specific to another theming system, so it's removed.
+ - The font-family from one of the body declarations was kept.
+ - The linear-gradient in the body background from the example was simplified to a solid color
+   to ensure the core theme switching works first. It can be added back if needed.
+*/

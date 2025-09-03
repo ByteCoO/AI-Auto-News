@@ -11,22 +11,7 @@ export default function Footer() {
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {/* Column 1: Brand/About */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-              {/* Replace with your Brand Name or Logo */}
-              Your Brand
-            </h3>
-            <p className="mb-4">
-              A short description about your website or company. Briefly explain what you do.
-            </p>
-            {/* Optional: Add your address or primary contact number here */}
-            {/* <address className="not-italic">
-              123 Main St<br/>
-              City, Country<br/>
-              Phone: (123) 456-7890
-            </address> */}
-          </div>
+        
 
           {/* Column 2: Quick Links */}
           <div>
@@ -35,25 +20,31 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                <a href="/" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   Home
                 </a>
               </li>
-              <li>
-                <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  About Us
+            {/*   <li>
+                <a href="/ft-news" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  FT-News
                 </a>
-              </li>
+              </li> */}
               <li>
-                <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Services
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                <a href="/blog" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
                   Blog
                 </a>
               </li>
+              <li>
+                <a href="/Channels" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  News Channels
+                </a>
+              </li>
+              <li>
+                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
+                  Pricing
+                </a>
+              </li>
+              
             </ul>
           </div>
 
@@ -98,7 +89,7 @@ export default function Footer() {
         {/* Bottom Section: Copyright and Legal Links */}
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center">
           <p>
-            © {currentYear} Your Company Name. All rights reserved.
+            © {currentYear} Game Visiong. All rights reserved.
           </p>
           <div className="mt-4 space-x-4">
             <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">

@@ -1,0 +1,18 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow API routes
+User-agent: *
+Disallow: /api/
+
+# Disallow admin routes
+User-agent: *
+Disallow: /admin/
+
+# Google Specific
+User-agent: Googlebot
+Allow: /
+
+# Sitemap
+Sitemap: https://visionong.dpdns.org/sitemap.xml
