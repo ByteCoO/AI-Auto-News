@@ -74,6 +74,7 @@ function getYoutubeVideoId(url: string): string | null {
 
 // 1. 修改: 获取所有已发布文章的 ID，供 generateStaticParams 使用
 async function getAllPublishedPostIds(): Promise<{ id: string }[]> {
+  console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
   try {
     // 只查询 id 列，非常高效
     const { data: posts, error } = await supabase
@@ -133,7 +134,7 @@ async function getRelatedPosts(currentPostId: string, category: string | null): 
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('id, title, slug')
+      .select('*')
       .eq('category', category)
       .neq('id', currentPostId)
       .limit(3);

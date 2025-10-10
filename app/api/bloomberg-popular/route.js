@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const limit = 10;
   const targetUrl = `https://personalization.bloomberg.com/popular/resources?minAge=0&maxAge=86400000&limit=${limit}&facets=Story%7CAll`;
