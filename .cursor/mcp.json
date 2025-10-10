@@ -1,4 +1,8 @@
 {
     "mcpServers": {
-      
+        "browsermcp": {
+            "command": "C:\\Program Files\\nodejs\\node.exe",
+            "args": ["D:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\@browsermcp\\mcp\\dist\\index.js"]
+          }
+    }
 }

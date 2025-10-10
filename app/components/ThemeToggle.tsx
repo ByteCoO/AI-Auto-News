@@ -5,14 +5,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
-  let theme, setTheme;
-  try {
-    ({ theme, setTheme } = useThemeContext());
-  } catch {
-    // fallback to next-themes
-    const nextThemes = require('next-themes');
-    ({ theme, setTheme } = nextThemes.useTheme());
-  }
+  const { theme, setTheme } = useThemeContext();
 
   // 组件挂载后再渲染，避免水合不匹配
   useEffect(() => {

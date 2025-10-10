@@ -52,8 +52,8 @@ export const revalidate = 0;
 
 
 export const metadata: Metadata = {
-  title: 'Homepage - Your News and Community Hub',
-  description: 'Discover the latest news, engage in popular forums, and connect with the community.',
+  title: 'Game Visioning: Your Hub for AI, Gaming, and Tech News',
+  description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
   alternates: {
     canonical: '/',
     languages: {
@@ -70,7 +70,7 @@ const LATEST_NEWS_ITEMS_PER_PAGE = 10;
 async function getInitialLatestNewsData(): Promise<LatestNewsData> {
   const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/news?page=1&limit=${LATEST_NEWS_ITEMS_PER_PAGE}&sourceType=latest`; // Added sourceType to differentiate if needed
   try {
-    const res = await fetch(apiUrl, { cache: 'no-store' });
+    const res = await fetch(apiUrl, { next: { revalidate: 3600 } });
     if (!res.ok) {
       const errorText = await res.text();
       console.error(`Failed to fetch initial latest news: ${res.status} ${res.statusText}. Response: ${errorText}`);
@@ -111,9 +111,8 @@ async function getInitialMultiSourceData(): Promise<Record<string, { items: Comp
   const initialNewsData: Record<string, any> = {};
   const itemsPerPage = 10;
 
-  for (const config of PAGE_TARGET_SOURCES_CONFIG) {
+  const promises = PAGE_TARGET_SOURCES_CONFIG.map(async (config) => {
     try {
-      // Direct database query instead of fetch()
       const { data, error, count } = await supabase
         .from('all_latest_news')
         .select('*', { count: 'exact' })
@@ -125,29 +124,39 @@ async function getInitialMultiSourceData(): Promise<Record<string, { items: Comp
         throw new Error(`Supabase query failed for ${config.name}: ${error.message}`);
       }
 
-      // Transform data for the component
       const items: ComponentNewsItem[] = (data || []).map((item: any) => ({
         id: String(item.id),
         headline: item.title,
         url: item.url,
         timestamp: item.original_timestamp || 'N/A',
         publicationTimeUTC: item.publication_time_utc,
-        source: item.source, // Add the 'source' field that was missing
+        source: item.source,
       }));
       
-      initialNewsData[config.name] = {
-        items: items,
-        page: 1,
-        hasMore: items.length < (count || 0),
-        isLoading: false,
+      return {
+        name: config.name,
+        data: {
+          items: items,
+          page: 1,
+          hasMore: items.length < (count || 0),
+          isLoading: false,
+        }
       };
-
     } catch (error) {
       console.error(`Error fetching initial data for ${config.name} directly from Supabase:`, error);
-      // Provide a default empty state on error to prevent crashing the page
-      initialNewsData[config.name] = { items: [], page: 1, hasMore: false, isLoading: false };
+      return {
+        name: config.name,
+        data: { items: [], page: 1, hasMore: false, isLoading: false }
+      };
     }
+  });
+
+  const results = await Promise.all(promises);
+
+  for (const result of results) {
+    initialNewsData[result.name] = result.data;
   }
+
   return initialNewsData;
 }
 
@@ -303,7 +312,7 @@ export default async function Home() {
 
          
           
-          <h1 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h1>
+          <h2 className="text-3xl font-bold text-center mb-6 mt-8">Multi-Source News Feed</h2>
           
           <MultiSourceNews 
             initialNewsData={initialMultiSourceData} 

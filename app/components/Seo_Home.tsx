@@ -132,6 +132,7 @@ const CategoryNewsGrid = async ({
             posts.map(post => (
               <Link href={`/blog/${post.id}`} key={post.id} className="block group bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                 <img 
+                  loading="lazy"
                   src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'}
                   alt={post.cover_image_alt || `Cover for ${post.title}`} 
                   className="w-full h-48 object-cover group-hover:opacity-80 transition-opacity" 
@@ -164,13 +165,17 @@ const CategoryNewsGrid = async ({
 };
 
 
+import Image from 'next/image';
+
+// ... (rest of the file)
+
 const PodcastHighlight = () => (
     <section className="bg-gray-900 py-20">
         <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-white text-center mb-12">Featured AI Podcast | Hear the Ideas Shaping Our World</h2>
             <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden md:flex">
                 <div className="md:w-1/3">
-                    <img src="/ai/ki (2).png" alt="The AI Breakdown podcast cover art" className="w-full h-full object-cover"/>
+                    <Image src="/ai/ki (2).png" alt="The AI Breakdown podcast cover art" width={500} height={500} className="w-full h-full object-cover"/>
                 </div>
                 <div className="p-8 md:w-2/3 flex flex-col justify-center">
                     <h3 className="text-2xl font-bold text-white mb-3">[The AI Breakdown] A Conversation with Anthropic's CEO on AI Safety</h3>

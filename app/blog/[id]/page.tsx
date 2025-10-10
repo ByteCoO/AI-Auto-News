@@ -125,6 +125,34 @@ async function getPostById(id: string): Promise<Post | null> {
   }
 }
 
+async function getRelatedPosts(currentPostId: string, category: string | null): Promise<Post[]> {
+  if (!category) {
+    return [];
+  }
+
+  try {
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select('id, title, slug')
+      .eq('category', category)
+      .neq('id', currentPostId)
+      .limit(3);
+
+    if (error) {
+      console.error(`Error fetching related posts for category ${category}:`, error.message);
+      return [];
+    }
+
+    return posts || [];
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('An unexpected error occurred while fetching related posts:', error.message);
+    }
+    return [];
+  }
+}
+
 // --- 静态页面生成配置 (核心新增部分) ---
 
 export async function generateStaticParams() {
@@ -144,6 +172,7 @@ export const revalidate = 480;
 // --- 页面组件 (无变化) ---
 export default async function PostDetailPage({ params }: { params: { id: string } }) {
   const post = await getPostById(params.id);
+  const relatedPosts = await getRelatedPosts(params.id, post?.category || null);
 
   if (!post) {
     return (
@@ -201,6 +230,7 @@ export default async function PostDetailPage({ params }: { params: { id: string 
             </div>
           ) : (
             <img 
+              loading="lazy"
               src={post.cover_image_url || 'https://placehold.co/600x400/0f172a/3b82f6?text=Image'} 
               alt={post.cover_image_alt || `Cover for ${post.title}`} 
               className="w-full h-auto max-h-[500px] object-cover rounded-lg shadow-xl"
@@ -229,6 +259,19 @@ export default async function PostDetailPage({ params }: { params: { id: string 
               Source: <span className="text-slate-400 font-medium">{post.source}</span>
             </p>
           </footer>
+        )}
+
+        {relatedPosts.length > 0 && (
+          <aside className="mt-16">
+            <h2 className="text-2xl font-bold text-white mb-6">Related Posts</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedPosts.map((relatedPost) => (
+                <a key={relatedPost.id} href={`/blog/${relatedPost.id}`} className="block bg-slate-800 p-6 rounded-lg hover:bg-slate-700 transition-colors">
+                  <h3 className="text-xl font-bold text-white mb-2">{relatedPost.title}</h3>
+                </a>
+              ))}
+            </div>
+          </aside>
         )}
       </div>
     </div>
