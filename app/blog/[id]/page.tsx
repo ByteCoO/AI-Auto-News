@@ -41,13 +41,15 @@ export async function generateMetadata(
 }
 
 
-// --- 类型定义和工具函数 (无变化) ---
+// --- 类型定义和工具函数 (有修改) ---
 interface Post {
   id: string;
   created_at: string;
   title: string;
   slug: string;
   content: string | null;
+  content_cn: string | null; // 新增：中文翻译内容
+  audio_url: string | null;  // 新增：音频文件URL
   excerpt: string | null;
   cover_image_url: string | null;
   cover_image_alt: string | null;
@@ -70,7 +72,7 @@ function getYoutubeVideoId(url: string): string | null {
   }
 }
 
-// --- 数据获取函数 (有修改和新增) ---
+// --- 数据获取函数 (无变化) ---
 
 // 1. 修改: 获取所有已发布文章的 ID，供 generateStaticParams 使用
 async function getAllPublishedPostIds(): Promise<{ id: string }[]> {
@@ -154,7 +156,7 @@ async function getRelatedPosts(currentPostId: string, category: string | null): 
   }
 }
 
-// --- 静态页面生成配置 (核心新增部分) ---
+// --- 静态页面生成配置 (无变化) ---
 
 export async function generateStaticParams() {
   const posts = await getAllPublishedPostIds();
@@ -170,7 +172,7 @@ export const dynamicParams = true;
 export const revalidate = 480;
 
 
-// --- 页面组件 (无变化) ---
+// --- 页面组件 (有修改) ---
 export default async function PostDetailPage({ params }: { params: { id: string } }) {
   const post = await getPostById(params.id);
   const relatedPosts = await getRelatedPosts(params.id, post?.category || null);
@@ -188,6 +190,7 @@ export default async function PostDetailPage({ params }: { params: { id: string 
 
   const youtubeVideoId = post.youtube_url ? getYoutubeVideoId(post.youtube_url) : null;
   const parsedContent = post.content ? marked.parse(post.content) as string : '<p>No content available.</p>';
+  const parsedContentCn = post.content_cn ? marked.parse(post.content_cn) as string : null;
 
   return (
     <div className="bg-slate-900 text-slate-300 font-sans">
@@ -206,6 +209,15 @@ export default async function PostDetailPage({ params }: { params: { id: string 
             Published on {new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </header>
+
+        {post.audio_url && (
+          <div className="my-8">
+            <audio controls className="w-full rounded-lg shadow-lg">
+              <source src={post.audio_url} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
 
         {post.tags && post.tags.length > 0 && (
           <div className="flex justify-center flex-wrap gap-2 mb-10">
@@ -253,6 +265,27 @@ export default async function PostDetailPage({ params }: { params: { id: string 
         >
           <div dangerouslySetInnerHTML={{ __html: parsedContent }} />
         </article>
+
+        {parsedContentCn && (
+          <details className="mt-12 group bg-slate-800/50 rounded-lg p-6">
+            <summary className="text-lg font-semibold text-slate-100 cursor-pointer list-none flex items-center gap-2 hover:text-sky-400 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-open:rotate-90 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+              View Chinese Translation
+            </summary>
+            <article
+              className="
+                prose prose-lg max-w-none prose-invert mt-4
+                prose-p:leading-relaxed prose-p:text-slate-300
+                prose-headings:text-slate-100 prose-headings:font-bold
+                prose-a:text-sky-400 hover:prose-a:text-sky-500
+              "
+            >
+              <div dangerouslySetInnerHTML={{ __html: parsedContentCn }} />
+            </article>
+          </details>
+        )}
 
         {post.source && (
           <footer className="mt-12 pt-8 border-t border-slate-800 text-center">
