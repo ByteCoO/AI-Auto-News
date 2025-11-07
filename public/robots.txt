@@ -1,18 +1,33 @@
-# *
+# Global robots.txt settings
 User-agent: *
 Allow: /
 
-# Disallow API routes
-User-agent: *
+# Disallow API routes from indexing
 Disallow: /api/
-
-# Disallow admin routes
-User-agent: *
+Disallow: /_next/
 Disallow: /admin/
+Disallow: /tmp/
+Disallow: /temp/
 
-# Google Specific
+# Allow important pages
+Allow: /blog/
+Allow: /Channels/
+Allow: /ft-news/
+Allow: /bloomberg-news/
+
+# Google specific settings
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
-# Sitemap
+# Bing specific settings  
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Sitemap locations
 Sitemap: https://visionong.dpdns.org/sitemap.xml
+Sitemap: https://visionong.dpdns.org/news-sitemap.xml
+
+# Host directive
+Host: https://visionong.dpdns.org

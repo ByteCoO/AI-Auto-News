@@ -2,6 +2,7 @@
 import MultiSourceNews, { RawNewsItemFromDb, SourceDisplayDetail, NewsItem as ComponentNewsItem } from './components/MultiSourceNews';
 import LatestNews from './components/LatestNews';
 import SEOHome from './components/Seo_Home';
+import { PerformanceOptimizer, WebVitalsReporter } from './components/PerformanceOptimizer';
 
 
 import { Metadata } from 'next';
@@ -194,21 +195,53 @@ export default async function Home() {
   const jsonLdWebSite = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${baseUrl}/#website`,
     url: `${baseUrl}/`,
     name: siteName,
+    description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
+    publisher: {
+      '@id': `${baseUrl}/#organization`
+    },
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${baseUrl}/search?q={search_term_string}`,
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/search?q={search_term_string}`
+      },
       'query-input': 'required name=search_term_string',
     },
+    inLanguage: 'en-US',
   };
 
   const jsonLdOrganization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${baseUrl}/#organization`,
     url: `${baseUrl}/`,
     name: siteName,
-    logo: `${baseUrl}/logo.png`,
+    description: 'Your hub for AI, gaming, and technology news',
+    logo: {
+      '@type': 'ImageObject',
+      '@id': `${baseUrl}/#logo`,
+      url: `${baseUrl}/logo.png`,
+      width: 180,
+      height: 60,
+      caption: siteName
+    },
+    image: {
+      '@id': `${baseUrl}/#logo`
+    },
+    sameAs: [
+      'https://twitter.com/gamevisioning',
+      'https://github.com/gamevisioning'
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      availableLanguage: 'English'
+    },
+    foundingDate: '2024',
+    knowsAbout: ['Artificial Intelligence', 'Gaming Industry', 'Technology News', 'Software Development']
   };
   
   const allNewsArticlesLd: object[] = [];
@@ -284,7 +317,36 @@ export default async function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdNewsGraph) }}
         />
       )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': [
+              {
+                '@type': 'Question',
+                'name': 'What type of content does Game Visioning provide?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Game Visioning provides the latest news, analysis, and insights on AI, gaming, and technology industries.'
+                }
+              },
+              {
+                '@type': 'Question', 
+                'name': 'How often is the content updated?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Our content is updated daily with the latest news from multiple trusted sources including Bloomberg, Financial Times, and Reuters.'
+                }
+              }
+            ]
+          })
+        }}
+      />
       <main className="min-h-screen w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <PerformanceOptimizer />
+        <WebVitalsReporter />
         <div>
         <SEOHome/>
           {/* Channels Section */}
@@ -302,6 +364,10 @@ export default async function Home() {
               <a href="/Channels?category=Politics%20%26%20Policy" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Politics & Policy</h3>
                 <p className="text-gray-600 dark:text-gray-400">Insights on government and global policy.</p>
+              </a>
+              <a href="/travel-post" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Travel Blog Post</h3>
+                <p className="text-gray-600 dark:text-gray-400">A Foodie’s Guide to Europe.</p>
               </a>
               <a href="/Channels?category=Technology" className="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">Technology</h3>

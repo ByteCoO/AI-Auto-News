@@ -2,6 +2,7 @@ import { Metadata, ResolvingMetadata } from 'next';
 import React from 'react';
 import { marked } from 'marked';
 import { supabase } from '@/lib/supabaseClient';
+import TTSPlayer from '@/app/components/TTSPlayer'; // 新增：导入TTS播放器组件
 
 // --- Dynamic Metadata Generation ---
 
@@ -208,6 +209,10 @@ export default async function PostDetailPage({ params }: { params: { id: string 
           <p className="mt-4 text-slate-400">
             Published on {new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
+
+          {/* @ts-ignore */}
+          <TTSPlayer postId={post.id} englishText={post.content} chineseText={post.content_cn} />
+
         </header>
 
         {post.audio_url && (

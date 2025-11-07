@@ -1,27 +1,41 @@
 
 /** @type {import('next-seo').DefaultSeoProps} */
 const defaultSEOConfig = {
-  title: 'Auto NW News',
-  description: 'Your premier source for automated news aggregation, bringing you the latest updates from around the world.',
+  title: 'Game Visioning: Your Hub for AI, Gaming, and Tech News',
+  description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
   openGraph: {
     type: 'website',
-    locale: 'en_IE',
-    url: 'https://www.auto-nw.com/', // Replace with your actual domain
-    siteName: 'Auto NW News',
+    locale: 'en_US',
+    url: 'https://visionong.dpdns.org/',
+    siteName: 'Game Visioning',
     images: [
       {
-        url: 'https://www.auto-nw.com/og-image.png', // Replace with your actual OG image URL
+        url: 'https://visionong.dpdns.org/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Auto NW News',
+        alt: 'Game Visioning - Your Hub for AI, Gaming, and Tech News',
       },
     ],
   },
   twitter: {
-    handle: '@auto_nw', // Replace with your Twitter handle
-    site: '@auto_nw', // Replace with your Twitter site
+    handle: '@gamevisioning',
+    site: '@gamevisioning',
     cardType: 'summary_large_image',
   },
+  additionalMetaTags: [
+    {
+      name: 'viewport',
+      content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0',
+    },
+    {
+      name: 'theme-color',
+      content: '#000000',
+    },
+    {
+      httpEquiv: 'x-ua-compatible',
+      content: 'IE=edge',
+    },
+  ],
 };
 
 export default defaultSEOConfig;

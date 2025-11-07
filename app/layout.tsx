@@ -13,14 +13,17 @@ import { AuthProvider } from './contexts/AuthContext'; // <--- 1. 导入 AuthPro
 export const metadata: Metadata = {
   metadataBase: new URL('https://visionong.dpdns.org'),
   title: {
-    default: 'Game Visioning: News, Analysis, and Community',
+    default: 'Game Visioning: Your Hub for AI, Gaming, and Tech News',
     template: `%s | Game Visioning`,
   },
-  description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions. Stay informed with our comprehensive coverage and expert insights.',
-  keywords: ['news', 'analysis', 'community', 'finance', 'markets', 'technology', 'politics'],
+  description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
+  keywords: ['AI news', 'gaming news', 'technology news', 'artificial intelligence', 'gaming industry', 'tech analysis', 'innovation', 'software development', 'game development', 'tech community'],
   authors: [{ name: 'Game Visioning Team' }],
   creator: 'Game Visioning',
   publisher: 'Game Visioning',
+  verification: {
+    google: 'your-google-site-verification-code-here',
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -30,8 +33,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Game Visioning: News, Analysis, and Community',
-    description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions.',
+    title: 'Game Visioning: Your Hub for AI, Gaming, and Tech News',
+    description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
     url: 'https://visionong.dpdns.org',
     siteName: 'Game Visioning',
     locale: 'en_US',
@@ -41,14 +44,14 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Game Visioning - News, Analysis, and Community',
+        alt: 'Game Visioning - Your Hub for AI, Gaming, and Tech News',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Game Visioning: News, Analysis, and Community',
-    description: 'Your premier destination for the latest news, in-depth analysis, and vibrant community discussions.',
+    title: 'Game Visioning: Your Hub for AI, Gaming, and Tech News',
+    description: 'Explore the latest in AI, gaming, and technology. Game Visioning delivers daily news, in-depth analysis, and a vibrant community for tech enthusiasts.',
     images: ['/og-image.jpg'],
     creator: '@gamevisioning',
     site: '@gamevisioning',
@@ -114,6 +117,31 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="canonical" href="https://visionong.dpdns.org" />
+        <link rel="alternate" type="application/rss+xml" title="Game Visioning RSS Feed" href="/rss.xml" />
+        <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+        <meta name="google-site-verification" content="your-google-site-verification-code-here" />
+        <meta name="msvalidate.01" content="your-bing-verification-code-here" />
+        <meta name="yandex-verification" content="your-yandex-verification-code-here" />
+        <meta name="p:domain_verify" content="your-pinterest-verification-code-here" />
+        <meta property="fb:app_id" content="your-facebook-app-id" />
+        <meta name="application-name" content="Game Visioning" />
+        <meta name="apple-mobile-web-app-title" content="Game Visioning" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+      </head>
       <body>
         <ThemeProvider
           attribute="class"

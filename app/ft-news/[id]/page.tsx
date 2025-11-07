@@ -3,6 +3,9 @@ import { supabase } from '../../lib/supabase';
 import Link from 'next/link';
 import { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
+import { generateNewsPageMetadata } from '@/app/templates/NewsPageTemplate';
+import { generateBreadcrumbStructuredData, StructuredDataScript } from '@/app/components/SEOTemplate';
+import { truncateDescription } from '@/app/utils/seoUtils';
 
 // Interfaces (assuming these are accurate from your existing code)
 interface FTArticleBodyItem {
@@ -62,6 +65,47 @@ type Props = {
 // 1. Implement generateMetadata for dynamic SEO tags
 // 1. Implement generateMetadata for dynamic SEO tags
 export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const id = params.id;
+  const article = await fetchFTNewsDetailServerSide(id);
+
+  if (!article) {
+    return {
+      title: 'Article Not Found',
+    };
+  }
+
+  const description = truncateDescription(
+    article.subheadline || 
+    (article.body && typeof article.body[0]?.content === 'string' 
+      ? article.body[0].content 
+      : `Latest Financial Times analysis: ${article.headline}`),
+    160
+  );
+  
+  return generateNewsPageMetadata({
+    title: article.headline,
+    description,
+    author: article.authors?.[0]?.name || 'Financial Times',
+    publishedTime: article.publishedtimestamputc || new Date().toISOString(),
+    modifiedTime: article.updated_at || article.publishedtimestamputc || new Date().toISOString(),
+    category: article.category?.text || 'Financial News',
+    tags: [
+      'financial times',
+      'financial news',
+      'market analysis',
+      article.category?.text?.toLowerCase() || 'news',
+      'business'
+    ],
+    slug: id,
+    ogImage: article.main_image?.url || '/og-image.jpg',
+  });
+}
+
+// Keep the old function as fallback
+async function generateMetadataFallback(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
@@ -158,14 +202,74 @@ export default async function FTNewsDetailPage({ params }: Props) {
     },
   };
 
+  // 生成结构化数据
+  const breadcrumbLD = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'Financial News', url: '/ft-news' },
+    { name: article.category?.text || 'News', url: article.category?.url || '/ft-news' },
+    { name: article.headline, url: `/ft-news/${id}` },
+  ]);
+
+  const enhancedJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    '@id': `https://visionong.dpdns.org/ft-news/${id}`,
+    headline: article.headline,
+    description: article.subheadline || `Latest Financial Times analysis: ${article.headline}`,
+    image: article.main_image?.url ? {
+      '@type': 'ImageObject',
+      url: article.main_image.url,
+      caption: article.main_image.caption,
+      alt: article.main_image.altText || article.headline,
+    } : undefined,
+    author: article.authors?.map(author => ({
+      '@type': 'Person',
+      name: author.name,
+      ...(author.url && { url: author.url }),
+    })) || [{
+      '@type': 'Organization',
+      name: 'Financial Times',
+    }],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Game Visioning',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://visionong.dpdns.org/logo.png',
+      },
+    },
+    datePublished: article.publishedtimestamputc,
+    dateModified: article.updated_at || article.publishedtimestamputc,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://visionong.dpdns.org/ft-news/${id}`,
+    },
+    articleSection: article.category?.text || 'Financial News',
+    inLanguage: 'en-US',
+    isBasedOn: article.page_url,
+    url: article.page_url,
+  };
+
   return (
     <>
-      {/* Add JSON-LD Script to the head effectively (Next.js handles script placement) */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredDataScript data={enhancedJsonLd} />
+      <StructuredDataScript data={breadcrumbLD} />
+      
       <div className="min-h-screen dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-900 py-10 px-4">
+        {/* 面包屑导航 */}
+        <div className="container mx-auto max-w-3xl mb-4">
+          <nav aria-label="Breadcrumb">
+            <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+              <li><a href="/" className="hover:text-blue-600">Home</a></li>
+              <li><span className="mx-2">/</span></li>
+              <li><a href="/ft-news" className="hover:text-blue-600">Financial News</a></li>
+              <li><span className="mx-2">/</span></li>
+              <li className="text-gray-900 dark:text-gray-100" aria-current="page">
+                {article.headline}
+              </li>
+            </ol>
+          </nav>
+        </div>
         <div className="container mx-auto max-w-3xl dark:bg-gray-800 bg-gray-100 p-6 sm:p-8 rounded-lg shadow-xl">
           <Link href="/ft-news" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 hover:underline mb-6 inline-block">
             ← Back to FT News List

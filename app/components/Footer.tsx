@@ -1,108 +1,73 @@
-import React from "react";
+import React from 'react';
 
-export default function Footer() {
-  const currentYear = new Date().getFullYear();
-
+const Footer = () => {
   return (
-    <footer className="w-full bg-gray-100 dark:bg-gray-900 py-12 mt-16 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
-      {/* Container for centering and max width */}
+    <footer className="bg-secondary-50 border-t border-secondary-100 py-16 mt-20">
       <div className="container mx-auto px-4">
-
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-        
-
-          {/* Column 2: Quick Links */}
-          <div>
-            <h3 className="text-base font-semibold mb-4 text-gray-800 dark:text-white">
-              Quick Links
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="/" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Home
-                </a>
-              </li>
-            {/*   <li>
-                <a href="/ft-news" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  FT-News
-                </a>
-              </li> */}
-              <li>
-                <a href="/blog" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="/Channels" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  News Channels
-                </a>
-              </li>
-              <li>
-                <a href="/price" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                  Pricing
-                </a>
-              </li>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="col-span-2">
+            <div className="flex flex-col space-y-6">
+              <div>
+                <h3 className="text-secondary-800 font-semibold text-lg mb-3">About</h3>
+                <p className="text-secondary-500">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam
+                </p>
+              </div>
               
-            </ul>
-          </div>
-
-          {/* Column 3: Contact Info */}
-          <div>
-            <h3 className="text-base font-semibold mb-4 text-gray-800 dark:text-white">
-              Contact Us
-            </h3>
-            <ul className="space-y-2">
-               <li>
-                 {/* Your original email link */}
-                 Email：<a href="mailto:admin@visiong.dpdns.org" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-                   admin@visiong.dpdns.org
-                 </a>
-               </li>
-               {/* Optional: Add more contact methods */}
-               {/* <li>Phone: (123) 456-7890</li> */}
-               {/* <li>Support: <a href="mailto:support@yourcompany.com" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">support@yourcompany.com</a></li> */}
-            </ul>
-          </div>
-
-          {/* Column 4: Social Media (Using simple text placeholders) */}
-          <div>
-            <h3 className="text-base font-semibold mb-4 text-gray-800 dark:text-white">
-              Follow Us
-            </h3>
-            <div className="flex space-x-4">
-              {/* Replace these with actual social media icons (e.g., using Heroicons, Font Awesome, etc.) */}
-              <a href="#" aria-label="Facebook" className="hover:text-blue-600 dark:hover:text-blue-400">
-                {/* Example Placeholder Icon/Text */}
-                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.79c0-2.508 1.493-3.893 3.776-3.893 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33V22C17.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>
-              </a>
-              <a href="#" aria-label="Twitter" className="hover:text-blue-600 dark:hover:text-blue-400">
-                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 014 10.207v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.12 4.12 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
-              </a>
-              {/* Add more social links as needed */}
+              <div className="space-y-2">
+                <p className="text-secondary-800 font-medium">Email : info@jstemplate.net</p>
+                <p className="text-secondary-800 font-medium">Phone : 880 123 456 789</p>
+              </div>
             </div>
           </div>
-
-        </div> {/* End Main Grid */}
-
-        {/* Bottom Section: Copyright and Legal Links */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p>
-            © {currentYear} Game Visiong. All rights reserved.
-          </p>
-          <div className="mt-4 space-x-4">
-            <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:underline hover:text-blue-600 dark:hover:text-blue-400">
-              Terms of Service
-            </a>
-            {/* Add more legal links if necessary */}
+          
+          <div>
+            <h3 className="text-secondary-800 font-semibold text-lg mb-6">Quick Link</h3>
+            <div className="space-y-3">
+              <a href="#" className="block text-secondary-600 hover:text-primary">Home</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">About</a>
+              <a href="/bloglist" className="block text-secondary-600 hover:text-primary">Blog</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Archived</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Author</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Contact</a>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-secondary-800 font-semibold text-lg mb-6">Category</h3>
+            <div className="space-y-3">
+              <a href="#" className="block text-secondary-600 hover:text-primary">Lifestyle</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Technology</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Travel</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Business</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Economy</a>
+              <a href="#" className="block text-secondary-600 hover:text-primary">Sports</a>
+            </div>
           </div>
         </div>
-
-      </div> {/* End Container */}
+        
+        <div className="border-t border-secondary-200 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="flex items-center space-x-4 mb-4 md:mb-0">
+            <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center">
+              <span className="text-white font-bold">MB</span>
+            </div>
+            <div>
+              <h4 className="font-bold text-secondary-900">MetaBlog</h4>
+              <p className="text-secondary-600 text-sm">© JS Template 2023. All Rights Reserved.</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-6">
+            <a href="#" className="text-secondary-600 hover:text-primary">Terms of Use</a>
+            <div className="h-5 w-px bg-secondary-200"></div>
+            <a href="#" className="text-secondary-600 hover:text-primary">Privacy Policy</a>
+            <div className="h-5 w-px bg-secondary-200"></div>
+            <a href="#" className="text-secondary-600 hover:text-primary">Cookie Policy</a>
+          </div>
+        </div>
+      </div>
     </footer>
   );
-}
+};
+
+export default Footer;

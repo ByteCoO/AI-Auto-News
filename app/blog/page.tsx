@@ -2,18 +2,17 @@ import { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import CompactTTSPlayer from '@/app/components/CompactTTSPlayer';
 
-export const metadata: Metadata = {
-  title: 'Blog - AI Content & Resources',
-  description: 'Explore our comprehensive collection of articles, research, and resources on Artificial Intelligence. Stay updated with the latest trends, tools, and discussions in the AI world.',
-  alternates: {
-    canonical: '/blog',
-    languages: {
-      'en-US': '/blog',
-      'zh-CN': '/zh-CN/blog',
-    },
-  },
-};
+import { generateListPageMetadata } from '@/app/templates/ListPageTemplate';
+import { generateBreadcrumbStructuredData } from '@/app/components/SEOTemplate';
+
+export const metadata: Metadata = generateListPageMetadata({
+  title: "Game Visioning Blog - AI Content & Resources",
+  description: "Explore our comprehensive collection of articles, research, and resources on Artificial Intelligence. Stay updated with the latest trends, tools, and discussions in the AI world.",
+  currentPage: 1,
+  canonical: "/blog",
+});
 
 
 // ============================================================================
@@ -30,6 +29,7 @@ export interface Post {
   title: string;
   slug: string;
   content: string | null;
+  content_cn: string | null;
   excerpt: string | null;
   cover_image_url: string | null;
   cover_image_alt: string | null;
@@ -77,12 +77,42 @@ const getPosts = async (): Promise<Array<Post>> => {
 // 3. UI HELPER COMPONENTS (ICONS)
 // ============================================================================
 
-const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
-const CubeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7l8 4" /></svg>;
-const DocumentTextIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
-const BookOpenIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
-const TrendingUpIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
-const ExternalLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>;
+// Icon Components
+const GridIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+  </svg>
+);
+
+const CubeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+  </svg>
+);
+
+const DocumentTextIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  </svg>
+);
+
+const BookOpenIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+);
+
+const TrendingUpIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+  </svg>
+);
+
+const ExternalLinkIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+  </svg>
+);
 
 // ============================================================================
 // 4. UI COMPONENTS
@@ -148,7 +178,15 @@ const ArticleCard: React.FC<{ post: Post }> = ({ post }) => (
       )}
       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
         <span className="text-sm text-gray-500">{post.source || 'N/A'}</span>
-        <span className="text-sm text-gray-500">{new Date(post.created_at).toLocaleDateString()}</span>
+        
+        <div className="flex items-center gap-2">
+          <CompactTTSPlayer 
+            postId={post.id.toString()} 
+            englishText={post.content || ''} 
+            chineseText={post.content_cn || ''} 
+          />
+          <span className="text-sm text-gray-500">{new Date(post.created_at).toLocaleDateString()}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -163,18 +201,85 @@ const ArticleCard: React.FC<{ post: Post }> = ({ post }) => (
  * it acts as a Next.js Server Component, allowing direct data fetching.
  */
 export default async function BlogPage() {
-  // The 'mockArticles' array is gone. Instead, we call our async fetching function.
   const posts = await getPosts();
 
+  const breadcrumbLD = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+  ]);
+
+  const blogLD = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': 'https://visionong.dpdns.org/blog',
+    name: 'Game Visioning Blog',
+    description: 'AI Content & Resources',
+    url: 'https://visionong.dpdns.org/blog',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Game Visioning',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://visionong.dpdns.org/logo.png',
+      },
+    },
+    inLanguage: 'en-US',
+    about: [
+      'Artificial Intelligence',
+      'Machine Learning',
+      'Technology Trends',
+      'AI Research',
+      'Tech Resources',
+    ],
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: posts?.length || 0,
+      itemListElement: posts?.slice(0, 10).map((post, index) => ({
+        '@type': 'BlogPosting',
+        position: index + 1,
+        name: post.title,
+        description: post.excerpt || post.title,
+        url: `https://visionong.dpdns.org/blog/${post.id}`,
+        datePublished: post.created_at,
+        author: {
+          '@type': 'Organization',
+          name: 'Game Visioning',
+        },
+      })) || [],
+    },
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="flex flex-col lg:flex-row max-w-screen-2xl mx-auto">
-       {/*  <Sidebar /> */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">All Content</h1>
-            <p className="text-lg text-gray-600 mt-1">Discover the latest AI-related content and resources</p>
-          </header>
+    <React.Fragment>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLD) }}
+      />
+      
+      <div className="bg-gray-50 min-h-screen">
+        <div className="flex flex-col lg:flex-row max-w-screen-2xl mx-auto">
+         {/*  <Sidebar /> */}
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            {/* 面包屑导航 */}
+            <nav className="mb-6" aria-label="Breadcrumb">
+              <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <li><a href="/" className="hover:text-blue-600">Home</a></li>
+                <li><span className="mx-2">/</span></li>
+                <li className="text-gray-900 dark:text-gray-100" aria-current="page">Blog</li>
+              </ol>
+            </nav>
+
+            <header className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">AI Content & Resources</h1>
+              <p className="text-lg text-gray-600 mt-1">Discover the latest AI-related content and resources</p>
+              <div className="text-sm text-gray-500 mt-2">
+                {posts?.length || 0} articles available
+              </div>
+            </header>
           
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {/* MODIFIED: We now map over 'posts' fetched from the API */}
@@ -189,9 +294,10 @@ export default async function BlogPage() {
                 <p>There are currently no articles to display. Please check back later.</p>
               </div>
             )}
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 }

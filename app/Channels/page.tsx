@@ -2,6 +2,8 @@
 import NewsClientComponent from '@/app/components/NewsClientComponent';
 import { supabase } from '@/lib/supabaseClient';
 import { Metadata } from 'next';
+import { generateCategorySEO } from '@/app/components/SEOTemplate';
+import { generateBreadcrumbStructuredData, StructuredDataScript } from '@/app/components/SEOTemplate';
 
 // Define interfaces used, ensuring consistency
 interface NewsItem {
@@ -132,22 +134,20 @@ export async function generateMetadata({ searchParams }: { searchParams: { categ
   const category = searchParams.category;
 
   if (category) {
-    return {
-      title: `${category} 新闻频道`,
-      description: `浏览 ${category} 频道的最新新闻文章。`,
-      alternates: {
-        canonical: `/Channels?category=${encodeURIComponent(category)}`,
-      },
-    };
+    return generateCategorySEO({
+      title: `${category} News Channel - Game Visioning`,
+      description: `Explore the latest ${category} news and analysis. Stay updated with comprehensive coverage from trusted sources.`,
+      category,
+      canonical: `/Channels?category=${encodeURIComponent(category)}`,
+    });
   }
 
-  return {
-    title: '所有新闻频道',
-    description: '探索我们所有的新闻频道，找到您感兴趣的主题。',
-    alternates: {
-      canonical: '/Channels',
-    },
-  };
+  return generateCategorySEO({
+    title: "News Channels - Curated Content from Top Sources | Game Visioning",
+    description: "Access curated news from leading sources including Bloomberg, Financial Times, Reuters, and more. Stay informed with comprehensive channel coverage across technology, finance, business, and politics.",
+    category: "News Channels",
+    canonical: '/Channels',
+  });
 }
 
 // The page is now an async Server Component
@@ -171,14 +171,87 @@ export default async function NewsClientPage({ searchParams }: { searchParams: {
 
   const currentChannel = uiChannels.find(c => c.name === category) || uiChannels[0];
 
+  // 生成结构化数据
+  const breadcrumbLD = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'Channels', url: '/Channels' },
+    ...(category ? [{ name: category, url: `/Channels?category=${encodeURIComponent(category)}` }] : []),
+  ]);
+
+  const channelsLD = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `https://visionong.dpdns.org/Channels${category ? `?category=${encodeURIComponent(category)}` : ''}`,
+    name: category ? `${category} News Channel` : 'Game Visioning News Channels',
+    description: category 
+      ? `Latest ${category} news and analysis from trusted sources`
+      : 'Curated news channels from top financial and technology sources',
+    url: `https://visionong.dpdns.org/Channels${category ? `?category=${encodeURIComponent(category)}` : ''}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: initialTotalCount,
+      itemListElement: initialNewsItems.slice(0, 5).map((item, index) => ({
+        '@type': 'NewsArticle',
+        position: index + 1,
+        name: item.title,
+        url: item.url || `https://visionong.dpdns.org/ft-news/${item.id}`,
+        datePublished: item.publication_time_utc,
+        author: {
+          '@type': 'Organization',
+          name: item.source || 'Game Visioning',
+        },
+      })),
+    },
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbLD['itemListElement'],
+    },
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      {/* Pass the server-fetched data as props to the client component */}
-      <NewsClientComponent 
-        initialNewsItems={initialNewsItems} 
-        initialTotalCount={initialTotalCount}
-        initialChannelId={currentChannel.id}
-      />
-    </div>
+    <>
+      <StructuredDataScript data={breadcrumbLD} />
+      <StructuredDataScript data={channelsLD} />
+      
+      <div className="container mx-auto p-4">
+        {/* 面包屑导航 */}
+        <nav className="mb-6" aria-label="Breadcrumb">
+          <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+            <li><a href="/" className="hover:text-blue-600">Home</a></li>
+            <li><span className="mx-2">/</span></li>
+            <li><a href="/Channels" className="hover:text-blue-600">Channels</a></li>
+            {category && (
+              <>
+                <li><span className="mx-2">/</span></li>
+                <li className="text-gray-900 dark:text-gray-100" aria-current="page">{category}</li>
+              </>
+            )}
+          </ol>
+        </nav>
+
+        {/* 页面头部 */}
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            {category ? `${category} News Channel` : 'News Channels'}
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
+            {category 
+              ? `Stay updated with the latest ${category} news and analysis from trusted sources.`
+              : 'Access curated news from leading sources including Bloomberg, Financial Times, Reuters, and more.'
+            }
+          </p>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {initialTotalCount} articles available
+          </div>
+        </header>
+
+        {/* Pass the server-fetched data as props to the client component */}
+        <NewsClientComponent 
+          initialNewsItems={initialNewsItems} 
+          initialTotalCount={initialTotalCount}
+          initialChannelId={currentChannel.id}
+        />
+      </div>
+    </>
   );
 }
