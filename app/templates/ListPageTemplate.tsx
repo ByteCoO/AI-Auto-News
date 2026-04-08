@@ -3,7 +3,7 @@ import {
   generateSEOMetadata, 
   generateBreadcrumbStructuredData,
   StructuredDataScript 
-} from '../components/SEOTemplate';
+} from '../components/SEOUnified';
 
 // 列表页面模板接口
 interface ListPageTemplateProps {

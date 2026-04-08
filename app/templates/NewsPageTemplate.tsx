@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
 import { 
-  generateNewsArticleSEO, 
+  generateNewsSEO, 
   generateArticleStructuredData,
   generateBreadcrumbStructuredData,
   StructuredDataScript 
-} from '../components/SEOTemplate';
+} from '../components/SEOUnified';
+import { sanitizeHtml } from '@/app/utils/sanitize'; // 安全：HTML净化防止XSS攻击
 
 // 新闻页面模板接口
 interface NewsPageTemplateProps {
@@ -33,7 +34,7 @@ export function generateNewsPageMetadata({
   slug,
   ogImage,
 }: NewsPageTemplateProps): Metadata {
-  return generateNewsArticleSEO({
+  return generateNewsSEO({
     title,
     description,
     author,
@@ -147,10 +148,10 @@ export default function NewsPageTemplate({
           </div>
         </header>
 
-        {/* 文章内容 */}
+        {/* 文章内容 - 使用 sanitizeHtml 净化防止 XSS */}
         <div 
           className="prose prose-lg dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
         />
 
         {/* 标签 */}

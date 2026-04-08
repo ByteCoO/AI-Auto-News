@@ -69,7 +69,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    // apple-touch-icon.png 需要创建后再启用
+    // apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
 };
@@ -132,10 +133,11 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="format-detection" content="telephone=no" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" />
+        {/* PWA 图标 - 创建对应文件后取消注释 */}
+        {/* <link rel="apple-touch-icon" href="/apple-touch-icon.png" /> */}
+        {/* <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" /> */}
+        {/* <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" /> */}
+        {/* <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000" /> */}
         <meta name="msapplication-TileColor" content="#000000" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
