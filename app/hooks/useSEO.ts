@@ -58,7 +58,8 @@ export function usePagePerformance() {
             // 可以发送到分析服务
             break;
           case 'first-input':
-            const fid = entry.processingStart - entry.startTime;
+            const fidEntry = entry as PerformanceEventTiming;
+            const fid = fidEntry.processingStart - fidEntry.startTime;
             console.log('FID:', fid);
             break;
           case 'layout-shift':
