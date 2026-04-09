@@ -90,34 +90,45 @@ const PricingTier: React.FC<PricingTierProps & { onButtonClick: () => void }> = 
   );
 };
 
-// UnderDevelopmentModal 组件 (无变化)
-const UnderDevelopmentModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+// FreePromoModal 组件 - 显示活动期间免费提示
+const FreePromoModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">Welcome to the FT News API!</h3>
-        <p className="text-gray-700 dark:text-slate-300 mb-2">
-          Explore real-time financial news data with our powerful API.
-        </p>
-        <p className="text-gray-700 dark:text-slate-300 mb-6">
-          Click the button below to visit the API documentation and get started.
-        </p>
-        <a
-          href="https://rapidapi.com/fanspan6/api/ft-news-api"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-center block"
-        >
-          Go to API Website
-        </a>
-        <button
-          onClick={onClose}
-          className="w-full bg-indigo-500 hover:bg-indigo-600 my-4 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 dark:bg-indigo-600 dark:hover:bg-indigo-700"
-        >
-          OK
-        </button>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div className="text-center">
+          {/* Icon */}
+          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+          </div>
+          
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            🎉 Limited Time Offer!
+          </h3>
+          
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-700 rounded-xl p-4 mb-6">
+            <p className="text-lg font-semibold text-green-700 dark:text-green-300 mb-2">
+              FREE during promotional period
+            </p>
+            <p className="text-sm text-green-600 dark:text-green-400">
+              All features available at no cost while the promotion lasts
+            </p>
+          </div>
+
+          <p className="text-gray-600 dark:text-slate-300 mb-6 text-sm">
+            Take advantage of this special offer and unlock full access to our premium features.
+          </p>
+
+          <button
+            onClick={onClose}
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+          >
+            Got it!
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -179,7 +190,7 @@ const PricingClientPage = () => {
 
   return (
     <>
-      <UnderDevelopmentModal isOpen={isModalOpen} onClose={closeDevelopmentModal} />
+      <FreePromoModal isOpen={isModalOpen} onClose={closeDevelopmentModal} />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 py-8 sm:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 text-gray-900 dark:text-white relative overflow-hidden font-sans antialiased">
         {/* Floating animated background elements */}

@@ -144,7 +144,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
       </head>
-      <body>
+      <body className="bg-white dark:bg-[#090B10] transition-colors duration-300">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -155,7 +155,7 @@ export default async function RootLayout({
           <AuthProvider>
             {/* FTNewsProvider seems to be missing from the JSX, add if needed */}
             <FTNewsProvider>
-            <main className="min-h-screen flex flex-col items-center">
+            <main className="w-full flex flex-col">
               {/* <div className="w-full max-w-4xl flex justify-end items-center py-3 px-3 lg:px-6 space-x-4"> */}
                 {/* AuthButton 现在可以安全地使用 useAuth()，因为它在 AuthProvider 内部 */}
                 {/* 注意：你仍然可以将服务器获取的 user 传递给 AuthButton 作为初始值，
