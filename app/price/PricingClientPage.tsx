@@ -22,13 +22,13 @@ const PricingTier: React.FC<PricingTierProps & { onButtonClick: () => void }> = 
   return (
     <div className={`relative border rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col transition-all duration-500 hover:transform hover:-translate-y-2 hover:shadow-2xl group cursor-pointer touch-manipulation ${
       highlighted 
-        ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-xl ring-2 sm:ring-4 ring-indigo-200 dark:ring-indigo-500/30 h-full hover:shadow-indigo-500/25 hover:ring-indigo-300 dark:hover:ring-indigo-400/50' 
-        : 'bg-white dark:bg-slate-800 shadow-lg border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 h-full mt-6 hover:shadow-xl hover:bg-gray-50 dark:hover:bg-slate-700'
+        ? 'bg-[#1A1A1A] text-white shadow-xl ring-1 ring-[#D4AF37] h-full hover:shadow-[0_0_25px_rgba(212,175,55,0.4)]' 
+        : 'bg-[#1A1A1A] shadow-lg border border-[#D4AF37]/30 hover:border-[#D4AF37] h-full mt-6 hover:shadow-xl'
     }`}>
       {/* Badge/Icon for highlighted plan */}
       {highlighted && (
         <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 sm:px-5 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+          <div className="bg-gradient-to-r from-[#F0D270] to-[#A3833E] text-black px-3 sm:px-5 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-black shadow-lg whitespace-nowrap transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
             ⭐ Most Popular
           </div>
         </div>
@@ -39,17 +39,17 @@ const PricingTier: React.FC<PricingTierProps & { onButtonClick: () => void }> = 
       
       {/* Plan icon */}
       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl mb-3 sm:mb-4 flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
-        highlighted ? 'bg-white/20 backdrop-blur group-hover:bg-white/30' : 'bg-gradient-to-br from-indigo-500 to-purple-600 group-hover:from-indigo-600 group-hover:to-purple-700'
+        highlighted ? 'bg-[#D4AF37]/20 backdrop-blur group-hover:bg-[#D4AF37]/30' : 'bg-gradient-to-br from-[#D4AF37] to-[#A3833E]'
       }`}>
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-black" fill="currentColor" viewBox="0 0 20 20">
           {name === 'Basic' && <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />}
           {name === 'Pro' && <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clipRule="evenodd" />}
           {name === 'Ultra' && <path fillRule="evenodd" d="M9.664 1.319a.75.75 0 01.672 0 41.059 41.059 0 018.198 5.424.75.75 0 01-.254 1.285 31.372 31.372 0 00-7.86 3.83.75.75 0 01-.84 0 31.508 31.508 0 00-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 013.305-2.033.75.75 0 00-.714-1.319 37 37 0 00-3.446 2.12A2.216 2.216 0 006 9.393v.38a31.293 31.293 0 00-4.28-1.746.75.75 0 01-.254-1.285 41.059 41.059 0 018.198-5.424zM6 11.459a29.848 29.848 0 00-2.455-1.158 41.029 41.029 0 00-.39 3.114.75.75 0 00.419.74c.528.256 1.046.53 1.554.82-.21-.899-.455-1.746-.721-2.516a.75.75 0 00-.407-.5z" clipRule="evenodd" />}
         </svg>
       </div>
 
-      <h3 className={`text-xl sm:text-2xl font-bold mb-2 ${highlighted ? 'text-white' : 'text-gray-900 dark:text-slate-100'}`}>{name}</h3>
-      {description && <p className={`text-xs sm:text-sm font-medium mb-3 sm:mb-4 ${highlighted ? 'text-white/90' : 'text-indigo-600 dark:text-indigo-400'}`}>{description}</p>}
+      <h3 className={`text-xl sm:text-2xl font-bold mb-2 ${highlighted ? 'text-[#D4AF37]' : 'text-white'}`}>{name}</h3>
+      {description && <p className={`text-xs sm:text-sm font-medium mb-3 sm:mb-4 ${highlighted ? 'text-white/70' : 'text-[#D4AF37]'}`}>{description}</p>}
       
       <div className="mb-4 sm:mb-6">
         <span className={`text-3xl sm:text-4xl lg:text-5xl font-black tabular-nums ${highlighted ? 'text-white' : 'text-gray-900 dark:text-slate-100'}`}>{price}</span>
@@ -192,7 +192,7 @@ const PricingClientPage = () => {
     <>
       <FreePromoModal isOpen={isModalOpen} onClose={closeDevelopmentModal} />
       
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 py-8 sm:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 text-gray-900 dark:text-white relative overflow-hidden font-sans antialiased">
+      <div className="min-h-screen bg-[#0A0A0A] py-8 sm:py-12 lg:py-16 px-3 sm:px-4 md:px-6 lg:px-8 text-white relative overflow-hidden font-sans antialiased">
         {/* Floating animated background elements */}
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           {/* Floating circles */}

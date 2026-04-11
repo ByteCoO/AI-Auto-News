@@ -53,44 +53,44 @@ export default function PricingPage() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="w-full bg-white dark:bg-[#090B10] text-gray-900 dark:text-white pt-24 transition-colors duration-300">
+    <div className="w-full bg-[#0A0A0A] text-gray-900 dark:text-white pt-24 transition-colors duration-300">
       <FreePromoModal isOpen={isModalOpen} onClose={closeModal} />
       
       <div className="w-full">
         {/* Header Section - Full Width */}
-        <header className="w-full text-center py-20 px-4 bg-gray-50 dark:bg-gray-900/30 border-b border-gray-100 dark:border-gray-800 mb-20">
-          <div className="inline-block px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-widest bg-blue-600 text-white rounded-full shadow-lg shadow-blue-500/20">
+        <header className="w-full text-center py-20 px-4 bg-[#1A1A1A]/50 border-b border-[#D4AF37]/20 mb-20">
+          <div className="inline-block px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-widest bg-[#D4AF37] text-white rounded-full shadow-lg shadow-blue-500/20">
             Pricing Plans
           </div>
-          <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-gray-900 dark:from-white to-gray-500 dark:to-gray-700">
+          <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-[#F0D270] via-[#C5A059] to-[#A3833E] filter drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
             Scale Your Intelligence
           </h1>
-          <p className="text-xl text-gray-500 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="text-xl text-[#A3A3A3] max-w-3xl mx-auto leading-relaxed font-light">
             Get unfair advantages with real-time commercial signals. Choose a plan that matches your ambition.
           </p>
         </header>
 
         {/* Pricing Cards - Fully Responsive & Full Width Padding */}
-        <div className="w-full px-4 md:px-12 lg:px-24 pb-24">
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-12 lg:px-24 pb-24">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
             
             {/* Starter Plan */}
-            <div className="bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-[2.5rem] p-10 flex flex-col shadow-xl">
-              <h3 className="text-2xl font-bold mb-2 tracking-tight">Starter</h3>
-              <p className="text-gray-500 text-sm mb-8">Perfect for individual researchers.</p>
-              <div className="text-5xl font-black mb-10">$0<span className="text-lg font-normal text-gray-400">/mo</span></div>
-              <ul className="space-y-5 mb-12 flex-grow">
-                <li className="flex items-center gap-3 text-sm font-bold"><span className="text-green-500">✓</span> Daily Signal Radar</li>
-                <li className="flex items-center gap-3 text-sm font-bold"><span className="text-green-500">✓</span> 3 Subreddits Monitored</li>
-                <li className="flex items-center gap-3 text-sm font-medium text-gray-400 line-through text-left">AI Intent Tagging</li>
-                <li className="flex items-center gap-3 text-sm font-medium text-gray-400 line-through text-left">SaaS Opportunity Engine</li>
+            <div className="bg-[#1A1A1A] border border-[#D4AF37]/10 rounded-[2.5rem] p-10 flex flex-col shadow-xl hover:border-[#D4AF37]/40 transition-all">
+              <h3 className="text-2xl font-bold mb-2 tracking-tight text-white">Starter</h3>
+              <p className="text-[#A3A3A3] text-sm mb-8">Perfect for individual researchers.</p>
+              <div className="text-5xl font-black mb-10 text-white">$0<span className="text-lg font-normal text-[#A3A3A3]">/mo</span></div>
+              <ul className="space-y-5 mb-12 flex-grow text-white">
+                <li className="flex items-center gap-3 text-sm font-bold"><span className="text-[#D4AF37]">✓</span> Daily Signal Radar</li>
+                <li className="flex items-center gap-3 text-sm font-bold"><span className="text-[#D4AF37]">✓</span> 3 Subreddits Monitored</li>
+                <li className="flex items-center gap-3 text-sm font-medium text-[#A3A3A3]/40 line-through text-left">AI Intent Tagging</li>
+                <li className="flex items-center gap-3 text-sm font-medium text-[#A3A3A3]/40 line-through text-left">SaaS Opportunity Engine</li>
               </ul>
-              <button onClick={showModal} className="w-full py-4 rounded-2xl bg-gray-100 dark:bg-gray-800 font-black text-xs uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">Current Plan</button>
+              <button onClick={showModal} className="w-full py-4 rounded-2xl border border-[#D4AF37]/30 text-[#A3A3A3] font-black text-xs uppercase tracking-widest hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all">Current Plan</button>
             </div>
 
             {/* Professional Plan - Highlighted */}
-            <div className="relative bg-gray-900 dark:bg-blue-600 text-white border-4 border-blue-500 dark:border-blue-400 rounded-[2.5rem] p-10 flex flex-col shadow-2xl shadow-blue-500/30 transform md:-translate-y-4">
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">Most Popular</div>
+            <div className="relative bg-[#1A1A1A] text-white border-2 border-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.15)] rounded-[2.5rem] p-10 flex flex-col transform md:-translate-y-4 hover:shadow-[0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#D4AF37] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">Most Popular</div>
               <h3 className="text-2xl font-bold mb-2 tracking-tight">Professional</h3>
               <p className="text-blue-100/70 text-sm mb-8">Built for serious builders & founders.</p>
               <div className="text-5xl font-black mb-10">$4.99<span className="text-lg font-normal opacity-60">/mo</span></div>
@@ -100,21 +100,21 @@ export default function PricingPage() {
                 <li className="flex items-center gap-3 text-sm font-bold text-left">✓ SaaS Opportunity Engine</li>
                 <li className="flex items-center gap-3 text-sm font-bold text-left">✓ Full Search & Export</li>
               </ul>
-              <button onClick={showModal} className="w-full py-4 rounded-2xl bg-white text-blue-600 font-black text-xs uppercase tracking-widest hover:shadow-xl transition-all">Unlock Radar Pro</button>
+              <button onClick={showModal} className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#F0D270] via-[#C5A059] to-[#A3833E] text-black font-black font-black text-xs uppercase tracking-widest hover:shadow-xl transition-all">Unlock Radar Pro</button>
             </div>
 
             {/* Enterprise Plan */}
-            <div className="bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-[2.5rem] p-10 flex flex-col shadow-xl">
-              <h3 className="text-2xl font-bold mb-2 tracking-tight">Enterprise</h3>
-              <p className="text-gray-500 text-sm mb-8">Custom intelligence for large teams.</p>
-              <div className="text-5xl font-black mb-10">$49.99<span className="text-lg font-normal text-gray-400">/mo</span></div>
-              <ul className="space-y-5 mb-12 flex-grow">
-                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-green-500">✓</span> Custom API Access</li>
-                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-green-500">✓</span> Instant Alerting (Slack)</li>
-                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-green-500">✓</span> Dedicated Support</li>
-                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-green-500">✓</span> White-label Reports</li>
+            <div className="bg-[#1A1A1A] border border-[#D4AF37]/20 rounded-[2.5rem] p-10 flex flex-col shadow-xl hover:border-[#D4AF37]/50 transition-all">
+              <h3 className="text-2xl font-bold mb-2 tracking-tight text-white">Enterprise</h3>
+              <p className="text-[#A3A3A3] text-sm mb-8">Custom intelligence for large teams.</p>
+              <div className="text-5xl font-black mb-10 text-white">$49.99<span className="text-lg font-normal text-[#A3A3A3]">/mo</span></div>
+              <ul className="space-y-5 mb-12 flex-grow text-white">
+                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-[#D4AF37]">✓</span> Custom API Access</li>
+                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-[#D4AF37]">✓</span> Instant Alerting (Slack)</li>
+                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-[#D4AF37]">✓</span> Dedicated Support</li>
+                <li className="flex items-center gap-3 text-sm font-bold text-left"><span className="text-[#D4AF37]">✓</span> White-label Reports</li>
               </ul>
-              <button onClick={showModal} className="w-full py-4 rounded-2xl bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-black text-xs uppercase tracking-widest hover:opacity-90 transition-all">Contact Sales</button>
+              <button onClick={showModal} className="w-full py-4 rounded-2xl border border-[#D4AF37] text-[#D4AF37] font-black text-xs uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all">Contact Sales</button>
             </div>
 
           </div>
