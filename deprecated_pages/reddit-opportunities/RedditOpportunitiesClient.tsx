@@ -42,6 +42,13 @@ interface RedditComment {
   business_value: number;
   analyzed_at: string;
   analysis_mode: string;
+  confidence_score?: number;
+  why_worth_doing?: string;
+  pricing_suggestion?: string;
+  market_size_estimate?: string;
+  mvp_features?: string[];
+  competitors?: string;
+  target_audience_detail?: string;
 }
 
 interface Stats {

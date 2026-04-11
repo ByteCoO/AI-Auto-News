@@ -62,7 +62,7 @@ export default function PricingPage() {
           <div className="inline-block px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-widest bg-[#D4AF37] text-white rounded-full shadow-lg shadow-blue-500/20">
             Pricing Plans
           </div>
-          <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-[#F0D270] via-[#C5A059] to-[#A3833E] filter drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+          <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white via-[#F0D270] to-[#D4AF37] drop-shadow-[0_2px_15px_rgba(212,175,55,0.4)]">
             Scale Your Intelligence
           </h1>
           <p className="text-xl text-[#A3A3A3] max-w-3xl mx-auto leading-relaxed font-light">
