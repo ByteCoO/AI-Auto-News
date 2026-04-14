@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
-import ExpandableText from '@/app/components/ExpandableText';
+import BusinessInsightsClient from './BusinessInsightsClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +34,8 @@ async function getInsights(sort: string = 'top', category: string = 'all', query
     query = query.order('score', { ascending: false });
   }
 
-  const { data, error } = await query;
+  // Limit the initial server-side fetch to the first 10 items
+  const { data, error } = await query.range(0, 9);
   return (data as BusinessInsight[]) || [];
 }
 
@@ -104,123 +105,13 @@ export default async function BusinessInsightsPage({
             ))}
         </div>
 
-        {/* Insights Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {insights.map((insight) => (
-            <div 
-              key={insight.idea_id} 
-              className="bg-[#161B22] rounded-3xl border border-[#30363D] overflow-hidden shadow-xl"
-            >
-              {/* Header: Title and Circle Score */}
-              <div className="p-6 pb-2 flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                    <span className="text-blue-400 text-xs font-bold">{insight.subreddit[0].toUpperCase()}</span>
-                  </div>
-                  <h2 className="text-lg font-bold text-white leading-snug pr-8 line-clamp-2">
-                    {insight.problem_statement}
-                  </h2>
-                </div>
-                <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-yellow-500/40 flex items-center justify-center">
-                   <span className="text-[10px] font-black text-yellow-500">{Math.floor(insight.score/10)}</span>
-                </div>
-              </div>
-
-              <div className="px-6 mb-4">
-                <p className="text-xs text-gray-500 font-medium">r/{insight.subreddit}</p>
-              </div>
-
-              {/* Meta Stats Bar */}
-              <div className="px-6 py-3 mx-6 rounded-xl bg-[#0D1117] border border-[#30363D] flex flex-wrap gap-5 text-[11px] font-bold">
-                <div className="flex items-center gap-1.5 text-orange-400">
-                  <span>👍</span> {insight.score} Upvotes
-                </div>
-                <div className="flex items-center gap-1.5 text-green-400">
-                  <span>📊</span> 91% Upvote Ratio
-                </div>
-                <div className="flex items-center gap-1.5 text-blue-400">
-                  <span>💬</span> {insight.signal_count} Comments
-                </div>
-                <div className="flex items-center gap-1.5 text-purple-400">
-                  <span>🕒</span> 2 days ago
-                </div>
-              </div>
-
-              {/* Content Sections */}
-              <div className="p-6 space-y-5">
-                {/* Original Quote - Expandable */}
-                <div className="mb-6">
-                   <ExpandableText 
-                      text={insight.original_quote}
-                      className="text-gray-400 text-sm leading-relaxed"
-                      maxLines={3}
-                   />
-                </div>
-
-                {/* Pain Point Block */}
-                <div className="border-l-[3px] border-red-500/60 bg-red-500/[0.03] p-4 rounded-r-xl">
-                    <div className="flex items-center gap-2 mb-2">
-                       <span className="text-red-500 text-xs">⚡</span>
-                       <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Pain Point</span>
-                    </div>
-                    <p className="text-sm text-gray-200 leading-relaxed font-medium">{insight.problem_statement}</p>
-                </div>
-
-                {/* Solution Block */}
-                <div className="border-l-[3px] border-green-500/60 bg-green-500/[0.03] p-4 rounded-r-xl">
-                    <div className="flex items-center gap-2 mb-2">
-                       <span className="text-green-500 text-xs">💡</span>
-                       <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Solution Idea</span>
-                    </div>
-                    <p className="text-sm text-gray-200 leading-relaxed font-medium">{insight.solution_idea}</p>
-                </div>
-
-                {/* AI Justification */}
-                <div className="border-l-[3px] border-purple-500/60 bg-purple-500/[0.03] p-4 rounded-r-xl">
-                    <div className="flex items-center gap-2 mb-2">
-                       <span className="text-purple-500 text-xs">✨</span>
-                       <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest">AI Justification</span>
-                    </div>
-                    <p className="text-sm text-gray-400 leading-relaxed">{insight.validation_evidence}. Community feedback confirms high demand for performance-focused alternatives.</p>
-                </div>
-
-                {/* Tags Section */}
-                <div className="pt-4 space-y-4">
-                    <div>
-                       <p className="text-[10px] font-black text-gray-600 uppercase mb-2 flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
-                          Service Types
-                       </p>
-                       <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-purple-400 text-[10px] font-bold">{insight.category.toLowerCase()}</span>
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-yellow-500/70 text-[10px] font-bold">SaaS Platform</span>
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-green-400/70 text-[10px] font-bold">Mobile App</span>
-                       </div>
-                    </div>
-                    <div>
-                       <p className="text-[10px] font-black text-gray-600 uppercase mb-2 flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                          Topics
-                       </p>
-                       <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-blue-400 text-[10px] font-bold">Performance Optimization</span>
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-red-400 text-[10px] font-bold">Market Gap</span>
-                          <span className="px-3 py-1 rounded-full bg-[#1C2128] border border-[#30363D] text-emerald-400 text-[10px] font-bold">{insight.subreddit}</span>
-                       </div>
-                    </div>
-                </div>
-              </div>
-
-              <Link 
-                href={insight.source_permalink}
-                target="_blank"
-                className="block border-t border-gray-800 p-4 text-center text-[11px] font-bold text-gray-500 hover:text-yellow-500 transition-colors uppercase tracking-widest"
-              >
-                View original discussion on Reddit
-              </Link>
-            </div>
-          ))}
-        </div>
+        {/* Client-side Insights List with Infinite Scroll */}
+        <BusinessInsightsClient 
+          initialInsights={insights} 
+          currentSort={currentSort}
+          currentCategory={currentCategory}
+          searchQuery={searchQuery}
+        />
       </div>
     </main>
   );
