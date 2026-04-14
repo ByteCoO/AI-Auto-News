@@ -211,6 +211,35 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* MrBeast Interaction Section */}
+      <section className="py-24 bg-[#00BFFF] dark:bg-[#00AEEF] relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#FF00FF] rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto px-4 relative z-10 text-center">
+          <div className="inline-block mb-8 px-8 py-3 bg-black text-white font-black text-2xl italic skew-x-[-12deg] shadow-[10px_10px_0px_0px_rgba(255,255,255,1)]">
+            FREE DATA CHALLENGE! ⚡
+          </div>
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter uppercase leading-[0.9] drop-shadow-[0_5px_5px_rgba(0,0,0,0.3)]">
+            TELL US WHAT DATA YOU NEED,<br/>
+            <span className="text-black bg-white px-4 inline-block my-2">MrBeast</span><br/>
+            MIGHT JUST MAKE IT HAPPEN!
+          </h2>
+          <p className="text-white text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto drop-shadow-lg">
+            "TELL US THE INSIGHTS YOU WANT, AND WE WILL CAPTURE THEM FOR YOU!"
+          </p>
+          <Link 
+            href="/feedback"
+            className="inline-flex items-center gap-6 px-16 py-8 bg-[#FF00FF] hover:bg-[#D400D4] text-white font-black text-3xl rounded-3xl transform hover:scale-110 hover:rotate-3 transition-all shadow-[0_12px_0_0_rgba(150,0,150,1)] active:shadow-none active:translate-y-[12px]"
+          >
+            <span>GO GIVE FEEDBACK!</span>
+            <span className="text-4xl animate-bounce">🔥</span>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-500 dark:from-yellow-600 dark:via-amber-600 dark:to-yellow-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

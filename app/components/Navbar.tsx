@@ -15,6 +15,7 @@ import {
   BookOpenIcon,
   ArrowRightOnRectangleIcon,
   LightBulbIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -23,6 +24,7 @@ const navigation = [
   { name: 'Business Insights', href: '/business-insights', icon: LightBulbIcon },
   { name: 'Pricing', href: '/price', icon: CurrencyDollarIcon },
   { name: 'About', href: '/about', icon: UserGroupIcon },
+  { name: 'Feedback', href: '/feedback', icon: ChatBubbleLeftRightIcon },
 ];
 
 export default function Navbar() {
