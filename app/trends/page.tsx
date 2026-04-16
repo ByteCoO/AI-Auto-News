@@ -13,6 +13,8 @@ interface Post {
   id: string;
   title: string;
   score: number;
+  num_comments?: number;
+  created_utc?: number;
   author: string;
   subreddit: string;
   permalink: string;
@@ -40,12 +42,12 @@ export default function TrendsDashboardPage() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
 
-  // 加载初始数据
+  // Load initial data
   const loadInitialData = useCallback(async () => {
     setLoading(true);
     setPage(1);
     
-    // 获取帖子
+    // Get posts
     let query = supabase.from('reddit_posts').select('*');
     
     if (searchQuery) {
@@ -53,7 +55,7 @@ export default function TrendsDashboardPage() {
     }
     
     if (currentSort === 'newest') {
-      query = query.order('fetch_date', { ascending: false });
+      query = query.order('created_utc', { ascending: false });
     } else {
       query = query.order('score', { ascending: false });
     }
@@ -71,11 +73,11 @@ export default function TrendsDashboardPage() {
       setHasMore((postsData || []).length >= POSTS_PER_PAGE);
     }
 
-    // 获取统计信息
+    // Get statistics
     const { count } = await supabase.from('reddit_posts').select('*', { count: 'exact', head: true });
     setTotalCount(count || 0);
 
-    // 获取 Subreddits
+    // Get Subreddits
     const { data: subData } = await supabase.from('reddit_posts').select('subreddit');
     const uniqueSubs = Array.from(new Set(subData?.map(d => d.subreddit) || []));
     setSubreddits(['all', ...uniqueSubs]);
@@ -83,7 +85,7 @@ export default function TrendsDashboardPage() {
     setLoading(false);
   }, [currentSub, currentSort, searchQuery]);
 
-  // 加载更多数据
+  // Load more data
   const loadMorePosts = useCallback(async () => {
     if (loadingMore || !hasMore) return;
 
@@ -99,7 +101,7 @@ export default function TrendsDashboardPage() {
     }
     
     if (currentSort === 'newest') {
-      query = query.order('fetch_date', { ascending: false });
+      query = query.order('created_utc', { ascending: false });
     } else {
       query = query.order('score', { ascending: false });
     }
@@ -201,7 +203,7 @@ export default function TrendsDashboardPage() {
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  {sub === 'all' ? '🌐 ALL' : `r/${sub}`}
+                  {sub === 'all' ? '🌐 ALL' : sub}
                 </Link>
               ))}
             </div>
@@ -243,6 +245,7 @@ export default function TrendsDashboardPage() {
                 {posts.map((post, idx) => {
                   const finalUrl = getPostUrl(post);
                   const fetchTime = post.fetch_date ? format(new Date(post.fetch_date), 'MM-dd HH:mm') : 'N/A';
+                  const createdTime = post.created_utc ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') : 'N/A';
                   
                   return (
                     <div key={post.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/[0.02] flex items-start gap-5 transition-colors group">
@@ -252,12 +255,13 @@ export default function TrendsDashboardPage() {
                           <a href={finalUrl} target="_blank" rel="noopener noreferrer" className="text-[16px] font-medium text-gray-900 dark:text-gray-200 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all">
                             {post.title}
                           </a>
-                          <span className="text-gray-400 dark:text-gray-600 text-[10px] font-mono">[{fetchTime}]</span>
+                          <span className="text-gray-500 dark:text-yellow-400 text-[10px] font-mono font-bold" title={`Fetched: ${fetchTime}`}>[{createdTime}]</span>
                         </div>
-                        <div className="flex items-center gap-4 text-[11px] text-gray-500">
-                          <span className="font-black text-orange-600">{post.score} PTS</span>
-                          <span>BY {post.author}</span>
-                          <span className="text-yellow-600 dark:text-yellow-400 font-black uppercase tracking-widest text-[10px]">r/{post.subreddit}</span>
+                        <div className="flex items-center gap-4 text-[11px] text-gray-500 dark:text-gray-400">
+                          <span className="font-black text-orange-600 dark:text-orange-400">👍 {post.score}</span>
+                          <span className="font-black text-blue-600 dark:text-blue-400">💬 {post.num_comments || 0}</span>
+                          <span className="dark:text-gray-300">BY {post.author}</span>
+                          <span className="text-yellow-600 dark:text-yellow-400 font-black uppercase tracking-widest text-[10px]">{post.subreddit}</span>
                           {post.intent_type && (
                             <div className="flex gap-2 ml-2">
                               <span className="text-purple-600 dark:text-purple-400 font-black uppercase text-[9px] bg-purple-500/5 px-1.5 py-0.5 rounded border border-purple-500/10">{post.intent_type}</span>
@@ -279,19 +283,25 @@ export default function TrendsDashboardPage() {
               {posts.map((post) => {
                 const finalUrl = getPostUrl(post);
                 const fetchTime = post.fetch_date ? format(new Date(post.fetch_date), 'MM-dd HH:mm') : 'N/A';
+                const createdTime = post.created_utc ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') : 'N/A';
                 
                 return (
                   <div key={post.id} className="group bg-white dark:bg-[#11141B] border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden hover:border-yellow-500/50 dark:hover:border-yellow-400/50 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all flex flex-col">
                     <div className="p-7 flex-grow">
                       <div className="flex justify-between items-center mb-6">
                         <span className="px-3 py-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 dark:from-yellow-500/20 dark:to-amber-500/20 text-yellow-700 dark:text-yellow-400 text-[10px] font-black rounded-full border border-yellow-500/30 dark:border-yellow-500/40 uppercase tracking-widest shadow-sm">
-                          r/{post.subreddit}
+                          {post.subreddit}
                         </span>
-                        <span className="text-[10px] text-gray-400 dark:text-gray-600 font-mono tracking-tighter">{fetchTime}</span>
+                        <span className="text-[10px] text-gray-500 dark:text-yellow-400 font-mono font-bold tracking-tighter" title={`Fetched: ${fetchTime}`}>{createdTime}</span>
                       </div>
                       <h2 className="text-xl font-bold mb-5 text-gray-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors leading-snug">
                         <a href={finalUrl} target="_blank" rel="noopener noreferrer">{post.title}</a>
                       </h2>
+                      <div className="flex gap-4 mb-4 text-[11px] font-bold">
+                        <span className="text-orange-600 dark:text-orange-400">👍 {post.score}</span>
+                        <span className="text-blue-600 dark:text-blue-400">💬 {post.num_comments || 0}</span>
+                        <span className="text-gray-500 dark:text-gray-300">BY {post.author}</span>
+                      </div>
                       {post.ai_summary && (
                         <div className="bg-gray-50 dark:bg-gray-900/80 rounded-2xl p-4 mb-4 border-l-4 border-purple-500">
                           <p className="text-xs text-gray-600 dark:text-gray-300 italic leading-relaxed">{post.ai_summary}</p>
@@ -301,7 +311,7 @@ export default function TrendsDashboardPage() {
                     <div className="bg-gray-50 dark:bg-black/30 px-7 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                       <div className="flex gap-2">
                         {post.intent_type && <span className="text-[9px] font-black px-2 py-1 bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md">{post.intent_type}</span>}
-                        {post.pain_level && <span className={`text-[9px] font-black px-2 py-1 rounded-md ${post.pain_level >= 4 ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'}`}>PAIN: {post.pain_level}</span>}
+                        {post.pain_level !== undefined && <span className={`text-[9px] font-black px-2 py-1 rounded-md ${post.pain_level >= 4 ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-orange-500/10 text-orange-600 dark:text-orange-400'}`}>PAIN: {post.pain_level}</span>}
                       </div>
                       {post.buy_signal && <span className="text-[9px] font-black bg-green-500 text-black px-2 py-1 rounded-md shadow-lg shadow-green-500/20">BUY</span>}
                     </div>
