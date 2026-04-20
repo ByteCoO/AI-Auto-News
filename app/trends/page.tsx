@@ -55,7 +55,10 @@ export default function TrendsDashboardPage() {
     }
     
     if (currentSort === 'newest') {
-      query = query.order('created_utc', { ascending: false });
+      query = query.order('created_utc', { ascending: false, nullsFirst: false });
+    } else if (currentSort === 'today') {
+      const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
+      query = query.gte('created_utc', twentyFourHoursAgo).order('score', { ascending: false });
     } else {
       query = query.order('score', { ascending: false });
     }
@@ -101,7 +104,10 @@ export default function TrendsDashboardPage() {
     }
     
     if (currentSort === 'newest') {
-      query = query.order('created_utc', { ascending: false });
+      query = query.order('created_utc', { ascending: false, nullsFirst: false });
+    } else if (currentSort === 'today') {
+      const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
+      query = query.gte('created_utc', twentyFourHoursAgo).order('score', { ascending: false });
     } else {
       query = query.order('score', { ascending: false });
     }
@@ -119,7 +125,11 @@ export default function TrendsDashboardPage() {
     }
 
     if (data && data.length > 0) {
-      setPosts(prev => [...prev, ...data]);
+      setPosts(prev => {
+        const existingIds = new Set(prev.map(p => p.id));
+        const newUniquePosts = data.filter(p => !existingIds.has(p.id));
+        return [...prev, ...newUniquePosts];
+      });
       setPage(nextPage);
       if (data.length < POSTS_PER_PAGE) {
         setHasMore(false);
@@ -210,6 +220,7 @@ export default function TrendsDashboardPage() {
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-yellow-500/20">
                 <Link href={getUrl({ sort: 'top' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'top' ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>🔥 Top</Link>
+                <Link href={getUrl({ sort: 'today' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'today' ? 'bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>⚡ Today Hot</Link>
                 <Link href={getUrl({ sort: 'newest' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'newest' ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>🆕 Newest</Link>
               </div>
               <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-yellow-500/20">
@@ -245,7 +256,9 @@ export default function TrendsDashboardPage() {
                 {posts.map((post, idx) => {
                   const finalUrl = getPostUrl(post);
                   const fetchTime = post.fetch_date ? format(new Date(post.fetch_date), 'MM-dd HH:mm') : 'N/A';
-                  const createdTime = post.created_utc ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') : 'N/A';
+                  const createdTime = post.created_utc 
+                    ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') 
+                    : (post.fetch_date ? format(new Date(post.fetch_date), 'yyyy-MM-dd HH:mm') : 'N/A');
                   
                   return (
                     <div key={post.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/[0.02] flex items-start gap-5 transition-colors group">
@@ -283,7 +296,9 @@ export default function TrendsDashboardPage() {
               {posts.map((post) => {
                 const finalUrl = getPostUrl(post);
                 const fetchTime = post.fetch_date ? format(new Date(post.fetch_date), 'MM-dd HH:mm') : 'N/A';
-                const createdTime = post.created_utc ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') : 'N/A';
+                const createdTime = post.created_utc 
+                  ? format(new Date(post.created_utc * 1000), 'yyyy-MM-dd HH:mm') 
+                  : (post.fetch_date ? format(new Date(post.fetch_date), 'yyyy-MM-dd HH:mm') : 'N/A');
                 
                 return (
                   <div key={post.id} className="group bg-white dark:bg-[#11141B] border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden hover:border-yellow-500/50 dark:hover:border-yellow-400/50 hover:shadow-2xl hover:shadow-yellow-500/10 transition-all flex flex-col">
