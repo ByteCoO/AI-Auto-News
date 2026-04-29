@@ -1,0 +1,108 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "compression on saas multiples is brutal right now. know few people trying to raise and it's rough out there when everyone's chasing the shiny ai object instead of looking at businesses that actually work.",
+      "upvotes": 16,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1sm9ckh/allbirds_the_shoe_company_just_announced_its/ogchhrg/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "companies with actual revenue and customers getting massacred while a shoe company pivots to gpu rentals and becomes a rocket ship. makes zero sense but market gonna market i guess.",
+      "upvotes": 16,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1sm9ckh/allbirds_the_shoe_company_just_announced_its/ogchhrg/",
+      "pain_intensity": 10
+    },
+    {
+      "quote": "Developers just might vibe code some of their tools rather than pay a third party for them.",
+      "upvotes": 1,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1sm9ckh/allbirds_the_shoe_company_just_announced_its/ogclzqg/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "AI is just an excuse to cut losses that investors can collectively rally behind",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1sm9ckh/allbirds_the_shoe_company_just_announced_its/ogcjbug/",
+      "pain_intensity": 6
+    },
+    {
+      "quote": "solid saas businesses with real revenue won't die from this, they'll just be undervalued for 12-18 months until the next correction.",
+      "upvotes": 1,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1sm9ckh/allbirds_the_shoe_company_just_announced_its/ogcp5ox/",
+      "pain_intensity": 5
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 35,
+    "total_mentions": 15,
+    "unique_users": 13,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "stable"
+  },
+  "revenue_signal": {
+    "users_paying": false,
+    "price_range": "N/A",
+    "payment_behavior": [
+      "Founders struggling to raise capital (revenue outflow)",
+      "Investors ignoring fundamentals for hype",
+      "Potential for developers to build internal tools (lost SaaS revenue)"
+    ],
+    "painkiller_vs_vitamin": "vitamin"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": true,
+    "risk_level": "high",
+    "why": "This is a market commentary and ideological debate among founders/investors. There is no specific problem being solved that users would pay a subscription fee for; it is purely a signal of macro-economic frustration."
+  },
+  "competition_reality": {
+    "competitor_count": 0,
+    "market_saturation": "low",
+    "user_satisfaction": "low",
+    "gap_score": 2
+  },
+  "success_probability": {
+    "success_probability": "10%",
+    "confidence": "high",
+    "reason_breakdown": [
+      "No actionable software demand identified",
+      "Purely macro-economic discussion",
+      "High noise-to-signal ratio for product development"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "N/A",
+    "users_reached": 0,
+    "expected_signup_rate": "0%",
+    "expected_payers": 0,
+    "conversion_rate": "0%",
+    "estimated_revenue": "$0",
+    "time_to_first_revenue": "N/A"
+  },
+  "analog_case": {
+    "similar_product": "SaaS valuation trackers / Market intelligence newsletters",
+    "revenue_estimate": "$2k/mo (ad-supported)",
+    "validation_type": "market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "90%",
+    "main_risks": [
+      "Building a product based on meta-discussion rather than utility",
+      "Targeting founders who are currently capital-constrained",
+      "Market timing (bubble vs. correction risk)"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Extract the high-pain quote about 'vibe coding' to pivot current app to a 'Vibe Coding Helper' tool.",
+    "day_4_10": "N/A",
+    "day_11_30": "N/A",
+    "first_revenue_strategy": "N/A",
+    "expected_result": "Discard as a standalone product idea."
+  },
+  "hot_leads": [],
+  "final_decision": "DO NOT BUILD"
+}

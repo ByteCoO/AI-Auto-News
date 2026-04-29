@@ -1,0 +1,116 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "every single time I post here lol",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smmfl4/rsaas_spammers_in_the_dms/ogfjj7y/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "Same here. I get at least a couple of spam DMs every time.",
+      "upvotes": 1,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smmfl4/rsaas_spammers_in_the_dms/oggdnf4/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "Thanks for trying to take care of the slop!",
+      "upvotes": 5,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smmfl4/rsaas_spammers_in_the_dms/ogfwtkc/",
+      "pain_intensity": 6
+    },
+    {
+      "quote": "Hi Team Thundercock, gave me a fair chuckle lmao",
+      "upvotes": 3,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smmfl4/rsaas_spammers_in_the_dms/oggd2on/",
+      "pain_intensity": 4
+    },
+    {
+      "quote": "Yall get this too?",
+      "upvotes": 6,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smmfl4/rsaas_spammers_in_the_dms/",
+      "pain_intensity": 8
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 78,
+    "total_mentions": 6,
+    "unique_users": 6,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": false,
+    "price_range": "N/A",
+    "payment_behavior": [
+      "Users are currently being targeted by paid marketing tools/bots",
+      "Significant time/attention loss for high-value individuals (SaaS founders)",
+      "Gratitude for moderation suggests high value in a 'clean' environment"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "The spam is an observable reality caused by other paid software (lead gen bots). The 'demand' to stop it is real, but the 'willingness to pay' to stop it on a free platform like Reddit is the risk."
+  },
+  "competition_reality": {
+    "competitor_count": 2,
+    "market_saturation": "low",
+    "user_satisfaction": "low",
+    "gap_score": 8
+  },
+  "success_probability": {
+    "success_probability": "60%",
+    "confidence": "medium",
+    "reason_breakdown": [
+      "High-value target audience (founders with budgets)",
+      "Clear escalation of bot sophistication",
+      "Gap in Reddit's native DM filtering for business accounts",
+      "Monetization difficulty (B2C vs B2B angle)"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit security threads / Privacy subreddits",
+    "users_reached": 500,
+    "expected_signup_rate": "12%",
+    "expected_payers": 5,
+    "conversion_rate": "1%",
+    "estimated_revenue": "$100 - $300 / month",
+    "time_to_first_revenue": "10 days"
+  },
+  "analog_case": {
+    "similar_product": "Cloudflare (for websites) / SpamSieve (for email)",
+    "revenue_estimate": "$10M+ ARR (scaled models)",
+    "validation_type": "market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "40%",
+    "main_risks": [
+      "Reddit API restrictions preventing 3rd party DM filtering",
+      "Users choosing to just 'turn off DMs' rather than pay for a filter",
+      "Difficulty in acquiring users at the exact moment of frustration"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Create a browser extension that 'auto-archives' DMs containing common B2B bot patterns (calendly links, generic praise).",
+    "day_4_10": "Release as 'Reddit Founder Shield' (free version) to gather data on bot patterns.",
+    "day_11_30": "Launch 'Shield Pro' for brands to monitor who is scraping their community members and block competing bot-inbox attacks.",
+    "first_revenue_strategy": "Sell 'Community Protection' as a service to Subreddit Mod teams or SaaS companies with their own subreddits.",
+    "expected_result": "Extension installed by 50+ founders; first B2B trial."
+  },
+  "hot_leads": [
+    {
+      "user_type": "High-Value SaaS Founder",
+      "intent_level": "high",
+      "quote": "every single time I post here lol",
+      "suggested_dm": "Saw your comment about the constant DM spam after posting. I'm beta testing a browser extension that silently filters out those 'Team Thundercock' style bot messages so you only see real human DMs. Want a link?"
+    }
+  ],
+  "final_decision": "NICHE ONLY"
+}

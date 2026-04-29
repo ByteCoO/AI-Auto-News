@@ -1,0 +1,116 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "the feedback on most posts is either super generic (“this is cool”, “nice idea”, emoji spam) or completely silent. Same thing happens around Product Hunt launches – you drop your thing, get a handful of upvotes from friends, and then crickets.",
+      "upvotes": 9,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smhqxv/tired_of_looks_good_comments_lets_build_a_small/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "spent ~19 years running an agency, recently trying to move into saas... we have a couple products live, some mrr, but honestly struggling to get real users outside our own network",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smhqxv/tired_of_looks_good_comments_lets_build_a_small/oge9lic/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "would be interested in a small group where people actually give real feedback instead of just “looks good”",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smhqxv/tired_of_looks_good_comments_lets_build_a_small/oge9lic/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "on initially community nobody gives a f*ck I asked 100s of builder to join... nobody want to stay active and contribute to others launches",
+      "upvotes": 1,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smhqxv/tired_of_looks_good_comments_lets_build_a_small/ogg5mmo/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "if people are giving advice about your product that's less time they're focused on their own products and most are concerned about their own self interest. So I'm helping others but where is my endeavor advancing",
+      "upvotes": 0,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smhqxv/tired_of_looks_good_comments_lets_build_a_small/ogenvl6/",
+      "pain_intensity": 10
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 75,
+    "total_mentions": 20,
+    "unique_users": 10,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": false,
+    "price_range": "N/A",
+    "payment_behavior": [
+      "Users mentioned participation-based payment systems as an incentive",
+      "Founders with existing MRR are struggling with growth (willingness to pay for what 'moves the needle')",
+      "High value placed on 'real, useful feedback' vs generic praise"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "The pain of 'shouting into the void' is real, but free 'support groups' almost always fail due to the altruism-exhaustion mentioned in the comments. The demand for growth is real, but the proposed free solution is likely fake demand."
+  },
+  "competition_reality": {
+    "competitor_count": 50,
+    "market_saturation": "high",
+    "user_satisfaction": "very low",
+    "gap_score": 9
+  },
+  "success_probability": {
+    "success_probability": "65%",
+    "confidence": "medium",
+    "reason_breakdown": [
+      "SaaS builders are desperate for distribution/initial traction",
+      "Existing free communities are too noisy/low signal",
+      "The 'Agency-to-SaaS' transition is a specific high-value niche",
+      "Need for a structured incentive model rather than just a Discord link"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit / Product Hunt",
+    "users_reached": 500,
+    "expected_signup_rate": "5%",
+    "expected_payers": 10,
+    "conversion_rate": "2%",
+    "estimated_revenue": "$1,000 - $3,000 / month (Premium Mastermind tier)",
+    "time_to_first_revenue": "14 days"
+  },
+  "analog_case": {
+    "similar_product": "Hampton / Indie Bites / Paid Masterminds",
+    "revenue_estimate": "$500 - $5,000 / year per member",
+    "validation_type": "market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "35%",
+    "main_risks": [
+      "Inactivity/churn of members",
+      "Lack of 'super-users' who can actually provide needle-moving feedback",
+      "Becoming a 'shilling circle' that gets banned by platforms"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Filter the 10-15 'serious' builders from the thread. Require an application with 'revenue proof' to ensure skin in the game.",
+    "day_4_10": "Setup a 'Feedback Swap' platform with a credit system (you must give a deep audit to get one).",
+    "day_11_30": "Launch a 'Launch Acceleration' service where this group provides the initial 10-15 high-quality comments on day 1 of PH.",
+    "first_revenue_strategy": "Transition from a free group to a paid 'Growth Audit' membership for post-revenue founders.",
+    "expected_result": "10-12 vetted members; first 2 paid upgrades for premium auditing services."
+  },
+  "hot_leads": [
+    {
+      "user_type": "Post-revenue Agency Owner",
+      "intent_level": "high",
+      "quote": "spent ~19 years running an agency, recently trying to move into saas... struggling to get real users",
+      "suggested_dm": "Saw your post about the agency-to-SaaS transition. I'm building a tight-knit mastermind specifically for post-revenue builders to trade high-signal audits. We have 3 other agency veterans. Want to see the entry requirements?"
+    }
+  ],
+  "final_decision": "BUILD"
+}

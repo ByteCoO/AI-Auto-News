@@ -8,7 +8,8 @@ import { FTNewsProvider } from './contexts/FTNewsContext';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Navbar from './components/Navbar';
-import { AuthProvider } from './contexts/AuthContext'; // <--- 1. 导入 AuthProvider
+import { AuthProvider } from './contexts/AuthContext';
+import FeedbackButton from './components/FeedbackButton';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://visionong.dpdns.org'),
@@ -166,9 +167,10 @@ export default async function RootLayout({
              {/*    <ThemeToggle /> */}
              {/*  </div> */}
              <Navbar/>
-              {children} {/* 你的页面内容会在这里渲染，它们也能访问 AuthContext */}
+              {children}
               <Footer /> 
             </main>
+            <FeedbackButton />
             </FTNewsProvider>
           </AuthProvider>
           {/* --- 结束 AuthProvider 包裹 --- */}

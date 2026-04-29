@@ -1,0 +1,115 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "I’ve been noticing way more “why am I facing this problem” post which OP then turns into a plug for their own product and uses bots to comment on the post.",
+      "upvotes": 7,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1slno92/new_rule_against_selfpromo/og8g817/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "These are literally the worst... this literally reads as a 'I bet you're such an idiot that you believe this is organic'",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1slno92/new_rule_against_selfpromo/oganqk6/",
+      "pain_intensity": 10
+    },
+    {
+      "quote": "I don't like reading something earnestly and then - here it comes - a hook - to their product. I kinda feel ambushed. It's not fair really.",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1slno92/new_rule_against_selfpromo/ogbjcz8/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "r/SaaS is a great sub-reddit, but those “promotional zombies” were just defaming it",
+      "upvotes": 2,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1slno92/new_rule_against_selfpromo/og8sqh9/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "I stopped checking in here as much when I saw all the AI garbage. Hoping things improve",
+      "upvotes": 1,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1slno92/new_rule_against_selfpromo/og95veo/",
+      "pain_intensity": 8
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 82,
+    "total_mentions": 12,
+    "unique_users": 8,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": false,
+    "price_range": "N/A",
+    "payment_behavior": [
+      "Moderators spending significant unpaid labor hours manually filtering",
+      "Users leaving the platform due to 'AI slop' quality decrease"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "The frustration is high and authentic, but the primary 'buyers' (Moderators) often work for free. The real buyer would be Reddit itself or large community owners."
+  },
+  "competition_reality": {
+    "competitor_count": 4,
+    "market_saturation": "high",
+    "user_satisfaction": "low",
+    "gap_score": 8
+  },
+  "success_probability": {
+    "success_probability": "55%",
+    "confidence": "medium",
+    "reason_breakdown": [
+      "High community frustration",
+      "Current tools (AutoMod) failing to catch 'disguised' AI promotion",
+      "Difficulty in monetizing volunteer moderators",
+      "Platform dependency on Reddit API"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit B2B / Community Management Outreach",
+    "users_reached": 50,
+    "expected_signup_rate": "15%",
+    "expected_payers": 2,
+    "conversion_rate": "4%",
+    "estimated_revenue": "$200 - $500 / month",
+    "time_to_first_revenue": "20 days"
+  },
+  "analog_case": {
+    "similar_product": "Hive Moderation / BotDefense",
+    "revenue_estimate": "Enterprise pricing",
+    "validation_type": "market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "45%",
+    "main_risks": [
+      "Non-paying volunteer users",
+      "Reddit API pricing/access changes",
+      "Rapidly evolving AI spam tactics"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Develop a semantic classifier specifically tuned to detect 'Problem-Solution' disguised promotional hooks.",
+    "day_4_10": "Run analysis on top 10 tech subreddits to generate a 'Spam Heatmap' for mod teams.",
+    "day_11_30": "Offer free trials to large community mods to build a whitelist; transition to B2B brand protection service.",
+    "first_revenue_strategy": "Sell 'Community Health Reports' to brands monitoring their mentions.",
+    "expected_result": "Onboarding 3 mod teams for feedback; 1 brand for monitoring."
+  },
+  "hot_leads": [
+    {
+      "user_type": "Community Moderator",
+      "intent_level": "high",
+      "quote": "We continue fighting spam and bots... things are worse than we initially thought.",
+      "suggested_dm": "I've built a semantic filter that specifically flags the 'disguised organic' promotional posts users are complaining about. Want to run a 48-hour shadow test on your sub?"
+    }
+  ],
+  "final_decision": "NICHE ONLY"
+}

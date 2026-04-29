@@ -1,0 +1,108 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "Nobody warns you that the hardest part of building a startup isn't the building. It's the part where you've made something good and the world hasn't noticed yet.",
+      "upvotes": 35,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smghw6/startup_struggle_need_help/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "You watch competitors with worse products close deals because they got loud first, or lucky first, or both.",
+      "upvotes": 35,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smghw6/startup_struggle_need_help/",
+      "pain_intensity": 10
+    },
+    {
+      "quote": "Im in week 2. got 4 users. was hoping to have about 20 by now. im also cold emailing, sending sms, videos. everything except cold calling cause thats a lot of $$$",
+      "upvotes": -33,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smghw6/startup_struggle_need_help/oge0nan/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "ive seen solid products get ignored just because no one’s telling the story well or it’s just not in front of the right people. feels less like merit sometimes and more like timing + visibility",
+      "upvotes": -26,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smghw6/startup_struggle_need_help/ogeawzq/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "Narrow the niche: If you’re cold emailing 'everyone,' try emailing 10 people in one tiny, specific sub-sector with a Loom video of one specific feature.",
+      "upvotes": -33,
+      "subreddit": "SaaS",
+      "link": "https://www.reddit.com/r/SaaS/comments/1smghw6/startup_struggle_need_help/oge5444/",
+      "pain_intensity": 7
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 40,
+    "total_mentions": 15,
+    "unique_users": 10,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "stable"
+  },
+  "revenue_signal": {
+    "users_paying": false,
+    "price_range": "N/A",
+    "payment_behavior": [
+      "Avoidance of high-cost channels like cold calling",
+      "Use of Loom/Email as free/low-cost workarounds",
+      "Focus on 'storytelling' over technical build"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": true,
+    "risk_level": "high",
+    "why": "The post is explicitly labeled as a 'BOT-TRAP'. While the struggle (lack of visibility) is a real pain point, this specific engagement is a honeypot designed to catch automated accounts. The 'demand' in the comments is from other struggling founders, not necessarily buyers."
+  },
+  "competition_reality": {
+    "competitor_count": 1000,
+    "market_saturation": "high",
+    "user_satisfaction": "low",
+    "gap_score": 3
+  },
+  "success_probability": {
+    "success_probability": "15%",
+    "confidence": "high",
+    "reason_breakdown": [
+      "Targeting 'struggling startups' is targeting a low-budget, high-churn segment",
+      "Post is an engineered bot trap",
+      "Market for marketing/growth services is oversaturated"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit outreach",
+    "users_reached": 100,
+    "expected_signup_rate": "5%",
+    "expected_payers": 0,
+    "conversion_rate": "0%",
+    "estimated_revenue": "$0",
+    "time_to_first_revenue": "N/A"
+  },
+  "analog_case": {
+    "similar_product": "Early-stage growth agencies / Cold email automation tools",
+    "revenue_estimate": "N/A",
+    "validation_type": "market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "85%",
+    "main_risks": [
+      "Non-paying founders ('cold calling is too expensive')",
+      "High acquisition cost for low-intent buyers",
+      "Platform fatigue"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Discard this as a lead source for SaaS products, but keep the 'Bot Trap' tactic as a reference for platform integrity.",
+    "day_4_10": "N/A",
+    "day_11_30": "N/A",
+    "first_revenue_strategy": "N/A",
+    "expected_result": "Avoid wasted effort."
+  },
+  "hot_leads": [],
+  "final_decision": "DO NOT BUILD"
+}
