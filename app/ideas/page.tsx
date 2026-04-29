@@ -229,7 +229,7 @@ const OpportunityCard = ({ opp, index }: { opp: Opportunity; index: number }) =>
           </div>
         </div>
 
-        {/* ── 统计指标 ── */}
+        {/* ── Statistical Metrics ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatBox label="Opportunity Score" value={opp.score} suffix="/100" highlight={opp.score >= 90} />
           <StatBox label="Confidence" value={opp.confidence} suffix="%" highlight={opp.confidence >= 85} />
@@ -243,7 +243,7 @@ const OpportunityCard = ({ opp, index }: { opp: Opportunity; index: number }) =>
           </div>
         </div>
 
-        {/* ── 评分进度条 ── */}
+        {/* ── Score Progress Bar ── */}
         <div className="mt-6">
           <div className="flex justify-between text-[10px] text-slate-600 font-bold uppercase tracking-wider mb-2">
             <span>Signal Strength</span>
@@ -258,7 +258,7 @@ const OpportunityCard = ({ opp, index }: { opp: Opportunity; index: number }) =>
         </div>
       </div>
 
-      {/* ── 用户评论 ── */}
+      {/* ── User Voices ── */}
       <div className="p-8 md:p-10 border-b border-white/[0.04] bg-black/30">
         <div className="flex items-center gap-3 mb-6">
           <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-sm">💬</span>
@@ -284,7 +284,7 @@ const OpportunityCard = ({ opp, index }: { opp: Opportunity; index: number }) =>
         )}
       </div>
 
-      {/* ── 执行步骤 & 预期轨迹 ── */}
+      {/* ── Execution Steps & Expected Trajectory ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2">
         <div className="p-8 md:p-10 border-r border-white/[0.04]">
           <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
