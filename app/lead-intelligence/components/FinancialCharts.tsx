@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Lead } from '../types';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  ScatterChart, Scatter, ZAxis
+  ScatterChart, Scatter, ZAxis, Cell
 } from 'recharts';
 
 interface FinancialChartsProps {
@@ -104,13 +104,13 @@ export function FinancialCharts({ leads }: FinancialChartsProps) {
               <RechartsTooltip 
                 cursor={{ strokeDasharray: '3 3', stroke: '#52525b' }}
                 contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '8px', color: '#f4f4f5' }}
-                formatter={(value: any, name: string) => [`${value}%`, name]}
+                formatter={(value: any, name: any) => [`${value}%`, name]}
                 labelFormatter={() => ''}
               />
               <Scatter name="Leads" data={scatterData} fill="#f59e0b" opacity={0.8}>
                 {
                   scatterData.map((entry, index) => (
-                    <cell key={`cell-${index}`} fill={entry.intentValue > 500 ? '#f59e0b' : '#52525b'} />
+                    <Cell key={`cell-${index}`} fill={entry.intentValue > 500 ? '#f59e0b' : '#52525b'} />
                   ))
                 }
               </Scatter>
