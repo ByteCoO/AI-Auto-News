@@ -22,6 +22,7 @@ import {
 const navigation = [
   { name: 'Home', href: '/', icon: HomeIcon },
   { name: 'AI Trends', href: '/trends', icon: ChartBarIcon },
+  { name: 'Lead Intelligence', href: '/lead-intelligence', icon: SparklesIcon },
   { name: 'Ideas', href: '/ideas', icon: LightBulbIcon },
   { name: 'Pricing', href: '/price', icon: CurrencyDollarIcon },
   { name: 'About', href: '/about', icon: UserGroupIcon },

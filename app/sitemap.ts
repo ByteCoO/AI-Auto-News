@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/ideas',
     '/trends',
+    '/lead-intelligence',
     '/goldmine',
     '/business-insights',
     '/reddit-insights',

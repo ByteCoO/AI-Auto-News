@@ -15,7 +15,9 @@ const Footer = () => {
               </div>
 
               <div className="space-y-2">
-                <p className="text-gray-800 dark:text-gray-200 font-medium">Email : admin@visiong.dpdns.org</p>
+                <p className="text-gray-800 dark:text-gray-200 font-medium">
+                  Email : <a href="mailto:admin@visiong.dpdns.org" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">admin@visiong.dpdns.org</a>
+                </p>
               </div>
             </div>
           </div>
@@ -25,6 +27,8 @@ const Footer = () => {
             <div className="space-y-3">
               <a href="/" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
               <a href="/trends" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">AI Trends</a>
+              <a href="/lead-intelligence" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Lead Intelligence</a>
+              <a href="/ideas" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Ideas</a>
               <a href="/price" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pricing</a>
               <a href="/login" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Login</a>
             </div>
