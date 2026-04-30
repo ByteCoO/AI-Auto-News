@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeContext();
 
   // 组件挂载后再渲染，避免水合不匹配
   useEffect(() => {

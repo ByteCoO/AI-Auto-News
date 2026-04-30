@@ -1,50 +1,139 @@
-import Image from 'next/image';
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
+import {
+  Bars3Icon,
+  XMarkIcon,
+  HomeIcon,
+  ChartBarIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  UserGroupIcon,
+  BookOpenIcon,
+  ArrowRightOnRectangleIcon,
+  LightBulbIcon,
+  ChatBubbleLeftRightIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
+
+const navigation = [
+  { name: 'Home', href: '/', icon: HomeIcon },
+  { name: 'AI Trends', href: '/trends', icon: ChartBarIcon },
+  { name: 'Lead Intelligence', href: '/lead-intelligence', icon: SparklesIcon },
+  { name: 'Ideas', href: '/ideas', icon: LightBulbIcon },
+  { name: 'Pricing', href: '/price', icon: CurrencyDollarIcon },
+  { name: 'About', href: '/about', icon: UserGroupIcon },
+  { name: 'Feedback', href: '/feedback', icon: ChatBubbleLeftRightIcon },
+];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
-    <nav className="bg-white py-3 px-4 shadow-sm transition-colors duration-200">
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-gray-800">🎮 GameVerse</span>
-          </Link>
-          
-          <div className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-gray-900">Home</Link>
-            <Link href="/streams" className="text-gray-700 hover:text-gray-900">Streams</Link>
-            <Link href="/forums" className="text-gray-700 hover:text-gray-900">Forums</Link>
-            <Link href="/news" className="text-gray-700 hover:text-gray-900">News</Link>
-            <Link href="/events" className="text-gray-700 hover:text-gray-900">Events</Link>
-            <Link href="/clans" className="text-gray-700 hover:text-gray-900">Clans</Link>
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">G</span>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                GameVerse
+              </span>
+            </Link>
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <button className="text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-          
-          <button className="text-gray-700 relative">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3"></span>
-          </button>
-          
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-full overflow-hidden">
-              <Image src="/avatar-placeholder.png" alt="User" width={32} height={32} className="object-cover" />
-            </div>
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-gray-800">Stray</p>
-              <p className="text-xs text-gray-500">@straycat</p>
-            </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Login Button & Theme Toggle */}
+          <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
+            <Link
+              href="/login"
+              className="flex items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <ArrowRightOnRectangleIcon className="w-4 h-4" />
+              <span>Login</span>
+            </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex items-center md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              {mobileMenuOpen ? (
+                <XMarkIcon className="w-6 h-6" />
+              ) : (
+                <Bars3Icon className="w-6 h-6" />
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium ${
+                    isActive
+                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <ArrowRightOnRectangleIcon className="w-5 h-5" />
+              <span>Login</span>
+            </Link>
+            <div className="px-3 py-2">
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
