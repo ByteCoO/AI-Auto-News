@@ -10,7 +10,7 @@ const Footer = () => {
               <div>
                 <h3 className="text-gray-800 dark:text-gray-200 font-semibold text-lg mb-3">About</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  GameVerse Intelligence - Your ultimate hub for AI insights and tech intelligence. Discover high-value commercial signals before anyone else.
+                  Game Visioning Intelligence - Your ultimate hub for AI insights and tech intelligence. Discover high-value commercial signals before anyone else.
                 </p>
               </div>
 
@@ -27,10 +27,14 @@ const Footer = () => {
             <div className="space-y-3">
               <a href="/" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
               <a href="/trends" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">AI Trends</a>
+              <a href="/business-insights" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Business Insights</a>
+              <a href="/reddit-insights" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Reddit Insights</a>
               <a href="/lead-intelligence" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Lead Intelligence</a>
               <a href="/ideas" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Ideas</a>
+              <a href="/goldmine" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Churn Radar</a>
               <a href="/price" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Pricing</a>
-              <a href="/login" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Login</a>
+              <a href="/about" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+              <a href="/feedback" className="block text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Feedback</a>
             </div>
           </div>
 
@@ -50,8 +54,8 @@ const Footer = () => {
               <span className="text-white font-bold">GV</span>
             </div>
             <div>
-              <h4 className="font-bold text-gray-900 dark:text-white">GameVerse</h4>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">© 2026 GameVerse Intelligence. All Rights Reserved.</p>
+              <h4 className="font-bold text-gray-900 dark:text-white">Game Visioning</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">© 2026 Game Visioning Intelligence. All Rights Reserved.</p>
             </div>
           </div>
         </div>

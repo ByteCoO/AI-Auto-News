@@ -2,6 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import BusinessInsightsClient from './BusinessInsightsClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Business Insights',
+  description: 'AI-curated commercial signals and validated business opportunities from across the web.',
+  alternates: { canonical: '/business-insights' },
+};
 
 export const dynamic = 'force-dynamic';
 

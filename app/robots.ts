@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/admin/', '/tmp/', '/temp/'],
+        disallow: ['/api/', '/_next/', '/admin/', '/tmp/', '/temp/', '/login'],
       },
       {
         userAgent: 'Googlebot',
@@ -17,9 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: [
-      'https://visionong.dpdns.org/sitemap.xml',
-      'https://visionong.dpdns.org/news-sitemap.xml',
-    ],
+    sitemap: 'https://visionong.dpdns.org/sitemap.xml',
   }
 }

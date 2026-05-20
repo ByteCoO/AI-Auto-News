@@ -122,7 +122,7 @@ export default function PricingPage() {
 
         {/* Simple Footer Text */}
         <footer className="w-full text-center py-12 border-t border-gray-100 dark:border-gray-800 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-          © 2026 GameVerse Intelligence. All rights reserved.
+          © 2026 Game Visioning Intelligence. All rights reserved.
         </footer>
       </div>
     </div>

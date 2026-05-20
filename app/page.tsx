@@ -1,7 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const metadata: Metadata = {
+  title: 'Game Visioning - AI-Powered Business Intelligence Platform',
+  description: 'Discover high-value commercial signals, track Reddit trends, and validate SaaS ideas with AI-driven insights. Your hub for tech intelligence.',
+  alternates: {
+    canonical: '/',
+  },
+};
 
 // Features data
 const features = [
@@ -42,6 +48,22 @@ const stats = [
 export default async function Home() {
   return (
     <main className="min-h-screen w-full flex flex-col bg-white dark:bg-[#090B10] transition-colors duration-300">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: 'Game Visioning - AI-Powered Business Intelligence Platform',
+            description: 'Discover high-value commercial signals, track Reddit trends, and validate SaaS ideas with AI-driven insights.',
+            url: 'https://visionong.dpdns.org',
+            publisher: {
+              '@type': 'Organization',
+              name: 'Game Visioning',
+            },
+          }),
+        }}
+      />
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
         {/* Background decorations */}
@@ -63,7 +85,7 @@ export default async function Home() {
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tighter leading-tight">
             <span className="block text-gray-900 dark:text-white">Welcome to</span>
             <span className="block mt-2 bg-gradient-to-r from-yellow-600 via-amber-500 to-yellow-600 dark:from-yellow-400 dark:via-amber-300 dark:to-yellow-500 bg-clip-text text-transparent">
-              GameVerse
+              Game Visioning
             </span>
           </h1>
 
@@ -143,7 +165,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Why Choose GameVerse?
+              Why Choose Game Visioning?
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               AI-driven business intelligence platform that helps you discover opportunities others miss
@@ -183,27 +205,51 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link href="/business-insights" className="group">
-              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-2xl p-8 border border-yellow-200 dark:border-yellow-800 hover:shadow-xl transition-all">
-                <div className="text-4xl mb-4">💡</div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-yellow-600 dark:group-hover:text-yellow-400">
+              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-800 hover:shadow-xl transition-all h-full">
+                <div className="text-3xl mb-3">💡</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-yellow-600 dark:group-hover:text-yellow-400">
                   Business Insights
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Explore AI-curated commercial signals and validated business opportunities
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  AI-curated commercial signals and validated opportunities
+                </p>
+              </div>
+            </Link>
+
+            <Link href="/ideas" className="group">
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/10 dark:to-green-900/10 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-800 hover:shadow-xl transition-all h-full">
+                <div className="text-3xl mb-3">🎯</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                  SaaS Ideas
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  High-conviction SaaS opportunities from Reddit and Twitter
+                </p>
+              </div>
+            </Link>
+
+            <Link href="/goldmine" className="group">
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/10 dark:to-red-900/10 rounded-2xl p-6 border border-orange-200 dark:border-orange-800 hover:shadow-xl transition-all h-full">
+                <div className="text-3xl mb-3">🔥</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                  Churn Radar
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Enterprise dissatisfaction signals intercepted via Reddit
                 </p>
               </div>
             </Link>
 
             <Link href="/about" className="group">
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-8 border border-purple-200 dark:border-purple-800 hover:shadow-xl transition-all">
-                <div className="text-4xl mb-4">👥</div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800 hover:shadow-xl transition-all h-full">
+                <div className="text-3xl mb-3">👥</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400">
                   About Us
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Learn about our mission, team, and the story behind GameVerse
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Our mission, team, and the story behind Game Visioning
                 </p>
               </div>
             </Link>
@@ -247,7 +293,7 @@ export default async function Home() {
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-8 text-white/90">
-            Join hundreds of teams already using GameVerse
+            Join hundreds of teams already using Game Visioning
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
@@ -266,10 +312,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 bg-gray-100 dark:bg-gray-950 text-center text-gray-600 dark:text-gray-400 text-sm">
-        <p>© 2024 GameVerse. All rights reserved.</p>
-      </footer>
     </main>
   );
 }

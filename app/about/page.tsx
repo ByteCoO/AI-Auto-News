@@ -69,7 +69,7 @@ const milestones = [
   {
     date: 'Q1 2023',
     title: 'Project Launched',
-    description: 'GameVerse team formed, started developing AI business insights platform',
+    description: 'Game Visioning team formed, started developing AI business insights platform',
     icon: RocketLaunchIcon,
   },
   {
@@ -112,7 +112,7 @@ export default function AboutPage() {
               Discover Real Business Opportunities with AI
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">
-              GameVerse's mission is to empower every entrepreneur to find genuine user needs, not rely on guesswork and luck
+              Game Visioning's mission is to empower every entrepreneur to find genuine user needs, not rely on guesswork and luck
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <div className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
@@ -146,10 +146,10 @@ export default function AboutPage() {
               <LightBulbIcon className="w-6 h-6 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-              Why GameVerse?
+              Why Game Visioning?
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              We've seen too many entrepreneurs fail because they didn't understand real user needs. Instead of spending months building a product nobody wants, why not validate the opportunity with data first? That's exactly what GameVerse solves.
+              We've seen too many entrepreneurs fail because they didn't understand real user needs. Instead of spending months building a product nobody wants, why not validate the opportunity with data first? That's exactly what Game Visioning solves.
             </p>
           </div>
 
@@ -161,7 +161,7 @@ export default function AboutPage() {
               What We Believe
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
-              We believe data is more reliable than intuition, AI can give small teams the same insights as big companies, and sharing success is more valuable than keeping it secret. This is GameVerse's DNA.
+              We believe data is more reliable than intuition, AI can give small teams the same insights as big companies, and sharing success is more valuable than keeping it secret. This is Game Visioning's DNA.
             </p>
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function AboutPage() {
             Ready to Discover Your Next Business Opportunity?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join 500+ teams already using GameVerse to drive their business decisions
+            Join 500+ teams already using Game Visioning to drive their business decisions
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <button className="px-8 py-3 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-100 transition-colors">

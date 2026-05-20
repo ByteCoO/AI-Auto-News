@@ -1,6 +1,13 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import React from 'react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Reddit SaaS Insights',
+  description: 'Validated market pain points and high-potential business opportunities extracted from Reddit community discussions.',
+  alternates: { canonical: '/reddit-insights' },
+};
 
 // Section Title Component
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
