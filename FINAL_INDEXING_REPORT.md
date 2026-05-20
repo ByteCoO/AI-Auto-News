@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-20
 **Domain:** https://visionong.dpdns.org
-**Audit Status:** 20 issues fixed, 5 remaining (documented below)
+**Audit Status:** 23 issues fixed, 3 remaining (documented below)
 
 ---
 
@@ -28,6 +28,9 @@
 18. **Feedback page SSR** - Restructured from fully client-rendered to server-fetch + client interactivity. Initial data now in HTML for Googlebot.
 19. **RSS feed created** - Added /rss.xml route serving latest Reddit posts. Added RSS link to layout head.
 20. **Error pages translated** - Translated Chinese text in error.tsx and global-error.tsx to English for consistency.
+21. **SVG favicon created** - Created favicon.svg with gradient design as primary favicon
+22. **Manifest updated** - Updated manifest.json with correct description, SVG icon, removed broken apple-touch-icon reference
+23. **Theme-color added** - Added theme-color meta tag (#3b82f6) for PWA and mobile browsers
 
 ---
 
@@ -50,8 +53,7 @@
 
 | # | Issue | Action Required |
 |---|-------|----------------|
-| 4 | **Missing apple-touch-icon** | Create apple-touch-icon.png (180x180) and uncomment the link in layout.tsx |
-| 5 | **Missing multi-size favicons** | Create favicon-32x32.png and favicon-16x16.png |
+| 4 | **Missing apple-touch-icon** | Create apple-touch-icon.png (180x180) for iOS home screen. SVG favicon now works for browsers. |
 | 8 | **lead-intelligence revalidate=0** | Consider setting a reasonable revalidate interval (e.g., 60) instead of no caching |
 
 ---
@@ -121,7 +123,7 @@
 
 1. Get real Google Search Console verification code and add it to `app/layout.tsx`
 2. Submit sitemap to Google Search Console
-3. Create proper favicon set and apple-touch-icon (apple-touch-icon.png, favicon-32x32.png, favicon-16x16.png)
+3. Optionally create apple-touch-icon.png (180x180) for iOS home screen
 
 ---
 

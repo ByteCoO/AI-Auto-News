@@ -171,5 +171,8 @@
 | Feedback page client-only | HIGH | FIXED |
 | Missing RSS feed | MEDIUM | FIXED |
 | Chinese error pages | LOW | FIXED |
+| Missing SVG favicon | LOW | FIXED |
+| Broken manifest icons | LOW | FIXED |
+| Missing theme-color | LOW | FIXED |
 | Unused files | LOW | FIXED |
 | Redundant head tags | LOW | FIXED |
