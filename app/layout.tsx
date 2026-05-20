@@ -111,6 +111,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="alternate" type="application/rss+xml" title="Game Visioning RSS Feed" href="/rss.xml" />
         {/* TODO: Add real verification codes from Google Search Console */}
         <script
@@ -160,6 +161,7 @@ export default async function RootLayout({
             }),
           }}
         />
+        <meta name="theme-color" content="#3b82f6" />
         <meta name="application-name" content="Game Visioning" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
