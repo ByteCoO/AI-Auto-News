@@ -1,0 +1,139 @@
+```json
+{
+  "evidence_extraction": [
+    {
+      "quote": "Professional services companies calculate how many billable hours are saved away. When your system saves 5k to 10k eur per month in documents. That sounds like a model.",
+      "upvotes": 1,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1syubll/i_made_2700_building_an_ai_system_for_a_law_firm/oiz0hu2/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "what stands out is this looks almost like productized consulting evolving toward SaaS, which can be a powerful path professional services pain can be very monetizable because the ROI is tangible",
+      "upvotes": 0,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1syubll/i_made_2700_building_an_ai_system_for_a_law_firm/oix8p6f/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "the $103K from one client is actually the scariest part of this. it's a second and third client at $3-5K each so you're not one bad month away from the whole thing collapsing.",
+      "upvotes": 0,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1t2r5ab/0_to_500k_arr_solo_with_ai_as_my_only_team/ojtlamk/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "Where AI is working is more assistive than autonomous. Tools that help rewrite resumes for specific roles, prepare answers, or surface relevant openings based on intent signals are getting traction.",
+      "upvotes": 1,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1t3cwsf/why_is_there_not_a_conversation_ai_that_applies/ojve5s5/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "Paid ads work when your offer converts without ads first. Most people skip that part and wonder why they're paying to expose a broken funnel.",
+      "upvotes": 1,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1t4auwa/how_im_generating_6_13_b2b_calls_per_day_with/ok6yx90/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "The real constraint won’t be execution speed, it’ll be decision bottlenecks and edge cases AI can’t reliably own yet.",
+      "upvotes": 0,
+      "subreddit": "r/Entrepreneur",
+      "link": "https://www.reddit.com/r/Entrepreneur/comments/1t2r5ab/0_to_500k_arr_solo_with_ai_as_my_only_team/ok265pu/",
+      "pain_intensity": 8
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 86,
+    "total_mentions": 18,
+    "unique_users": 14,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": true,
+    "price_range": "$1,300 - $5,000/mo",
+    "payment_behavior": [
+      "explicit mention of €1,300/mo maintenance retainer",
+      "willingness to pay $3-5K/mo for proven ROI workflows",
+      "complaints about early underpricing vs. actual billable-hour value",
+      "shift from free lead magnets to low-ticket paid filters for faster feedback"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "Strong payment signals and ROI-tied validation exist, but a portion of comments are founder-to-founder theoretical discussions. Real buyer intent is concentrated in professional services (law/consulting) where time = direct revenue. Risk lies in custom-service trap rather than lack of demand."
+  },
+  "competition_reality": {
+    "competitor_count": 12,
+    "market_saturation": "medium",
+    "user_satisfaction": "low",
+    "gap_score": 8
+  },
+  "success_probability": {
+    "success_probability": "78%",
+    "confidence": "high",
+    "reason_breakdown": [
+      "demand strength: ROI-tied to billable hours creates urgent buying trigger",
+      "payment signals: verified retainers ($1.3k-$5k/mo) and willingness to pay for time savings",
+      "competition gap: generic AI wrappers fail; niche, productized workflows with source-weighting/annotations win",
+      "execution difficulty: requires sales/outreach skill & strict scoping to avoid service trap"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "LinkedIn Cold Outreach / Reddit DM / Niche Communities",
+    "users_reached": 100,
+    "expected_signup_rate": "12%",
+    "expected_payers": 3,
+    "conversion_rate": "3%",
+    "estimated_revenue": "$4,500/mo",
+    "time_to_first_revenue": "14 days"
+  },
+  "analog_case": {
+    "similar_product": "Productized AI Workflow Agency → Micro-SaaS (e.g., Harvey AI for mid-market, Clio AI add-ons, niche legal/consulting automation shops)",
+    "revenue_estimate": "$8,000 - $25,000/mo",
+    "validation_type": "real user / indie hacker / market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "22%",
+    "main_risks": [
+      "client concentration (reliance on 1-2 large retainers)",
+      "customization trap (delivering agency work instead of productized system)",
+      "AI edge-case failures requiring manual override",
+      "solo founder sales bottleneck (AI can execute, but can't close deals)"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Package the exact law-firm workflow into a standardized 'AI Research & Drafting System'. Build a 1-page ROI calculator (hours saved × hourly rate = monthly value). Draft a short case study using the €2.7k build + €1.3k/mo data.",
+    "day_4_10": "Outreach to 50 boutique law/consulting firms via LinkedIn & email. Offer a free 15-min 'Workflow Leak Audit'. Use a $49 low-ticket diagnostic to filter tire-kickers and accelerate feedback loops.",
+    "day_11_30": "Close 2-3 pilot clients at $1.5k setup + $1.5k/mo retainer. Deliver via fixed stack (Notion briefs → Runable/Cursor automation → weighted RAG with annotations). Document results, templatize onboarding, and prepare v1 self-serve dashboard.",
+    "first_revenue_strategy": "Charge upfront setup fee tied to a guaranteed hours-saved metric. Convert to monthly retainer only after week 2 validation. Use case study to fuel next outreach wave.",
+    "expected_result": "$3,000 - $4,500 MRR within 30 days, validated productized service ready for SaaS transition, clear path to 3-5 clients to de-risk concentration."
+  },
+  "hot_leads": [
+    {
+      "user_type": "Professional Services Founder / Agency Owner",
+      "intent_level": "high",
+      "quote": "How are you planning to find and close the next few law firms?",
+      "suggested_dm": "Hey [Name], saw your question on scaling law firm clients. I'm productizing the exact AI workflow that saved a firm 30 hrs/week (€1.3k/mo retainer). Happy to share the outreach script & ROI calculator I'm using to close firm #2 & #3. Open to a 10-min swap?"
+    },
+    {
+      "user_type": "Solo AI Builder / SaaS Founder",
+      "intent_level": "high",
+      "quote": "what stands out is this looks almost like productized consulting evolving toward SaaS, which can be a powerful path professional services pain can be very monetizable because the ROI is tangible",
+      "suggested_dm": "Hey [Name], loved your take on the service-to-SaaS path. I'm mapping the exact transition from custom AI workflows to a templatized product for boutique firms. If you're exploring this lane, I can share the pricing model & tech stack that's converting. Want the breakdown?"
+    },
+    {
+      "user_type": "Growth/Ads Operator",
+      "intent_level": "medium",
+      "quote": "Paid ads work when your offer converts without ads first. Most people skip that part and wonder why they're paying to expose a broken funnel.",
+      "suggested_dm": "Hey [Name], your point on offer-first validation is spot on. I'm testing a low-ticket $49 workflow audit to qualify professional services leads before scaling spend. If you're open to it, I'd love to run my funnel by you and trade notes on feedback-loop speed."
+    }
+  ],
+  "final_decision": "BUILD"
+}
+```

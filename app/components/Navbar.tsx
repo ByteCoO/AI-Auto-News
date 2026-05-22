@@ -16,13 +16,12 @@ import {
   ArrowRightOnRectangleIcon,
   LightBulbIcon,
   ChatBubbleLeftRightIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Home', href: '/', icon: HomeIcon },
   { name: 'AI Trends', href: '/trends', icon: ChartBarIcon },
-  { name: 'Lead Intelligence', href: '/lead-intelligence', icon: SparklesIcon },
+  { name: 'SaaS Radar', href: '/saas-opportunities', icon: ChartBarIcon },
   { name: 'Ideas', href: '/ideas', icon: LightBulbIcon },
   { name: 'Pricing', href: '/price', icon: CurrencyDollarIcon },
   { name: 'About', href: '/about', icon: UserGroupIcon },

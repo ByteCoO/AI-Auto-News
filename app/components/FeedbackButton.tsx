@@ -69,19 +69,25 @@ export default function FeedbackButton() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      {/* 浮动按钮 */}
+    <div className="fixed bottom-32 right-0 z-50">
+      {/* 浮动按钮 - 半圆贴着右下角边设计 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-full shadow-lg transition-all active:scale-95"
+        className="group flex items-center bg-blue-600 hover:bg-blue-700 text-white h-12 pl-4 pr-3 rounded-l-full shadow-2xl transition-all duration-300 ease-in-out active:scale-95"
       >
-        {isOpen ? <XMarkIcon className="w-6 h-6" /> : <ChatBubbleLeftEllipsisIcon className="w-6 h-6" />}
-        <span className="font-medium">Feedback</span>
+        {isOpen ? (
+          <XMarkIcon className="w-5 h-5 flex-shrink-0" />
+        ) : (
+          <ChatBubbleLeftEllipsisIcon className="w-5 h-5 flex-shrink-0" />
+        )}
+        <span className="font-medium text-xs max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap group-hover:ml-2">
+          Feedback
+        </span>
       </button>
 
-      {/* 反馈弹窗 */}
+      {/* 反馈弹窗 - 稍微向左偏移，避免紧贴边缘 */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-80 sm:w-96 bg-white dark:bg-[#1A1D24] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 transition-all animate-in fade-in slide-in-from-bottom-4">
+        <div className="absolute bottom-16 right-4 w-80 sm:w-96 bg-white dark:bg-[#1A1D24] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-6 transition-all animate-in fade-in slide-in-from-bottom-4">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold flex items-center text-gray-900 dark:text-white">
               <ChatBubbleLeftEllipsisIcon className="w-5 h-5 mr-2 text-blue-500" />

@@ -19,10 +19,10 @@ export const ScrollToTopButton: React.FC<ScrollToTopButtonProps> = ({ visible })
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 rounded-full shadow-2xl shadow-yellow-500/30 dark:shadow-yellow-500/20 hover:shadow-yellow-500/50 transition-all duration-300 transform hover:scale-110 active:scale-95 border-2 border-yellow-600 dark:border-yellow-300"
+      className="fixed bottom-8 right-8 z-50 w-8 h-8 flex items-center justify-center bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 rounded-full shadow-2xl shadow-yellow-500/30 dark:shadow-yellow-500/20 hover:shadow-yellow-500/50 transition-all duration-300 transform scale-75 hover:scale-125 opacity-40 hover:opacity-100 active:scale-95 border border-yellow-600 dark:border-yellow-300"
       aria-label="Scroll to top"
     >
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
       </svg>
     </button>

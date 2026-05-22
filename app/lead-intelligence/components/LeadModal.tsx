@@ -118,7 +118,7 @@ export function LeadModal({ lead, onClose }: LeadModalProps) {
                     <div className="mt-2 text-sm text-zinc-400">
                       <span className="font-semibold text-zinc-300 block mb-2 mt-4">Existing Tools:</span>
                       <div className="flex flex-wrap gap-2">
-                        {lead.user_profile.existing_tools.map(t => (
+                        {(lead.user_profile.existing_tools || []).map(t => (
                           <span key={t} className="bg-zinc-800 text-zinc-300 px-2 py-1 rounded border border-zinc-700 text-xs">{t}</span>
                         ))}
                       </div>
@@ -126,7 +126,7 @@ export function LeadModal({ lead, onClose }: LeadModalProps) {
                     <div className="mt-4 text-sm text-zinc-400">
                       <span className="font-semibold text-zinc-300 block mb-2">Behavior Signals:</span>
                       <ul className="list-disc list-inside space-y-1 text-zinc-300">
-                         {lead.user_profile.behavior_signal.map((signal, i) => (
+                         {(lead.user_profile.behavior_signal || []).map((signal, i) => (
                            <li key={i}>{signal}</li>
                          ))}
                       </ul>
@@ -143,7 +143,7 @@ export function LeadModal({ lead, onClose }: LeadModalProps) {
                     <div className="mt-4 text-sm">
                       <span className="font-semibold text-zinc-300 block mb-2">What to sell:</span>
                       <div className="flex flex-wrap gap-2">
-                        {lead.action_plan.what_to_sell.map(t => (
+                        {(lead.action_plan.what_to_sell || []).map(t => (
                           <span key={t} className="bg-amber-500/20 border border-amber-500/30 text-amber-400 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider">{t}</span>
                         ))}
                       </div>

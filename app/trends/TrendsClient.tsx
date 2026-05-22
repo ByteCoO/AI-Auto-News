@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { supabase } from '@/lib/supabaseClient';
 import { InfiniteScrollContainer } from './InfiniteScroll';
+
+const AVAILABLE_SUBREDDITS = [
+  'artificial', 'MachineLearning', 'SaaS', 'startups', 'Entrepreneur',
+  'SideProject', 'AppIdeas', 'GrowthHacking', 'EntrepreneurRideAlong',
+  'microsaas', 'micro_saas', 'indiehackers', 'smallbusiness',
+  'freelance', 'consulting', 'startup', 'marketing', 'sales',
+  'productmanagement', 'humanresources', 'accounting', 'ChatGPT',
+  'ClaudeAI', 'ArtificialInteligence', 'webdev', 'devops',
+];
 
 const POSTS_PER_PAGE = 20;
 
@@ -26,7 +36,7 @@ interface Post {
 
 interface TrendsClientProps {
   initialPosts: Post[];
-  initialSubreddits: string[];
+  initialSubreddits: string[]; // kept for backward compat but unused
   initialTotalCount: number;
   currentSub: string;
   currentSort: string;
@@ -36,20 +46,29 @@ interface TrendsClientProps {
 
 export default function TrendsClient({
   initialPosts,
-  initialSubreddits,
   initialTotalCount,
   currentSub,
   currentSort,
   searchQuery,
   isCompact,
 }: TrendsClientProps) {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [subreddits] = useState<string[]>(initialSubreddits);
   const [totalCount] = useState(initialTotalCount);
+  const [subDropdownOpen, setSubDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(initialPosts.length >= POSTS_PER_PAGE);
   const [page, setPage] = useState(1);
+
+  // Sync server data to client state when props change (URL param navigation)
+  useEffect(() => {
+    setPosts(initialPosts);
+    setHasMore(initialPosts.length >= POSTS_PER_PAGE);
+    setPage(1);
+    setLoading(false);
+  }, [initialPosts, initialTotalCount, currentSub, currentSort, searchQuery]);
 
   const loadMorePosts = useCallback(async () => {
     if (loadingMore || !hasMore) return;
@@ -65,17 +84,25 @@ export default function TrendsClient({
       query = query.or(`title.ilike.%${searchQuery}%,selftext.ilike.%${searchQuery}%`);
     }
 
+    if (currentSub && currentSub !== 'all') {
+      // 兼容数据库中带有 'r/' 前缀以及不带前缀的 subreddit 名称
+      const subWithPrefix = currentSub.startsWith('r/') ? currentSub : `r/${currentSub}`;
+      const subWithoutPrefix = currentSub.startsWith('r/') ? currentSub.substring(2) : currentSub;
+      query = query.or(`subreddit.eq.${subWithPrefix},subreddit.eq.${subWithoutPrefix}`);
+    }
+
     if (currentSort === 'newest') {
       query = query.order('created_utc', { ascending: false, nullsFirst: false });
     } else if (currentSort === 'today') {
-      const twentyFourHoursAgo = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
-      query = query.gte('created_utc', twentyFourHoursAgo).order('score', { ascending: false });
+      // 严格过滤：优先使用创建时间过滤24小时，created_utc 为 null 时才用 fetch_date 兜底
+      const nowSec = Math.floor(Date.now() / 1000);
+      const cutoff = nowSec - 24 * 60 * 60;
+      const cutoffIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      query = query
+        .or(`created_utc.gte.${cutoff},and(created_utc.is.null,fetch_date.gte.${cutoffIso})`)
+        .order('score', { ascending: false });
     } else {
       query = query.order('score', { ascending: false });
-    }
-
-    if (currentSub && currentSub !== 'all') {
-      query = query.eq('subreddit', currentSub);
     }
 
     const { data, error } = await query.range(from, to);
@@ -103,6 +130,16 @@ export default function TrendsClient({
     setLoadingMore(false);
   }, [currentSub, currentSort, searchQuery, page, loadingMore, hasMore]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setSubDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const getUrl = (params: Record<string, string>) => {
     const newParams = new URLSearchParams({
       sub: currentSub,
@@ -112,6 +149,17 @@ export default function TrendsClient({
       ...params
     });
     return `/trends?${newParams.toString()}`;
+  };
+
+  const navigate = (params: Record<string, string>) => {
+    const targetUrl = getUrl(params);
+    const currentUrl = window.location.pathname + window.location.search;
+    if (targetUrl === currentUrl) {
+      return;
+    }
+    setLoading(true);
+    router.push(targetUrl);
+    router.refresh();
   };
 
   const getPostUrl = (post: Post) => {
@@ -149,30 +197,121 @@ export default function TrendsClient({
         {/* Toolbar */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 border-b border-gray-200 dark:border-yellow-500/20 pb-8">
           <div className="flex flex-col gap-4 w-full xl:w-auto">
-            <div className="flex flex-wrap gap-2">
-              {subreddits.map(sub => (
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={getUrl({ sub: 'all' })}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate({ sub: 'all' });
+                }}
+                className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                  currentSub === 'all'
+                    ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-lg shadow-yellow-500/30 dark:shadow-yellow-500/20'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                }`}
+              >
+                🌐 ALL
+              </Link>
+              {currentSub !== 'all' && (
                 <Link
-                  key={sub}
-                  href={getUrl({ sub: sub })}
-                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
-                    currentSub === sub
-                      ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-lg shadow-yellow-500/30 dark:shadow-yellow-500/20'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-                  }`}
+                  href={getUrl({ sub: currentSub })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ sub: currentSub });
+                  }}
+                  className="px-3 py-1.5 rounded-md text-xs font-bold bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-lg shadow-yellow-500/30 dark:shadow-yellow-500/20"
                 >
-                  {sub === 'all' ? '🌐 ALL' : sub}
+                  r/{currentSub}
                 </Link>
-              ))}
+              )}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setSubDropdownOpen(!subDropdownOpen)}
+                  className="px-3 py-1.5 rounded-md text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all flex items-center gap-1"
+                >
+                  <span>Select Subreddit</span>
+                  <svg className={`w-3 h-3 transition-transform ${subDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {subDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl shadow-black/20 dark:shadow-black/50 p-2 w-64 max-h-80 overflow-y-auto">
+                    <div className="flex flex-wrap gap-1.5">
+                      {AVAILABLE_SUBREDDITS.map(sub => (
+                        <Link
+                          key={sub}
+                          href={getUrl({ sub })}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setSubDropdownOpen(false);
+                            navigate({ sub });
+                          }}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                            currentSub === sub
+                              ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-md'
+                              : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-yellow-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 hover:border-yellow-400 dark:hover:border-yellow-500'
+                          }`}
+                        >
+                          r/{sub}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-yellow-500/20">
-                <Link href={getUrl({ sort: 'top' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'top' ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>🔥 Top</Link>
-                <Link href={getUrl({ sort: 'today' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'today' ? 'bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>⚡ Today Hot</Link>
-                <Link href={getUrl({ sort: 'newest' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'newest' ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>🆕 Newest</Link>
+                <Link
+                  href={getUrl({ sort: 'today' })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ sort: 'today' });
+                  }}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'today' ? 'bg-gradient-to-r from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}
+                >
+                  ⚡ Today Hot
+                </Link>
+                <Link
+                  href={getUrl({ sort: 'top' })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ sort: 'top' });
+                  }}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'top' ? 'bg-gradient-to-r from-yellow-500 to-amber-500 dark:from-yellow-400 dark:to-amber-400 text-gray-900 shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}
+                >
+                  🔥 Top
+                </Link>
+                <Link
+                  href={getUrl({ sort: 'newest' })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ sort: 'newest' });
+                  }}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${currentSort === 'newest' ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}
+                >
+                  🆕 Newest
+                </Link>
               </div>
               <div className="flex bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-yellow-500/20">
-                <Link href={getUrl({ view: 'compact' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${isCompact ? 'bg-white dark:bg-gray-800 shadow-sm dark:shadow-none text-gray-900 dark:text-white border border-yellow-500/30 dark:border-yellow-500/40' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>Compact</Link>
-                <Link href={getUrl({ view: 'cards' })} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${!isCompact ? 'bg-white dark:bg-gray-800 shadow-sm dark:shadow-none text-gray-900 dark:text-white border border-yellow-500/30 dark:border-yellow-500/40' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}>Cards</Link>
+                <Link
+                  href={getUrl({ view: 'compact' })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ view: 'compact' });
+                  }}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${isCompact ? 'bg-white dark:bg-gray-800 shadow-sm dark:shadow-none text-gray-900 dark:text-white border border-yellow-500/30 dark:border-yellow-500/40' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}
+                >
+                  Compact
+                </Link>
+                <Link
+                  href={getUrl({ view: 'cards' })}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate({ view: 'cards' });
+                  }}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${!isCompact ? 'bg-white dark:bg-gray-800 shadow-sm dark:shadow-none text-gray-900 dark:text-white border border-yellow-500/30 dark:border-yellow-500/40' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'}`}
+                >
+                  Cards
+                </Link>
               </div>
             </div>
           </div>
@@ -193,7 +332,11 @@ export default function TrendsClient({
 
         {/* Posts List with Infinite Scroll */}
         <InfiniteScrollContainer onLoadMore={loadMorePosts} hasMore={hasMore} loading={loadingMore}>
-          {posts.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-yellow-500/20 border-t-yellow-500"></div>
+            </div>
+          ) : posts.length === 0 ? (
             <div className="bg-gray-100 dark:bg-gray-900/30 rounded-3xl p-24 text-center border border-dashed border-gray-300 dark:border-gray-800">
               <p className="text-2xl text-gray-400 font-light italic">No signals found.</p>
             </div>
