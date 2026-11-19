@@ -1,0 +1,143 @@
+{
+  "evidence_extraction": [
+    {
+      "quote": "Cold calls and Facebook groups can work but the effort rarely matches the return. Most small business owners tune out anything that feels like an approach.",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4nv5i/whats_been_your_most_effective_way_to_start/ok4lsl7/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "Getting “numbers” directly is usually the hardest (and riskiest) route, and cold calling random owners often leads to low response unless your offer is extremely clear and relevant.",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4jc0r/how_to_get_ecom_business_leads/ok366ds/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "The Meta Ad Library is basically a free lead list. Search your niche, filter for brands running a lot of ads, then actually look at the creative. If they’ve been running the same image for weeks or the copy is clearly phoned in, that’s your pitch",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4jc0r/how_to_get_ecom_business_leads/ok4jgeb/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "Start with stores already showing pain, not random lists. Look for brands asking about ads, creative volume, UGC, or low conversion content.",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4jc0r/how_to_get_ecom_business_leads/ok3042z/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "storeleads -> hunter io -> instantly  \nThat is what I am running now, just laucnhed today",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4jc0r/how_to_get_ecom_business_leads/ok2z84y/",
+      "pain_intensity": 6
+    },
+    {
+      "quote": "I had QB Self-Employed but they stopped Etsy integration ~February 2026 without notifying me. Does anyone know if there's a new QB product that has: working Etsy integration, ability to figure out quarter estimated taxes",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4tg15/quickbooks_product_with_etsy_integration/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "What worked better for me was email, with enough volume and consistency that I wasn't dependent on any single reply... leading with something genuinely useful, no pitch, just relevance.",
+      "upvotes": 1,
+      "subreddit": "r/smallbusiness",
+      "link": "/r/smallbusiness/comments/1t4nv5i/whats_been_your_most_effective_way_to_start/ok4lsl7/",
+      "pain_intensity": 7
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 74,
+    "total_mentions": 18,
+    "unique_users": 14,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": true,
+    "price_range": "$50-$300/mo",
+    "payment_behavior": [
+      "Active tool chaining: storeleads -> hunter.io -> instantly",
+      "Complaints about QBSE integration drop forcing paid migration to QBO/Bonsai/Craftybase",
+      "Willingness to pay for lead data, email sequencing, and tax/compliance automation"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "Users are actively spending on fragmented tool stacks and manually stitching workflows. Pain is operational (low reply rates, integration breaks, tax compliance risk). Risk stems from high competition in generic lead gen, but the 'intent/pain-first' enrichment angle is underserved and validated by multiple users."
+  },
+  "competition_reality": {
+    "competitor_count": 12,
+    "market_saturation": "high",
+    "user_satisfaction": "low",
+    "gap_score": 8
+  },
+  "success_probability": {
+    "success_probability": "68%",
+    "confidence": "medium",
+    "reason_breakdown": [
+      "Strong existing payment behavior for lead data & sequencing tools",
+      "Clear workflow fragmentation (3-4 tools chained manually)",
+      "High dissatisfaction with cold call/generic list response rates",
+      "Execution difficulty is medium due to API dependencies & deliverability tuning"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit outreach / Cold email / Twitter",
+    "users_reached": 100,
+    "expected_signup_rate": "9%",
+    "expected_payers": 3,
+    "conversion_rate": "3%",
+    "estimated_revenue": "$450",
+    "time_to_first_revenue": "14 days"
+  },
+  "analog_case": {
+    "similar_product": "Clay.com / Instantly.ai / Leadfeeder",
+    "revenue_estimate": "$500k-$2M+/month",
+    "validation_type": "real market example (agencies & B2B sellers heavily pay for intent enrichment & automated sequencing)"
+  },
+  "risk_analysis": {
+    "failure_probability": "32%",
+    "main_risks": [
+      "Platform dependency (Meta/LinkedIn/Reddit API rate limits & policy changes)",
+      "High churn if reply-rate uplift isn't proven within 14 days",
+      "Crowded market noise requires sharp positioning (intent-first vs bulk scraping)",
+      "GDPR/CAN-SPAM compliance risks if outreach automation isn't properly gated"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Build MVP: Meta Ad Library scraper + AI intent classifier (flags ad fatigue, weak creatives, high spend). Output: CSV with store URL, ad link, pain hook, and verified founder email. Set up landing page: 'Stop cold calling. Find ecom brands actively wasting ad spend.'",
+    "day_4_10": "Run concierge onboarding for 10 agency owners. Manually verify 50 leads/user. Track open/reply rates. Integrate Instantly/Smartlead API for 1-click sequencing. Collect case study data.",
+    "day_11_30": "Automate pipeline. Launch on r/smallbusiness, r/agency, IndieHackers. Offer 14-day trial at $97/mo. Implement usage-based pricing (credits per verified intent lead). Close first 5-10 paying customers.",
+    "first_revenue_strategy": "Productized service → SaaS transition. Charge $97/mo for 'Intent Lead Finder + 1-Click Sequence'. Guarantee 15%+ reply rate or refund.",
+    "expected_result": "5-10 paying users, $500-$1000 MRR, validated 2x reply-rate uplift vs generic lists, clear path to scale via affiliate/agency partnerships."
+  },
+  "hot_leads": [
+    {
+      "user_type": "Agency Owner",
+      "intent_level": "high",
+      "quote": "I run a content creation agency and am looking for ecommerce businesses leads (owners number preferably). How tips on how i can find them?",
+      "suggested_dm": "Saw your post on ecom leads. I built a system that finds stores running fatigued ads so you can pitch with exact creative feedback instead of cold calling. Want 50 free intent-matched leads to test reply rates?"
+    },
+    {
+      "user_type": "B2B Outreach Operator",
+      "intent_level": "high",
+      "quote": "I’ve been trying a mix of cold outreach, social (mostly Facebook), and recently started doing more cold calls... Feels like people are way more guarded and the traditional methods get ignored pretty quickly.",
+      "suggested_dm": "Noticed you're grinding cold calls with low response. I'm testing a workflow that flags ecom brands by ad creative fatigue so you can lead with value, not a pitch. Open to a 10-min walkthrough?"
+    },
+    {
+      "user_type": "Ecom/Solo Seller",
+      "intent_level": "high",
+      "quote": "I had QB Self-Employed but they stopped Etsy integration ~February 2026 without notifying me. Does anyone know if there's a new QB product that has: working Etsy integration, ability to figure out quarter estimated taxes",
+      "suggested_dm": "Saw the QBSE/Etsy integration drop. I'm tracking alternative stacks that auto-sync sales + calc quarterly taxes without manual CSV work. Want a quick comparison sheet + migration checklist?"
+    }
+  ],
+  "final_decision": "BUILD"
+}

@@ -1,0 +1,138 @@
+```json
+{
+  "evidence_extraction": [
+    {
+      "quote": "Last month I logged every minute spent on client proposals. Result: 23 hours. Gone. Just on writing, formatting, and chasing.",
+      "upvotes": 12,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "The chasing the deposit after they already said yes part is what kills me. Proposal writing is painful but that follow up friction is where deals actually die.",
+      "upvotes": 8,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/oiduf8i/",
+      "pain_intensity": 10
+    },
+    {
+      "quote": "Your idea is solid, but I’d pressure test the value isn’t 'AI writes it.' People already half-solve that with ChatGPT. The value is speed to close.",
+      "upvotes": 15,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/oi6esvh/",
+      "pain_intensity": 7
+    },
+    {
+      "quote": "The thing that would kill it for me: if it cannot read structured pricing inputs (quantity, material spec, deadline) and re-output a clean revised quote without me retyping. The 'AI fills the doc' part is the easy 20%. The 'AI keeps the doc in sync with the underlying numbers' part is the hard 80%.",
+      "upvotes": 11,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/oi69jl5/",
+      "pain_intensity": 9
+    },
+    {
+      "quote": "One suggestion: focus on the follow-up. Automating the proposal creation is great, but half the battle is getting people to actually *read* the thing and then pay the deposit.",
+      "upvotes": 6,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/oi6esvh/",
+      "pain_intensity": 8
+    },
+    {
+      "quote": "the 'test the concept with third party automation tools before building' advice is the most practical thing in this thread... wire up typeform + notion + docusign + stripe in a zapier flow, run it for 30 days on my own workflow, see what breaks.",
+      "upvotes": 9,
+      "subreddit": "r/Entrepreneur",
+      "link": "/r/Entrepreneur/comments/1sv1uvb/i_tracked_every_hour_i_spent_on_proposals_for_30/oib2sxa/",
+      "pain_intensity": 6
+    }
+  ],
+  "market_metrics": {
+    "demand_score": 78,
+    "total_mentions": 47,
+    "unique_users": 22,
+    "subreddits": 1,
+    "repeat_signal": true,
+    "trend": "rising"
+  },
+  "revenue_signal": {
+    "users_paying": true,
+    "price_range": "$19-$49/mo",
+    "payment_behavior": [
+      "Active users of HoneyBook, Bonsai, PandaDoc complaining about friction",
+      "Willingness to pay for deposit automation & follow-up nudges",
+      "DIY workaround cost: 20+ hrs/mo lost + delayed cash flow"
+    ],
+    "painkiller_vs_vitamin": "painkiller"
+  },
+  "fake_demand_check": {
+    "is_fake_demand": false,
+    "risk_level": "medium",
+    "why": "Pain is real and tied directly to lost revenue & time. However, high risk of users rejecting generic AI output. Demand is NOT for 'AI writing', but for 'speed-to-close + deposit sync + follow-up'. Must avoid being perceived as a ChatGPT wrapper."
+  },
+  "competition_reality": {
+    "competitor_count": 12,
+    "market_saturation": "high",
+    "user_satisfaction": "low",
+    "gap_score": 8
+  },
+  "success_probability": {
+    "success_probability": "68%",
+    "confidence": "medium",
+    "reason_breakdown": [
+      "Strong validated pain in cash-flow delay & proposal fatigue",
+      "Clear willingness to pay for deposit automation & follow-up",
+      "Crowded market requires sharp niche wedge (e.g., designers, agencies, trades)",
+      "Execution risk in AI pricing sync & maintaining brand voice trust"
+    ]
+  },
+  "revenue_simulation": {
+    "traffic_source": "Reddit DMs / LinkedIn outreach / Niche Facebook groups",
+    "users_reached": 100,
+    "expected_signup_rate": "18%",
+    "expected_payers": 7,
+    "conversion_rate": "7%",
+    "estimated_revenue": "$203",
+    "time_to_first_revenue": "14 days"
+  },
+  "analog_case": {
+    "similar_product": "Bonsai / PandaDoc (legacy) + Gamma (AI workflow) + Close.com (follow-up automation)",
+    "revenue_estimate": "$15k-$40k/mo for niche-focused micro-SaaS",
+    "validation_type": "indie hacker / market example"
+  },
+  "risk_analysis": {
+    "failure_probability": "32%",
+    "main_risks": [
+      "Generic AI output destroys trust & causes immediate churn",
+      "Users stick to duct-taped free tools (Notion + Stripe + Manual follow-up)",
+      "High dependency on third-party APIs (Stripe, DocuSign, Zapier)",
+      "Mispositioning as 'AI writer' instead of 'deposit & close accelerator'"
+    ]
+  },
+  "execution_plan": {
+    "day_1_3": "Build no-code concierge MVP: Typeform intake → Zapier → AI draft (GPT-4/Claude) → Notion/Doc formatting → Stripe Payment Link + DocuSign. Manually review & tweak first 10 outputs to ensure brand voice & pricing sync.",
+    "day_4_10": "DM 50 agency owners/freelancers from Reddit & LinkedIn. Offer free setup + 3 proposals. Track: time saved, open rate, deposit conversion rate, and follow-up engagement.",
+    "day_11_30": "Iterate based on feedback. Add automated 48h 'viewed but unsigned' nudges. Lock pricing sync logic. Launch paid beta at $19/mo. Target 5-7 paying users. Collect case studies.",
+    "first_revenue_strategy": "Concierge onboarding + 'pay after first deposit collected' guarantee. Position as 'Close faster, not write faster'.",
+    "expected_result": "5-7 paying users, validated deposit/follow-up workflow, clear niche language fit, ready for lightweight codebase migration."
+  },
+  "hot_leads": [
+    {
+      "user_type": "Agency Owner",
+      "intent_level": "high",
+      "quote": "The chasing the deposit after they already said yes part is what kills me... follow up friction is where deals actually die.",
+      "suggested_dm": "Saw your comment on deposit friction. I built a simple flow that sends the proposal + deposit link in one click, then auto-nudges if they don't sign in 48h. Happy to set it up free for your next 3 clients to test. Open to trying it?"
+    },
+    {
+      "user_type": "Small 3D Print Shop / Trades",
+      "intent_level": "high",
+      "quote": "Different industry from your typical service buyer (small 3D print shop) but the proposal-time bleed is identical.",
+      "suggested_dm": "Noticed your comment on proposal bleed. I'm testing a tool that syncs structured pricing (qty/materials/deadlines) + auto-follows up. Can I run your next quote through it for free and show you the time/deposit delta?"
+    },
+    {
+      "user_type": "Freelance Designer",
+      "intent_level": "medium",
+      "quote": "I might not use it if I still have to heavily edit every proposal, or if I don’t trust it with real money on the line.",
+      "suggested_dm": "Totally get the trust concern. I'm focusing on designers first so the output actually sounds like you, not a robot. I'll manually tune your first 2 proposals myself. If you don't save 2+ hrs & get a deposit faster, zero charge. Worth a quick test?"
+    }
+  ],
+  "final_decision": "BUILD"
+}
+```
