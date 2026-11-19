@@ -10,13 +10,13 @@ const Footer = () => {
               <div>
                 <h3 className="text-gray-800 dark:text-gray-200 font-semibold text-lg mb-3">About</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Game Visioning Intelligence - Your ultimate hub for AI insights and tech intelligence. Discover high-value commercial signals before anyone else.
+                  Game Lumai Intelligence - Your ultimate hub for AI insights and tech intelligence. Discover high-value commercial signals before anyone else.
                 </p>
               </div>
 
               <div className="space-y-2">
                 <p className="text-gray-800 dark:text-gray-200 font-medium">
-                  Email : <a href="mailto:admin@visiong.dpdns.org" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">admin@visiong.dpdns.org</a>
+                  Email : <a href="mailto:fanspan6@gmail.com" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">fanspan6@gmail.com</a>
                 </p>
               </div>
             </div>
@@ -54,8 +54,8 @@ const Footer = () => {
               <span className="text-white font-bold">GV</span>
             </div>
             <div>
-              <h4 className="font-bold text-gray-900 dark:text-white">Game Visioning</h4>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">© 2026 Game Visioning Intelligence. All Rights Reserved.</p>
+              <h4 className="font-bold text-gray-900 dark:text-white">Game Lumai</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">© 2026 Game Lumai Intelligence. All Rights Reserved.</p>
             </div>
           </div>
         </div>
